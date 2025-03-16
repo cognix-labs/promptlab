@@ -24,7 +24,7 @@ class EvaluationConfig(BaseModel):
     type: str
     metric: str
     column_mapping: dict
-    evaluator: Optional[Any] = None
+    evaluator: Optional[Evaluator] = None
 
     model_config = {
         "arbitrary_types_allowed": True

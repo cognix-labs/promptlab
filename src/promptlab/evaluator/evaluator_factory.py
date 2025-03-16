@@ -28,7 +28,7 @@ class RagasMetricEval(Evaluator):
 class EvaluatorFactory:
     
     @staticmethod
-    def get_evaluator(eval_library: str, evaluator:Any, metric:str, model:ModelConfig) -> Evaluator:
+    def get_evaluator(eval_library: str, metric:str, model:ModelConfig, evaluator:Evaluator = None) -> Evaluator:
         
         if eval_library == EvalLibrary.RAGAS.value:
     

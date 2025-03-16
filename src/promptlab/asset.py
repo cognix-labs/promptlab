@@ -50,7 +50,6 @@ class Asset:
 
             binary = dataset_record['asset_binary'] if dataset.file_path is None else {"file_path": dataset.file_path}
 
-            # self.tracer.db_client.execute_query(SQLQuery.UPDATE_ASSET_QUERY, (dataset.description, binary, dataset.version, dataset.id))
             self.tracer.db_client.execute_query(SQLQuery.INSERT_ASSETS_QUERY, (dataset.id, dataset.name, dataset.description, dataset.version, AssetType.DATASET.value, json.dumps(binary), timestamp))
         else:        
             dataset.id = str(uuid.uuid4())
@@ -83,7 +82,7 @@ class Asset:
                 <<user>>
                     {template.user_prompt}
             '''
-            # self.tracer.db_client.execute_query(SQLQuery.UPDATE_ASSET_QUERY, (template.description, binary, template.version, template.id))
+
             self.tracer.db_client.execute_query(SQLQuery.INSERT_ASSETS_QUERY, (template.id, template.name, template.description, template.version, AssetType.PROMPT_TEMPLATE.value,  binary, timestamp))
         else:
             template.id = str(uuid.uuid4())
