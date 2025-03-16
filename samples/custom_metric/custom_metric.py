@@ -1,6 +1,6 @@
 from promptlab import PromptLab
 from promptlab.types import Dataset, PromptTemplate
-from is_numeric import IsNumericEvaluator
+from length import LengthEvaluator
 
 def create_prompt_lab(tracer_type: str, tracer_db_file_path: str) -> PromptLab:
 
@@ -13,7 +13,7 @@ def create_prompt_lab(tracer_type: str, tracer_db_file_path: str) -> PromptLab:
 
     return prompt_lab
 
-def create_prompt_template(prompt_lab: PromptLab,prompt_template_id, system_prompt, user_prompt) -> str:
+def create_prompt_template(prompt_lab: PromptLab, prompt_template_id, system_prompt, user_prompt) -> str:
 
     name = 'essay_feedback_prompt'
     description = 'A prompt designed to generate feedback for essays.'
@@ -47,7 +47,7 @@ def create_dataset(prompt_lab: PromptLab, file_path: str) -> str:
 
 def create_experiment(prompt_lab: PromptLab, prompt_template_id: str, prompt_template_version: int, dataset_id: str, dataset_version: int):
 
-    ine = IsNumericEvaluator()
+    length_eval = LengthEvaluator()
 
     experiment = {
             "model" : {
@@ -66,11 +66,11 @@ def create_experiment(prompt_lab: PromptLab, prompt_template_id: str, prompt_tem
             "evaluation": [
                     {
                         "type": "custom",
-                        "metric": "IsNumericEvaluator",
+                        "metric": "LengthEvaluator",
                         "column_mapping": {
                             "response":"$inference",
                         },
-                        "evaluator": ine
+                        "evaluator": length_eval
                     },                    
                     {
                         "type": "ragas",
@@ -110,60 +110,36 @@ if __name__ == "__main__":
 
     # Create a dataset.
     eval_dataset_file_path = 'C:\work\promptlab\test\dataset\essay_feedback.jsonl'
-    # dataset_id, dataset_version = create_dataset(prompt_lab, eval_dataset_file_path)
+    dataset_id, dataset_version = create_dataset(prompt_lab, eval_dataset_file_path)
 
     #-------------------------------------------------------------------------------------------------#
     #-------------------------------------------------------------------------------------------------#
 
     # Create a prompt template.
-    system_prompt_v1 = 'You are a helpful assistant who can provide feedback on essays.'
-    user_prompt_v1 = '''The essay topic is - <essay_topic>.
+    system_prompt = 'You are a helpful assistant who can provide feedback on essays.'
+    user_prompt = '''The essay topic is - <essay_topic>.
 
     The submitted essay is - <essay>
     Now write feedback on this essay.
     '''
 
-    # prompt_template_id, prompt_template_version_v1 = create_prompt_template(prompt_lab, None, system_prompt_v1, user_prompt_v1)
-
-    # Create the second version of the prompt template.
-    system_prompt_v2 = '''You are a helpful assistant who can provide feedback on essays. You follow the criteria below while writing feedback.                    
-    Grammar & Spelling - The essay should have correct grammar, punctuation, and spelling.
-    Clarity & Fluency - Ideas should be expressed clearly, with smooth transitions between sentences and paragraphs.
-    Content & Relevance - The essay should stay on topic, answer the prompt effectively, and include well-developed ideas with supporting details or examples.
-    Structure & Organization - The essay should have a clear introduction, body paragraphs, and conclusion. Ideas should be logically arranged, with a strong thesis statement and supporting arguments.
-    '''
-    user_prompt_v2 = '''The essay topic is - <essay_topic>.
-
-    The submitted essay is - <essay>
-    Now write feedback on this essay.
-    '''
-    # prompt_template_id, prompt_template_version_v2 = create_prompt_template(prompt_lab, prompt_template_id, system_prompt_v2, user_prompt_v2)
+    prompt_template_id, prompt_template_version = create_prompt_template(prompt_lab, None, system_prompt, user_prompt)
     
     #-------------------------------------------------------------------------------------------------#
     #-------------------------------------------------------------------------------------------------#
 
     prompt_template_id = 'c395330a-78af-4f3a-84c6-a386773b30a8'
-    prompt_template_version_v1 = 1
+    prompt_template_version = 1
     dataset_id = '0a6f739e-090f-47ae-a2b9-ed50e8e96586'
     dataset_version = 0
     # Create an experiment and run it with the first version of the prompt template.
-    create_experiment(prompt_lab, prompt_template_id, prompt_template_version_v1, dataset_id, dataset_version)
-
-    # Create an experiment and run it with the second version of the prompt template.
-    # create_experiment(prompt_lab, prompt_template_id, prompt_template_version_v2, dataset_id, dataset_version)
+    create_experiment(prompt_lab, prompt_template_id, prompt_template_version, dataset_id, dataset_version)
 
     #-------------------------------------------------------------------------------------------------#
     #-------------------------------------------------------------------------------------------------#
 
     # Let's launch the studio again and check the experiment and its result.
     prompt_lab.studio.start(8000)
-
-    #-------------------------------------------------------------------------------------------------#
-    #-------------------------------------------------------------------------------------------------#
-
-    # Let's deploy the second version of the prompt template to a directory in production.
-    deployment_dir = 'C:\work\prompt_templates'
-    # deploy_prompt_template(prompt_lab, deployment_dir, prompt_template_id, prompt_template_version_v2)
 
 
 

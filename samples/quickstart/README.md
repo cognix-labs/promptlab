@@ -26,14 +26,12 @@ In the [quickstart.py](quickstart.py), the `def create_prompt_template(prompt_la
 
 A  prompt template has two main attributes - `system_prompt` and `user_prompt`. The sample prompt used in this example is -
 
-    system_prompt_v1 = 'You are a helpful assistant who can provide feedback on essays.'
-    user_prompt_v1 = '''Here is the essay topic. 
-                    <essay_topic>
+    system_prompt = 'You are a helpful assistant who can provide feedback on essays.'
+    user_prompt = '''The essay topic is - <essay_topic>.
 
-                    Here is the submitted essay.
-                    <essay>
-                    
-                    Provide feedback on the essay.'''
+    The submitted essay is - <essay>
+    Now write feedback on this essay.
+    '''
 
 Here, `<context>` and `<question>` are placeholders that will be replaced with real data before sending to the LLM. PromptLab will search the dataset for columns with these exact names and use their values to replace the corresponding placeholders. Ensure that the dataset contains columns named `context` and `question` to avoid errors.
 
