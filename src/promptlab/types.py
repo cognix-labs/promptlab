@@ -1,9 +1,10 @@
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel, HttpUrl, field_validator
 
 from promptlab.enums import TracerType
+from promptlab.evaluator.evaluator import Evaluator
 from promptlab.utils import Utils
 
 class ModelConfig(BaseModel):
@@ -15,12 +16,20 @@ class ModelConfig(BaseModel):
     inference_model_deployment: str
     embedding_model_deployment: str
 
+    class config:
+        arbitrary_types_allowed=True
+
 class EvaluationConfig(BaseModel):
 
     type: str
     metric: str
     column_mapping: dict
+    evaluator: Optional[Any] = None
 
+    model_config = {
+        "arbitrary_types_allowed": True
+    }
+    
 class AssetConfig(BaseModel):
 
     id: str

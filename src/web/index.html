@@ -618,7 +618,7 @@
                 data.forEach(exp => {
                     const row = document.createElement('tr');
                     const evaluationData = JSON.parse(exp.evaluation);
-                    
+                    console.log('Evaluation data:', evaluationData);
                     if (currentRecordId !== exp.dataset_record_id) {
                         isAlternate = !isAlternate;
                         currentRecordId = exp.dataset_record_id;
@@ -629,7 +629,7 @@
                     // Create metrics map
                     const metricResults = {};
                     evaluationData.forEach(e => {
-                        metricResults[e.metric] = e.result.toFixed(4);
+                        metricResults[e.metric] = e.result ? e.result.toFixed(4) : e.result.toString();
                     });
                     
                     // Map of all possible values

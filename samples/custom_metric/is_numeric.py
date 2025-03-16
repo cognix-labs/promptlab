@@ -2,7 +2,8 @@ from promptlab.evaluator.evaluator import Evaluator
 
 class IsNumericEvaluator(Evaluator):
     
-    def evaluate(self, inference: str) -> str:
+    def evaluate(self, data: dict) -> str:
+        inference = data.get("response")
         val = False
         if isinstance(inference, (int, float)):
             val = True

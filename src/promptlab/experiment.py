@@ -62,7 +62,7 @@ class Experiment:
 
         evaluations = []
         for eval in experiment_config.evaluation:
-            evaluator = EvaluatorFactory.get_evaluator(eval.type, eval.metric, experiment_config.model)
+            evaluator = EvaluatorFactory.get_evaluator(eval.type, eval.evaluator, eval.metric, experiment_config.model)
             data = dict()
             for key, value in eval.column_mapping.items():
                 if value == "$inference":

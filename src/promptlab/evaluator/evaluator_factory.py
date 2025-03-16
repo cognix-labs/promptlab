@@ -1,4 +1,5 @@
 import os
+from typing import Any
 from ragas import SingleTurnSample
 import ragas
 from ragas.embeddings import LangchainEmbeddingsWrapper
@@ -27,7 +28,7 @@ class RagasMetricEval(Evaluator):
 class EvaluatorFactory:
     
     @staticmethod
-    def get_evaluator(eval_library: str, metric:str, model:ModelConfig) -> Evaluator:
+    def get_evaluator(eval_library: str, evaluator:Any, metric:str, model:ModelConfig) -> Evaluator:
         
         if eval_library == EvalLibrary.RAGAS.value:
     
@@ -82,8 +83,11 @@ class EvaluatorFactory:
             constructor_params = metric_params.get(metric, {})
 
             metric_class = getattr(ragas.metrics, metric)
-            metric_class=metric_class(**constructor_params)
+            metric_class = metric_class(**constructor_params)
 
             return RagasMetricEval(metric_class)    
+        
+        if eval_library == EvalLibrary.CUSTOM.value:
+            return evaluator
         else:
             raise ValueError(f"Unknown evaluation strategy: {eval_library}")

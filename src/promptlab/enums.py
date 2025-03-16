@@ -18,3 +18,4 @@ class EvaluationMetric(Enum):
 
 class EvalLibrary(Enum):
     RAGAS = "ragas"
+    CUSTOM = "custom"
