@@ -47,7 +47,7 @@ In the [custom_metric.py](custom_metric.py), the `def create_dataset(prompt_lab:
 
 ## Create custom evaluator
 
-In this example, we are going to build a custom evaluator to calculate the length of the response. The code is in the [length.py](length.py) file. The class needs to implement the Evaluator interface.
+In this example, we are going to build a custom evaluator to calculate the length of the response. The code is in the [length.py](length.py) file. The class needs to implement the Evaluator interface. This is a very basic custom evaluator that calculates the length of the output from LLM.
 
     from promptlab.evaluator.evaluator import Evaluator
 
@@ -57,11 +57,51 @@ In this example, we are going to build a custom evaluator to calculate the lengt
         
             return len(str(inference))
 
+We can also use LLM as a judge to evaluate our prompt. The [fluency.py](fluency.py) implements an evaluator to calculate the fluency of the Feedback.
+
+from promptlab.evaluator.evaluator import Evaluator
+
+class FluencyEvaluator(Evaluator):
+    
+    def evaluate(self, data: dict):
+
+        system_prompt = """
+                        # Instruction
+                        ## Goal
+                        ### You are an expert in evaluating the quality of a FEEDBACK from an intelligent system based on provided definition and data. Your goal will involve answering the questions below using the information provided.
+                        - **Definition**: You are given a definition of the communication trait that is being evaluated to help guide your Score.
+                        - **Data**: Your input data include a FEEDBACK.
+                        - **Tasks**: To complete your evaluation you will be asked to evaluate the Data in different ways.
+                    """
+
+        user_prompt = """
+                    # Definition
+                    **Fluency** refers to the effectiveness and clarity of written communication, focusing on grammatical accuracy, vocabulary range, sentence complexity, coherence, and overall readability. It assesses how smoothly ideas are conveyed and how easily the text can be understood by the reader.
+                    .................................
+                    .................................
+                    .................................
+
+                    # Data
+                    FEEDBACK: {{feedback}}
+
+
+                    # Tasks
+                    ## Please provide your assessment Score for the previous FEEDBACK based on the Definitions above. The Score you give MUST be a integer score (i.e., "1", "2"...) based on the levels of the definitions. Only reply with the numeric score. Do not add any other text or explanation score.
+                        """
+        
+        inference = data["response"]
+
+        user_prompt = user_prompt.replace("{{feedback}}", inference)
+
+        inference_result = self.inference_model.invoke(system_prompt, user_prompt)
+
+        return inference_result.inference    
+
 ## Create experiment
 
 An experiment evaluates the outcome of a prompt against a set of metrics for a given dataset. Developers can modify hyperparameters (such as prompt template and models) and compare experiment results to determine the best prompt for deployment in production. Please check [Experiment](../../docs/README.md#experiment) to learn more about it.
 
-In the [length.py](length.py), we are using the prompt template and dataset created in the previous steps to design an experiment. The `def create_experiment(prompt_lab: PromptLab, endpoint:str, prompt_template_id: str, prompt_template_version: int, dataset_id: str, dataset_version: int):
+In the [custom_metric.py](custom_metric.py), we are using the prompt template and dataset created in the previous steps to design an experiment. The `def create_experiment(prompt_lab: PromptLab, endpoint:str, prompt_template_id: str, prompt_template_version: int, dataset_id: str, dataset_version: int):
 ` method demonstrates how to create and run an expriment.
 
 ![PromptLab Studio](../../img/studio-home.png)

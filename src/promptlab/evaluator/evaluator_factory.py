@@ -10,6 +10,7 @@ from langchain_ollama import ChatOllama, OllamaEmbeddings
 
 from promptlab.enums import EvalLibrary, ModelType
 from promptlab.evaluator.evaluator import Evaluator
+from promptlab.model.model_factory import ModelFactory
 from promptlab.types import ModelConfig
 
 class RagasMetricEval(Evaluator):
@@ -88,6 +89,8 @@ class EvaluatorFactory:
             return RagasMetricEval(metric_class)    
         
         if eval_library == EvalLibrary.CUSTOM.value:
+            inference_model = ModelFactory.get_model(model)
+            evaluator.inference_model = inference_model
             return evaluator
         else:
             raise ValueError(f"Unknown evaluation strategy: {eval_library}")

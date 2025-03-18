@@ -1,6 +1,7 @@
 from promptlab import PromptLab
 from promptlab.types import Dataset, PromptTemplate
 from length import LengthEvaluator
+from fluency import FluencyEvaluator
 
 def create_prompt_lab(tracer_type: str, tracer_db_file_path: str) -> PromptLab:
 
@@ -48,6 +49,7 @@ def create_dataset(prompt_lab: PromptLab, file_path: str) -> str:
 def create_experiment(prompt_lab: PromptLab, prompt_template_id: str, prompt_template_version: int, dataset_id: str, dataset_version: int):
 
     length_eval = LengthEvaluator()
+    fluency_eval = FluencyEvaluator()
 
     experiment = {
             "model" : {
@@ -71,6 +73,14 @@ def create_experiment(prompt_lab: PromptLab, prompt_template_id: str, prompt_tem
                             "response":"$inference",
                         },
                         "evaluator": length_eval
+                    },     
+                    {
+                        "type": "custom",
+                        "metric": "FluencyEvaluator",
+                        "column_mapping": {
+                            "response":"$inference",
+                        },
+                        "evaluator": fluency_eval
                     },                    
                     {
                         "type": "ragas",
@@ -128,10 +138,6 @@ if __name__ == "__main__":
     #-------------------------------------------------------------------------------------------------#
     #-------------------------------------------------------------------------------------------------#
 
-    prompt_template_id = 'c395330a-78af-4f3a-84c6-a386773b30a8'
-    prompt_template_version = 1
-    dataset_id = '0a6f739e-090f-47ae-a2b9-ed50e8e96586'
-    dataset_version = 0
     # Create an experiment and run it with the first version of the prompt template.
     create_experiment(prompt_lab, prompt_template_id, prompt_template_version, dataset_id, dataset_version)
 
@@ -140,6 +146,3 @@ if __name__ == "__main__":
 
     # Let's launch the studio again and check the experiment and its result.
     prompt_lab.studio.start(8000)
-
-
-

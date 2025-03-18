@@ -629,7 +629,7 @@
                     // Create metrics map
                     const metricResults = {};
                     evaluationData.forEach(e => {
-                        metricResults[e.metric] = e.result ? e.result.toFixed(4) : e.result.toString();
+                        metricResults[e.metric] = e.result ? e.result.toString() : '-';
                     });
                     
                     // Map of all possible values
