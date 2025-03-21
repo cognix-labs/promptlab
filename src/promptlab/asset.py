@@ -1,6 +1,7 @@
 from typing import overload, TypeVar
 from datetime import datetime
 import json
+import re
 import os
 import uuid
 
@@ -28,6 +29,12 @@ class Asset:
     @overload
     def deploy(self, asset: PromptTemplate, target_dir: str):
         ...
+        
+    @staticmethod
+    def is_valid_name(name: str) -> bool:
+        return bool(re.match(r'^[a-zA-Z][a-zA-Z0-9_-]*$', name))
+
+    
     
     def create_or_update(self, asset: T) -> T:
 
@@ -71,6 +78,9 @@ class Asset:
             prompt_template = self.tracer.db_client.fetch_data(SQLQuery.SELECT_ASSET_BY_ID_QUERY, (template.id,template.id))[0]
             system_prompt, user_prompt, prompt_template_variables = Utils.split_prompt_template(prompt_template['asset_binary'])
 
+            if not Asset.is_valid_name(template.name):
+                raise ValueError("Name must begin with a letter and use only alphanumeric, underscore, or hyphen.")
+            
             template.name = prompt_template['asset_name']
             template.description = prompt_template['asset_description'] if template.description is None else template.description
             template.system_prompt = system_prompt if template.system_prompt is None else template.system_prompt
