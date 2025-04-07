@@ -130,7 +130,7 @@ if __name__ == "__main__":
     # Create a dataset.
     dataset_name = "essay_feedback_dataset"
     eval_dataset_file_path = 'C:\work\promptlab\test\dataset\essay_feedback.jsonl'
-    # dataset = create_dataset(prompt_lab, dataset_name, eval_dataset_file_path)
+    dataset = create_dataset(prompt_lab, dataset_name, eval_dataset_file_path)
 
     #-------------------------------------------------------------------------------------------------#
     #-------------------------------------------------------------------------------------------------#
@@ -145,7 +145,7 @@ if __name__ == "__main__":
     Now write feedback on this essay.
     '''
 
-    # prompt_template_v1 = create_prompt_template(prompt_lab, prompt_template_name, system_prompt_v1, user_prompt_v1)
+    prompt_template_v1 = create_prompt_template(prompt_lab, prompt_template_name, system_prompt_v1, user_prompt_v1)
 
     # Create the second version of the prompt template.
     system_prompt_v2 = '''You are a helpful assistant who can provide feedback on essays. You follow the criteria below while writing feedback.                    
@@ -159,16 +159,16 @@ if __name__ == "__main__":
     The submitted essay is - <essay>
     Now write feedback on this essay.
     '''
-    # prompt_template_v2 = update_prompt_template(prompt_lab, prompt_template_name, system_prompt_v2, user_prompt_v2, 0)
+    prompt_template_v2 = update_prompt_template(prompt_lab, prompt_template_name, system_prompt_v2, user_prompt_v2, 0)
     
     #-------------------------------------------------------------------------------------------------#
     #-------------------------------------------------------------------------------------------------#
 
-    # # Create an experiment and run it with the first version of the prompt template.
-    # create_experiment(prompt_lab, prompt_template_name, 0, dataset_name, 0)
+    # Create an experiment and run it with the first version of the prompt template.
+    create_experiment(prompt_lab, prompt_template_name, 0, dataset_name, 0)
 
-    # # Create an experiment and run it with the second version of the prompt template.
-    # create_experiment(prompt_lab, prompt_template_name, 1, dataset_name, 0)
+    # Create an experiment and run it with the second version of the prompt template.
+    create_experiment(prompt_lab, prompt_template_name, 1, dataset_name, 0)
 
     #-------------------------------------------------------------------------------------------------#
     #-------------------------------------------------------------------------------------------------#
@@ -179,9 +179,9 @@ if __name__ == "__main__":
     #-------------------------------------------------------------------------------------------------#
     #-------------------------------------------------------------------------------------------------#
 
-    # # Let's deploy the second version of the prompt template to a directory in production.
-    # deployment_dir = 'C:\work\prompt_templates'
-    # deploy_prompt_template(prompt_lab, deployment_dir, prompt_template_id, prompt_template_version_v2)
+    # Let's deploy the second version of the prompt template to a directory in production.
+    deployment_dir = 'C:\work\prompt_templates'
+    deploy_prompt_template(prompt_lab, deployment_dir, prompt_template_name, 1)
 
 
 
