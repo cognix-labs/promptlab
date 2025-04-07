@@ -12,26 +12,40 @@ def create_prompt_lab(tracer_type: str, tracer_db_file_path: str) -> PromptLab:
 
     return prompt_lab
 
-def create_prompt_template(prompt_lab: PromptLab,prompt_template_id, system_prompt, user_prompt) -> str:
+def create_prompt_template(prompt_lab: PromptLab, name, system_prompt, user_prompt) -> str:
 
-    name = 'essay_feedback_prompt'
     description = 'A prompt designed to generate feedback for essays.'
     
     prompt_template = PromptTemplate (
-        id = prompt_template_id,
         name = name,
         description = description,
         system_prompt = system_prompt,
         user_prompt = user_prompt,
     )
 
-    prompt_template = prompt_lab.asset.create_or_update(prompt_template) 
+    prompt_template = prompt_lab.asset.create(prompt_template) 
 
-    return (prompt_template.id, prompt_template.version)
+    return prompt_template
 
-def create_dataset(prompt_lab: PromptLab, file_path: str) -> str:
+def update_prompt_template(prompt_lab: PromptLab, name, system_prompt, user_prompt, version) -> str:
 
-    name = "essay_feedback_dataset"
+    name = 'essay_feedback_prompt'
+    description = 'A prompt designed to generate feedback for essays.'
+    
+    prompt_template = PromptTemplate (
+        name = name,
+        version = version,
+        description = description,
+        system_prompt = system_prompt,
+        user_prompt = user_prompt,
+    )
+
+    prompt_template = prompt_lab.asset.update(prompt_template) 
+
+    return prompt_template
+
+def create_dataset(prompt_lab: PromptLab, name, file_path: str) -> str:
+
     description = "dataset for evaluating the essay_feedback_prompt."
 
     dataset = Dataset (
@@ -40,11 +54,11 @@ def create_dataset(prompt_lab: PromptLab, file_path: str) -> str:
         file_path = file_path,
     )
 
-    dataset = prompt_lab.asset.create_or_update(dataset) 
+    dataset = prompt_lab.asset.create(dataset) 
 
-    return (dataset.id, dataset.version)
+    return dataset
 
-def create_experiment(prompt_lab: PromptLab, prompt_template_id: str, prompt_template_version: int, dataset_id: str, dataset_version: int):
+def create_experiment(prompt_lab: PromptLab, prompt_template_name: str, prompt_template_version: int, dataset_name: str, dataset_version: int):
 
     experiment = {
             "model" : {
@@ -53,11 +67,11 @@ def create_experiment(prompt_lab: PromptLab, prompt_template_id: str, prompt_tem
                     "embedding_model_deployment": "nomic-embed-text:latest",
             },
             "prompt_template": {
-                "id": prompt_template_id,
+                "name": prompt_template_name,
                 "version": prompt_template_version
             },
             "dataset": {
-                "id": dataset_id,
+                "name": dataset_name,
                 "version": dataset_version
             },
             "evaluation": [
@@ -114,13 +128,16 @@ if __name__ == "__main__":
     #-------------------------------------------------------------------------------------------------#
 
     # Create a dataset.
+    dataset_name = "essay_feedback_dataset"
     eval_dataset_file_path = 'C:\work\promptlab\test\dataset\essay_feedback.jsonl'
-    dataset_id, dataset_version = create_dataset(prompt_lab, eval_dataset_file_path)
+    # dataset = create_dataset(prompt_lab, dataset_name, eval_dataset_file_path)
 
     #-------------------------------------------------------------------------------------------------#
     #-------------------------------------------------------------------------------------------------#
 
     # Create a prompt template.
+    prompt_template_name = 'essay_feedback_prompt'
+
     system_prompt_v1 = 'You are a helpful assistant who can provide feedback on essays.'
     user_prompt_v1 = '''The essay topic is - <essay_topic>.
 
@@ -128,7 +145,7 @@ if __name__ == "__main__":
     Now write feedback on this essay.
     '''
 
-    prompt_template_id, prompt_template_version_v1 = create_prompt_template(prompt_lab, None, system_prompt_v1, user_prompt_v1)
+    # prompt_template_v1 = create_prompt_template(prompt_lab, prompt_template_name, system_prompt_v1, user_prompt_v1)
 
     # Create the second version of the prompt template.
     system_prompt_v2 = '''You are a helpful assistant who can provide feedback on essays. You follow the criteria below while writing feedback.                    
@@ -142,16 +159,16 @@ if __name__ == "__main__":
     The submitted essay is - <essay>
     Now write feedback on this essay.
     '''
-    prompt_template_id, prompt_template_version_v2 = create_prompt_template(prompt_lab, prompt_template_id, system_prompt_v2, user_prompt_v2)
+    # prompt_template_v2 = update_prompt_template(prompt_lab, prompt_template_name, system_prompt_v2, user_prompt_v2, 0)
     
     #-------------------------------------------------------------------------------------------------#
     #-------------------------------------------------------------------------------------------------#
 
-    # Create an experiment and run it with the first version of the prompt template.
-    create_experiment(prompt_lab, prompt_template_id, prompt_template_version_v1, dataset_id, dataset_version)
+    # # Create an experiment and run it with the first version of the prompt template.
+    # create_experiment(prompt_lab, prompt_template_name, 0, dataset_name, 0)
 
-    # Create an experiment and run it with the second version of the prompt template.
-    create_experiment(prompt_lab, prompt_template_id, prompt_template_version_v2, dataset_id, dataset_version)
+    # # Create an experiment and run it with the second version of the prompt template.
+    # create_experiment(prompt_lab, prompt_template_name, 1, dataset_name, 0)
 
     #-------------------------------------------------------------------------------------------------#
     #-------------------------------------------------------------------------------------------------#
@@ -162,9 +179,9 @@ if __name__ == "__main__":
     #-------------------------------------------------------------------------------------------------#
     #-------------------------------------------------------------------------------------------------#
 
-    # Let's deploy the second version of the prompt template to a directory in production.
-    deployment_dir = 'C:\work\prompt_templates'
-    deploy_prompt_template(prompt_lab, deployment_dir, prompt_template_id, prompt_template_version_v2)
+    # # Let's deploy the second version of the prompt template to a directory in production.
+    # deployment_dir = 'C:\work\prompt_templates'
+    # deploy_prompt_template(prompt_lab, deployment_dir, prompt_template_id, prompt_template_version_v2)
 
 
 

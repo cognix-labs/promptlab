@@ -23,14 +23,10 @@ class SQLiteClient:
         """Execute a query such as CREATE TABLE or INSERT."""
         conn = self.create_connection()
         cursor = conn.cursor()
-        try:
-            cursor.execute(query, params)
-            conn.commit()
-        except sqlite3.Error as e:
-            print(f"Error executing query: {e}")
-        finally:
-            cursor.close()
-            conn.close()
+        cursor.execute(query, params)
+        conn.commit()
+        cursor.close()
+        conn.close()
 
     def execute_query_many(self, query: str, params: List[Tuple]): 
         """Execute a query such as CREATE TABLE or INSERT."""

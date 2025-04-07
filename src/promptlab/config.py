@@ -13,8 +13,8 @@ class ConfigValidator:
 
     @staticmethod
     def validate_experiment_config(experiment_config: ExperimentConfig):
-        validate_prompt_template_id(experiment_config.prompt_template.id)
-        validate_dataset_id(experiment_config.dataset.id)
+        validate_prompt_template(experiment_config.prompt_template.name)
+        validate_dataset(experiment_config.dataset.name)
 
 def validate_db_type(db_type: str) -> None:
 
@@ -53,12 +53,12 @@ def validate_db_file_exists(db_file: str) -> None:
             raise
         raise ValueError(f"Invalid database file path: {str(e)}")
 
-def validate_prompt_template_id(template_path: str) -> None:
+def validate_prompt_template(name: str) -> None:
 
-    if not isinstance(template_path, str):
-        raise ValueError(f"Template path must be a string, got {type(template_path)}")
+    if not isinstance(name, str):
+        raise ValueError(f"Name must be a string, got {type(name)}")
 
-def validate_dataset_id(dataset_path: str) -> None:
+def validate_dataset(name: str) -> None:
 
-    if not isinstance(dataset_path, str):
-        raise ValueError(f"Dataset path must be a string, got {type(dataset_path)}")
+    if not isinstance(name, str):
+        raise ValueError(f"Name must be a string, got {type(name)}")

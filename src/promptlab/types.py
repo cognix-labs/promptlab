@@ -32,7 +32,7 @@ class EvaluationConfig(BaseModel):
     
 class AssetConfig(BaseModel):
 
-    id: str
+    name: str
     version: int
 
 class ExperimentConfig(BaseModel):
@@ -69,7 +69,6 @@ class Dataset:
     name: str
     description: str
     file_path: str
-    id: str = None
     version: int = 0
 
 @dataclass
@@ -78,5 +77,4 @@ class PromptTemplate:
     description: str = None
     system_prompt: str = None
     user_prompt: str = None
-    id: str = None
     version: int = 0

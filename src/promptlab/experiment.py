@@ -20,10 +20,10 @@ class Experiment:
         experiment_config = ExperimentConfig(**experiment_config)
         ConfigValidator.validate_experiment_config(experiment_config)
 
-        prompt_template = self.tracer.db_client.fetch_data(SQLQuery.SELECT_ASSET_QUERY, (experiment_config.prompt_template.id, experiment_config.prompt_template.version))[0]
+        prompt_template = self.tracer.db_client.fetch_data(SQLQuery.SELECT_ASSET_QUERY, (experiment_config.prompt_template.name, experiment_config.prompt_template.version))[0]
         system_prompt, user_prompt, prompt_template_variables = Utils.split_prompt_template(prompt_template['asset_binary'])
         
-        eval_dataset_path = self.tracer.db_client.fetch_data(SQLQuery.SELECT_DATASET_FILE_PATH_QUERY, (experiment_config.dataset.id, experiment_config.dataset.version))[0]
+        eval_dataset_path = self.tracer.db_client.fetch_data(SQLQuery.SELECT_DATASET_FILE_PATH_QUERY, (experiment_config.dataset.name, experiment_config.dataset.version))[0]
         eval_dataset = Utils.load_dataset(eval_dataset_path['file_path'])
 
         exp_summary = self.init_batch_eval(eval_dataset, system_prompt, user_prompt, prompt_template_variables, experiment_config)

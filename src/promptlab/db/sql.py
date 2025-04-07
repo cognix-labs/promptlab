@@ -2,7 +2,6 @@ class SQLQuery:
     
     CREATE_ASSETS_TABLE_QUERY = '''
             CREATE TABLE IF NOT EXISTS assets (
-                asset_id TEXT,
                 asset_name TEXT,
                 asset_version INTEGER,
                 asset_description TEXT,
@@ -10,7 +9,8 @@ class SQLQuery:
                 asset_binary BLOB,
                 is_deployed BOOLEAN DEFAULT 0,
                 deployment_time TIMESTAMP,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (asset_name, asset_version)
             )
         '''
 
@@ -69,14 +69,13 @@ class SQLQuery:
             '''
     
     INSERT_ASSETS_QUERY = '''INSERT INTO assets(
-                                    asset_id, 
                                     asset_name, 
-                                    asset_description, 
                                     asset_version, 
+                                    asset_description, 
                                     asset_type, 
                                     asset_binary,
                                     created_at
-                                ) VALUES(?, ?, ?, ?, ?, ?, ?)'''
+                                ) VALUES(?, ?, ?, ?, ?, ?)'''
 
     SELECT_ASSET_QUERY = '''SELECT  asset_name, 
                                     asset_description, 
@@ -85,18 +84,18 @@ class SQLQuery:
                                     asset_binary,
                                     created_at
                             FROM assets
-                            WHERE asset_id = ? AND asset_version = ?'''
+                            WHERE asset_name = ? AND asset_version = ?'''
     
-    SELECT_ASSET_BY_ID_QUERY = '''SELECT  asset_name, 
+    SELECT_ASSET_BY_NAME_QUERY = '''SELECT  asset_name, 
                                     asset_description, 
                                     asset_version, 
                                     asset_type, 
                                     asset_binary,
                                     created_at
                             FROM assets
-                            WHERE asset_id = ? AND asset_version = (SELECT MAX(asset_version) FROM assets WHERE asset_id = ?)'''
+                            WHERE asset_name = ? AND asset_version = (SELECT MAX(asset_version) FROM assets WHERE asset_name = ?)'''
     
-    SELECT_ASSET_BY_TYPE_QUERY = '''SELECT  asset_id,
+    SELECT_ASSET_BY_TYPE_QUERY = '''SELECT  
                                     asset_name, 
                                     asset_description, 
                                     asset_version, 
@@ -110,7 +109,7 @@ class SQLQuery:
     SELECT_DATASET_FILE_PATH_QUERY = '''SELECT 
                                             json_extract(asset_binary, '$.file_path') AS file_path 
                                         FROM assets 
-                                        WHERE asset_id =  ? AND asset_version = ?'''
+                                        WHERE asset_name =  ? AND asset_version = ?'''
 
     SELECT_EXPERIMENTS_QUERY = """
                                 SELECT
@@ -120,9 +119,9 @@ class SQLQuery:
                                     json_extract(model, '$.endpoint') AS model_endpoint,
                                     json_extract(model, '$.inference_model_deployment') AS inference_model_deployment,
                                     json_extract(model, '$.embedding_model_deployment') AS embedding_model_deployment,
-                                    json_extract(asset, '$.prompt_template_id') AS prompt_template_id,
+                                    json_extract(asset, '$.prompt_template_name') AS prompt_template_name,
                                     json_extract(asset, '$.prompt_template_version') AS prompt_template_version,
-                                    json_extract(asset, '$.dataset_id') AS dataset_id,
+                                    json_extract(asset, '$.dataset_name') AS dataset_name,
                                     json_extract(asset, '$.dataset_version') AS dataset_version,
                                     er.dataset_record_id as dataset_record_id,
                                     er.inference as inference,
@@ -135,8 +134,7 @@ class SQLQuery:
                                 JOIN experiment_result er on 
                                     e.experiment_id = er.experiment_id 
                                 JOIN assets a ON
-                                    a.asset_id = prompt_template_id AND a.asset_version = prompt_template_version
+                                    a.asset_name = prompt_template_name AND a.asset_version = prompt_template_version
                                 """
     
     DEPLOY_ASSET_QUERY = '''UPDATE assets SET is_deployed = 1, deployment_time = CURRENT_TIMESTAMP WHERE asset_id = ? and asset_version = ?'''
-    UPDATE_ASSET_QUERY = '''UPDATE assets SET asset_description = ?, asset_binary = ?, asset_version = ?, created_at = CURRENT_TIMESTAMP WHERE asset_id = ?'''

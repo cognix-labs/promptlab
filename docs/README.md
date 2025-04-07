@@ -64,11 +64,11 @@ A sample experiment definition:
             "embedding_model_deployment": "<embedding_model_name>"
         },
         "prompt_template": {
-                "id": "<prompt_template_id>",
+                "id": "<prompt_template_name>",
                 "version": "<prompt_template_version>"
             },
         "dataset": {
-                "id": "<dataset_id>",
+                "id": "<dataset_name>",
                 "version": "<dataset_version>"
             },
         "evaluation": [

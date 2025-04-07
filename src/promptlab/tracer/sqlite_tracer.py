@@ -33,9 +33,9 @@ class SQLiteTracer(Tracer):
         }
 
         asset = {
-            "prompt_template_id": experiment_config.prompt_template.id,
+            "prompt_template_name": experiment_config.prompt_template.name,
             "prompt_template_version": experiment_config.prompt_template.version,
-            "dataset_id": experiment_config.dataset.id,
+            "dataset_name": experiment_config.dataset.name,
             "dataset_version": experiment_config.dataset.version
         }
 

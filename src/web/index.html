@@ -320,9 +320,9 @@
                             <th>Model Type</th>
                             <th>Embedding Model</th>
                             <th>Inference Model</th>
-                            <th>Prompt Template ID</th>
+                            <th>Prompt Template</th>
                             <th>Prompt Template Version</th>
-                            <th>Dataset ID</th>
+                            <th>Dataset</th>
                             <th>Dataset Version</th>
                             <th>System Prompt</th>
                             <th>User Prompt</th>
@@ -353,7 +353,7 @@
                 <table id="promptTemplateTable">
                     <thead>
                         <tr>
-                            <th>Id</th>
+                            <!-- <th>Id</th> -->
                             <th>Name</th>
                             <th>Description</th>
                             <th>Version</th>
@@ -378,7 +378,7 @@
                 <table id="datasetTable">
                     <thead>
                         <tr>
-                            <th>Id</th>
+                            <!-- <th>Id</th> -->
                             <th>Name</th>
                             <th>Description</th>
                             <th>Version</th>
@@ -424,9 +424,9 @@
                         <td>${exp.model_type}</td>
                         <td>${exp.embedding_model_deployment}</td>
                         <td>${exp.inference_model_deployment}</td>
-                        <td>${exp.prompt_template_id}</td>
+                        <td>${exp.prompt_template_name}</td>
                         <td>${exp.prompt_template_version}</td>
-                        <td>${exp.dataset_id}</td>
+                        <td>${exp.dataset_name}</td>
                         <td>${exp.dataset_version}</td>
                         <td>${exp.system_prompt_template.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
                         <td>${exp.user_prompt_template.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
@@ -705,7 +705,6 @@
                     }
                     
                     row.innerHTML = `
-                        <td>${template.asset_id}</td>
                         <td>${template.asset_name}</td>
                         <td>${template.asset_description}</td>
                         <td>${template.asset_version}</td>
@@ -739,7 +738,6 @@
                     const createdAt = new Date(dataset.created_at).toLocaleString();
                     
                     row.innerHTML = `
-                        <td>${dataset.asset_id}</td>
                         <td>${dataset.asset_name}</td>
                         <td>${dataset.asset_description}</td>
                         <td>${dataset.asset_version}</td>
