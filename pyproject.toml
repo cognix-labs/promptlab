@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "promptlab"
-version = "0.0.3"
+version = "0.0.5"
 description = "PromptLab is a free, lightweight, open-source experimentation tool for Gen AI applications."
 readme = "README.md"
 authors = [{name = "Raihan Alam", email = "raihan.alam@gmail.com"}]

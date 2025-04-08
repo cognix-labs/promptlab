@@ -145,7 +145,7 @@ class Asset:
         
     def _handle_prompt_template_deploy(self, template: PromptTemplate, target_dir: str):
 
-        prompt_template = self.tracer.db_client.fetch_data(SQLQuery.SELECT_ASSET_QUERY, (template.id, template.version))[0]
+        prompt_template = self.tracer.db_client.fetch_data(SQLQuery.SELECT_ASSET_QUERY, (template.name, template.version))[0]
 
         prompt_template_name = prompt_template['asset_name']
         prompt_template_binary = prompt_template['asset_binary']
@@ -155,4 +155,4 @@ class Asset:
         with open(prompt_template_path, 'w', encoding='utf-8') as file:
             file.write(prompt_template_binary)
 
-        self.tracer.db_client.execute_query(SQLQuery.DEPLOY_ASSET_QUERY, (template.id, template.version))
+        self.tracer.db_client.execute_query(SQLQuery.DEPLOY_ASSET_QUERY, (template.name, template.version))

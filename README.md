@@ -1,5 +1,5 @@
 <h4 align="center">
-    <img alt="logo" src="https://raw.githubusercontent.com/imum-ai/promptlab/main/img/banner.png" style="">
+    <img alt="logo" src="https://raw.githubusercontent.com/imum-ai/promptlab/main/img/logo.png" style="height:200px">
 </h4>
 
 ## Table of Contents

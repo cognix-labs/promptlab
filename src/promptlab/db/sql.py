@@ -137,4 +137,4 @@ class SQLQuery:
                                     a.asset_name = prompt_template_name AND a.asset_version = prompt_template_version
                                 """
     
-    DEPLOY_ASSET_QUERY = '''UPDATE assets SET is_deployed = 1, deployment_time = CURRENT_TIMESTAMP WHERE asset_id = ? and asset_version = ?'''
+    DEPLOY_ASSET_QUERY = '''UPDATE assets SET is_deployed = 1, deployment_time = CURRENT_TIMESTAMP WHERE asset_name = ? and asset_version = ?'''

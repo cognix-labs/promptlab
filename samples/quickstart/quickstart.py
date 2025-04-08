@@ -104,10 +104,10 @@ def create_experiment(prompt_lab: PromptLab, prompt_template_name: str, prompt_t
 
     prompt_lab.experiment.run(experiment)
 
-def deploy_prompt_template(prompt_lab: PromptLab, deployment_dir: str, prompt_template_id: str, prompt_template_version: int):
+def deploy_prompt_template(prompt_lab: PromptLab, deployment_dir: str, prompt_template_name: str, prompt_template_version: int):
     
     prompt = PromptTemplate (
-        id = prompt_template_id,
+        name = prompt_template_name,
         version = prompt_template_version,
         )
     
