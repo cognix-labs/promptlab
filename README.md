@@ -186,6 +186,23 @@ For comprehensive documentation, visit our [Documentation Page](https://github.c
 - [Evaluating prompts locally with Ollama and PromptLab](https://www.linkedin.com/pulse/evaluating-prompts-locally-ollama-promptlab-raihan-alam-i2iic)
 - [Creating custom prompt evaluation metrics with PromptLab](https://www.linkedin.com/pulse/promptlab-creating-custom-metric-prompt-evaluation-raihan-alam-o0slc)
 
+## CI/CD 🔄
+
+PromptLab uses GitHub Actions for continuous integration and testing:
+
+- **Unit Tests**: Run unit tests for all components of PromptLab
+- **Integration Tests**: Run integration tests that test the interaction between components
+- **Performance Tests**: Run performance tests to ensure performance requirements are met
+
+The tests are organized into the following directories:
+
+- `tests/unit/`: Unit tests for individual components
+- `tests/integration/`: Tests that involve multiple components working together
+- `tests/performance/`: Tests that measure performance
+- `tests/fixtures/`: Common test fixtures and utilities
+
+You can find more information about the CI/CD workflows in the [.github/workflows](https://github.com/imum-ai/promptlab/tree/main/.github/workflows) directory.
+
 ## Contributing 👥
 
 Contributions are welcome! Please feel free to submit a Pull Request.
