@@ -46,6 +46,7 @@ With PromptLab, you can:
 - **Visual Studio**: Compare experiments and track assets through a local web interface
 - **Multiple Model Support**: Works with Azure OpenAI, Ollama, DeepSeek and more
 - **Version Control**: Automatic versioning of all assets for reproducibility
+- **Async Support**: Run experiments and invoke models asynchronously for improved performance
 
 ## Installation 📦
 
@@ -122,6 +123,32 @@ pl.experiment.run(experiment_config)
 pl.studio.start(8000)
 ```
 
+### Async Support
+
+PromptLab also supports asynchronous operations:
+
+```python
+import asyncio
+from promptlab import PromptLab
+
+async def main():
+    # Initialize PromptLab
+    tracer_config = {
+        "type": "sqlite",
+        "db_file": "./promptlab.db"
+    }
+    pl = PromptLab(tracer_config)
+
+    # Run experiment asynchronously
+    await pl.run_experiment_async(experiment_config)
+
+    # Start the PromptLab Studio asynchronously
+    await pl.start_studio_async(8000)
+
+# Run the async main function
+asyncio.run(main())
+```
+
 ## Core Concepts 🧩
 
 ### Tracer
@@ -148,6 +175,7 @@ A local web interface for visualizing experiments and comparing results.
 
 - [Quickstart](https://github.com/imum-ai/promptlab/tree/main/samples/quickstart): Basic usage of PromptLab
 - [Custom Metric](https://github.com/imum-ai/promptlab/tree/main/samples/custom_metric): Creating custom evaluation metrics
+- [Async Example](https://github.com/imum-ai/promptlab/tree/main/samples/async_example): Using async functionality for improved performance
 
 ## Documentation 📖
 
