@@ -27,7 +27,7 @@ def create_prompt_template(prompt_lab: PromptLab, name, system_prompt, user_prom
 
     return prompt_template
 
-def update_prompt_template(prompt_lab: PromptLab, name, system_prompt, user_prompt, version) -> str:
+def update_prompt_template(prompt_lab: PromptLab, name, version, system_prompt, user_prompt) -> str:
 
     name = 'essay_feedback_prompt'
     description = 'A prompt designed to generate feedback for essays.'
@@ -159,16 +159,16 @@ if __name__ == "__main__":
     The submitted essay is - <essay>
     Now write feedback on this essay.
     '''
-    prompt_template_v2 = update_prompt_template(prompt_lab, prompt_template_name, system_prompt_v2, user_prompt_v2, 0)
+    prompt_template_v2 = update_prompt_template(prompt_lab, prompt_template_v1.name, prompt_template_v1.version, system_prompt_v2, user_prompt_v2)
     
     #-------------------------------------------------------------------------------------------------#
     #-------------------------------------------------------------------------------------------------#
 
     # Create an experiment and run it with the first version of the prompt template.
-    create_experiment(prompt_lab, prompt_template_name, 0, dataset_name, 0)
+    create_experiment(prompt_lab, prompt_template_v1.name, prompt_template_v1.version, dataset.name, dataset.version)
 
     # Create an experiment and run it with the second version of the prompt template.
-    create_experiment(prompt_lab, prompt_template_name, 1, dataset_name, 0)
+    create_experiment(prompt_lab, prompt_template_v2.name, prompt_template_v2.version, dataset.name, dataset.version)
 
     #-------------------------------------------------------------------------------------------------#
     #-------------------------------------------------------------------------------------------------#
