@@ -45,13 +45,16 @@ def create_dataset(prompt_lab: PromptLab, name, file_path: str) -> str:
 
 def create_experiment(prompt_lab: PromptLab, prompt_template_name: str, prompt_template_version: int, dataset_name: str, dataset_version: int):
 
-    length_eval = LengthEvaluator()
+    # length_eval = LengthEvaluator()
     fluency_eval = FluencyEvaluator()
 
     experiment = {
-            "model" : {
+            "inference_model" : {
                     "type": "ollama",
                     "inference_model_deployment": "llama3.2",
+            },
+            "embedding_model" : {
+                    "type": "ollama",
                     "embedding_model_deployment": "nomic-embed-text:latest",
             },
             "prompt_template": {
@@ -64,24 +67,20 @@ def create_experiment(prompt_lab: PromptLab, prompt_template_name: str, prompt_t
             },
             "evaluation": [
                     {
-                        "type": "custom",
                         "metric": "LengthEvaluator",
                         "column_mapping": {
                             "response":"$inference",
                         },
-                        "evaluator": length_eval
                     },     
                     {
-                        "type": "custom",
                         "metric": "FluencyEvaluator",
                         "column_mapping": {
                             "response":"$inference",
                         },
-                        "evaluator": fluency_eval
+                        # "evaluator": fluency_eval
                     },                    
                     {
-                        "type": "ragas",
-                        "metric": "SemanticSimilarity",
+                        "metric": "SemanticSimilarityEvaluator",
                         "column_mapping": {
                             "response":"$inference",
                             "reference":"feedback"
@@ -116,15 +115,15 @@ if __name__ == "__main__":
     #-------------------------------------------------------------------------------------------------#
 
     # Create a dataset.
-    dataset_name = "essay_feedback_dataset"
+    dataset_name = "essay_feedback_dataset9"
     eval_dataset_file_path = 'C:\work\promptlab\test\dataset\essay_feedback.jsonl'
-    dataset = create_dataset(prompt_lab, dataset_name, eval_dataset_file_path)
+    # dataset = create_dataset(prompt_lab, dataset_name, eval_dataset_file_path)
 
     #-------------------------------------------------------------------------------------------------#
     #-------------------------------------------------------------------------------------------------#
 
     # Create a prompt template.
-    prompt_template_name = 'essay_feedback_prompt'
+    prompt_template_name = 'essay_feedback_prompt9'
 
     system_prompt = 'You are a helpful assistant who can provide feedback on essays.'
     user_prompt = '''The essay topic is - <essay_topic>.
@@ -133,13 +132,14 @@ if __name__ == "__main__":
     Now write feedback on this essay.
     '''
 
-    prompt_template = create_prompt_template(prompt_lab, prompt_template_name, system_prompt, user_prompt)
+    # prompt_template = create_prompt_template(prompt_lab, prompt_template_name, system_prompt, user_prompt)
     
     #-------------------------------------------------------------------------------------------------#
     #-------------------------------------------------------------------------------------------------#
 
     # Create an experiment and run it with the first version of the prompt template.
-    create_experiment(prompt_lab, prompt_template.name, prompt_template.version, dataset.name, dataset.version)
+    # create_experiment(prompt_lab, prompt_template.name, prompt_template.version, dataset.name, dataset.version)
+    create_experiment(prompt_lab, prompt_template_name, 0, dataset_name, 0)
 
     #-------------------------------------------------------------------------------------------------#
     #-------------------------------------------------------------------------------------------------#

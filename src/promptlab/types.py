@@ -7,13 +7,23 @@ from promptlab.enums import TracerType
 from promptlab.evaluator.evaluator import Evaluator
 from promptlab.utils import Utils
 
-class ModelConfig(BaseModel):
+class InferenceModelConfig(BaseModel):
     
     type: str
     api_key: Optional[str] = None
     api_version: Optional[str] = None
     endpoint: Optional[HttpUrl] = None 
     inference_model_deployment: str
+
+    class config:
+        arbitrary_types_allowed=True
+
+class EmbeddingModelConfig(BaseModel):
+    
+    type: str
+    api_key: Optional[str] = None
+    api_version: Optional[str] = None
+    endpoint: Optional[HttpUrl] = None 
     embedding_model_deployment: str
 
     class config:
@@ -21,7 +31,6 @@ class ModelConfig(BaseModel):
 
 class EvaluationConfig(BaseModel):
 
-    type: str
     metric: str
     column_mapping: dict
     evaluator: Optional[Evaluator] = None
@@ -37,7 +46,8 @@ class AssetConfig(BaseModel):
 
 class ExperimentConfig(BaseModel):
 
-    model: ModelConfig
+    inference_model: InferenceModelConfig
+    embedding_model: EmbeddingModelConfig
     prompt_template: AssetConfig
     dataset: AssetConfig
     evaluation: List[EvaluationConfig]

@@ -1,18 +1,19 @@
+from typing import Any
 import ollama
 
-from promptlab.model.model import Model
-from promptlab.types import InferenceResult, ModelConfig
+from promptlab.model.model import EmbeddingModel, Model
+from promptlab.types import EmbeddingModelConfig, InferenceResult, InferenceModelConfig
 
 class Ollama(Model):
 
-    def __init__(self, model_config: ModelConfig):
+    def __init__(self, model_config: InferenceModelConfig):
 
         super().__init__(model_config)
 
         self.model_config = model_config
         self.client = ollama
         
-    def invoke(self, system_prompt: str, user_prompt: str):
+    def __call__(self, system_prompt: str, user_prompt: str)->InferenceResult:
 
         payload = [
             {
@@ -41,3 +42,20 @@ class Ollama(Model):
             completion_tokens=completion_token,
             latency_ms=latency_ms
         )
+    
+class Ollama_Embedding(EmbeddingModel):
+
+    def __init__(self, model_config: EmbeddingModelConfig):
+
+        super().__init__(model_config)
+
+        self.model_config = model_config
+        self.client = ollama
+    
+    def __call__(self, text: str) -> Any:
+        embedding = self.client.embed(
+                    model=self.model_config.embedding_model_deployment,
+                    input=text,
+                    )["embeddings"]
+
+        return embedding

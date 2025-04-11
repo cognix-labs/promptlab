@@ -32,7 +32,7 @@ class Experiment:
 
     def init_batch_eval(self, eval_dataset, system_prompt, user_prompt, prompt_template_variables, experiment_config: ExperimentConfig) -> List:
 
-        inference_model = ModelFactory.get_model(experiment_config.model)
+        inference = ModelFactory.get_model(experiment_config.inference_model)
         experiment_id = str(uuid.uuid4())
         timestamp = datetime.now().isoformat()
 
@@ -41,7 +41,7 @@ class Experiment:
         for eval_record in eval_dataset:
             system_prompt, user_prompt = self.prepare_prompts(eval_record, system_prompt, user_prompt, prompt_template_variables)
 
-            inference_result = inference_model.invoke(system_prompt, user_prompt)
+            inference_result = inference(system_prompt, user_prompt)
             evaluation = self.evaluate(inference_result.inference, eval_record, experiment_config)
 
             eval = dict()
@@ -62,7 +62,7 @@ class Experiment:
 
         evaluations = []
         for eval in experiment_config.evaluation:
-            evaluator = EvaluatorFactory.get_evaluator(eval.type, eval.metric, experiment_config.model, eval.evaluator)
+            evaluator = EvaluatorFactory.get_evaluator(eval.metric, experiment_config.inference_model, experiment_config.embedding_model, eval.evaluator)
             data = dict()
             for key, value in eval.column_mapping.items():
                 if value == "$inference":
@@ -71,7 +71,7 @@ class Experiment:
                     data[key] = row[value]
             evaluation_result = evaluator.evaluate(data)
             evaluations.append({
-                "metric": f'{eval.type}-{eval.metric}',
+                "metric": f'{eval.metric}',
                 "result": evaluation_result
             })
         return json.dumps(evaluations)
