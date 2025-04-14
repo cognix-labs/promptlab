@@ -1,7 +1,7 @@
 from promptlab.evaluator.evaluator import Evaluator
 import numpy as np
 
-class SemanticSimilarityEvaluator(Evaluator):
+class SemanticSimilarity(Evaluator):
     
     def evaluate(self, data: dict):
         inference = data["response"]

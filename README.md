@@ -146,7 +146,8 @@ A local web interface for visualizing experiments and comparing results.
 
 ## Examples 📚
 
-- [Quickstart](https://github.com/imum-ai/promptlab/tree/main/samples/quickstart): Basic usage of PromptLab
+- [Quickstart](https://github.com/imum-ai/promptlab/tree/main/samples/quickstart): Getting started with PromptLab
+- [Asset versioning](https://github.com/imum-ai/promptlab/tree/main/samples/asset_versioning): Versioning Prompts and Datasets
 - [Custom Metric](https://github.com/imum-ai/promptlab/tree/main/samples/custom_metric): Creating custom evaluation metrics
 
 ## Documentation 📖

@@ -11,7 +11,7 @@ class ModelFactory:
     def get_model(model_config: InferenceModelConfig) -> Model:
 
         connection_type = model_config.type
-
+        
         if connection_type == ModelType.AZURE_OPENAI.value:
             return AzOpenAI(model_config=model_config)
         if connection_type == ModelType.OLLAMA.value:

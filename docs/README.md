@@ -55,12 +55,18 @@ Experiment is at the center of PromptLab. An experiment means running a prompt f
 A sample experiment definition:
 
     experiment = {
-        "model": {
+        "inference_model" : {
             "type": "<model_type>",
             "api_key": "<your_api_key>",
             "api_version": "<api_version>",
             "endpoint": "<your_model_endpoint>",
             "inference_model_deployment": "<inference_model_name>",
+        },
+        "embedding_model" : {
+            "type": "<model_type>",
+            "api_key": "<your_api_key>",
+            "api_version": "<api_version>",
+            "endpoint": "<your_model_endpoint>",
             "embedding_model_deployment": "<embedding_model_name>"
         },
         "prompt_template": {
@@ -93,7 +99,7 @@ PromptLab needs two models to work properly. An inference model for prompt infer
 
 Fields definition:
 
-- type (mandatory): valid values are `azure_openai`, `ollama` 
+- type (mandatory)
 - api_key (optional)
 - api_version (optional)
 - endpoint (optional)
@@ -102,17 +108,11 @@ Fields definition:
 
 #### Evaluation
 
-It is a list of evaluation metrics with column mapping. PromptLab's motto is "bring your metrics". 
+It is a list of evaluation metrics with column mapping. You can use built in metrics or custom metrics.
 
-Evaluation library integration -
-
-| Library | Status |
-|----------|----------|
-| [RAGAS](https://www.ragas.io/) | Beta |
-| [DeepEval](https://docs.confident-ai.com/) | Coming soon |
 
 Fields definition:
 
-- type (mandatory): valid vaules are `ragas`
 - metric (mandatory): name of the metric from the specific library
 - column_mapping (mandatory): column mapping to map the metric paramaeters with dataset columns and the inference output. To map a parameter to inference output, use `$inference`.
+- evaluator (required for custom metric): it's the evaluator object that's required for custom metrics. 

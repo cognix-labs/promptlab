@@ -1,6 +1,6 @@
 from promptlab.evaluator.evaluator import Evaluator
 
-class FluencyEvaluator(Evaluator):
+class Fluency(Evaluator):
     
     def evaluate(self, data: dict):
 

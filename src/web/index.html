@@ -317,9 +317,8 @@
                         <tr>
                             <th><input type="checkbox" id="selectAll"></th>
                             <th>Experiment ID</th>
-                            <th>Model Type</th>
-                            <th>Embedding Model</th>
                             <th>Inference Model</th>
+                            <th>Embedding Model</th>
                             <th>Prompt Template</th>
                             <th>Prompt Template Version</th>
                             <th>Dataset</th>
@@ -421,9 +420,8 @@
                     row.innerHTML = `
                         <td><input type="checkbox" class="experiment-checkbox" data-id="${exp.experiment_id}"></td>
                         <td>${exp.experiment_id}</td>
-                        <td>${exp.model_type}</td>
-                        <td>${exp.embedding_model_deployment}</td>
-                        <td>${exp.inference_model_deployment}</td>
+                        <td>${exp.inference_model}</td>
+                        <td>${exp.embedding_model}</td>
                         <td>${exp.prompt_template_name}</td>
                         <td>${exp.prompt_template_version}</td>
                         <td>${exp.dataset_name}</td>
