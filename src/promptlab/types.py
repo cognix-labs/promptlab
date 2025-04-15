@@ -29,6 +29,17 @@ class EmbeddingModelConfig(BaseModel):
     class config:
         arbitrary_types_allowed=True
 
+class ModelConfig(BaseModel):
+    
+    type: str
+    api_key: Optional[str] = None
+    api_version: Optional[str] = None
+    endpoint: Optional[HttpUrl] = None 
+    model_deployment: str
+
+    # class config:
+    #     arbitrary_types_allowed=True
+
 class EvaluationConfig(BaseModel):
 
     metric: str
@@ -46,8 +57,10 @@ class AssetConfig(BaseModel):
 
 class ExperimentConfig(BaseModel):
 
-    inference_model: InferenceModelConfig
-    embedding_model: EmbeddingModelConfig
+    # inference_model: InferenceModelConfig
+    # embedding_model: EmbeddingModelConfig
+    inference_model: Any
+    embedding_model: Any
     prompt_template: AssetConfig
     dataset: AssetConfig
     evaluation: List[EvaluationConfig]

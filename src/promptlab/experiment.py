@@ -32,7 +32,8 @@ class Experiment:
 
     def init_batch_eval(self, eval_dataset, system_prompt, user_prompt, prompt_template_variables, experiment_config: ExperimentConfig) -> List:
 
-        inference = ModelFactory.get_model(experiment_config.inference_model)
+        # inference = ModelFactory.get_model(experiment_config.inference_model)
+        inference = (experiment_config.inference_model)
         experiment_id = str(uuid.uuid4())
         timestamp = datetime.now().isoformat()
 

@@ -25,14 +25,14 @@ class SQLiteTracer(Tracer):
         experiment_id = experiment_summary[0]['experiment_id']
 
         model = {
-            "inference_model_type": experiment_config.inference_model.type,
-            "inference_model_name": experiment_config.inference_model.inference_model_deployment,
-            "inference_model_api_version": experiment_config.inference_model.api_version,
-            "inference_model_endpoint": str(experiment_config.inference_model.endpoint),
-            "embedding_model_type": experiment_config.embedding_model.type,
-            "embedding_model_name": experiment_config.embedding_model.embedding_model_deployment,
-            "embedding_model_api_version": experiment_config.embedding_model.api_version,
-            "embedding_model_endpoint": str(experiment_config.embedding_model.endpoint),
+            "inference_model_type": experiment_config.inference_model.config.type,
+            "inference_model_name": experiment_config.inference_model.config.model_deployment,
+            "inference_model_api_version": experiment_config.inference_model.config.api_version,
+            "inference_model_endpoint": str(experiment_config.inference_model.config.endpoint),
+            "embedding_model_type": experiment_config.embedding_model.config.type,
+            "embedding_model_name": experiment_config.embedding_model.config.model_deployment,
+            "embedding_model_api_version": experiment_config.embedding_model.config.api_version,
+            "embedding_model_endpoint": str(experiment_config.embedding_model.config.endpoint),
         }
 
         asset = {

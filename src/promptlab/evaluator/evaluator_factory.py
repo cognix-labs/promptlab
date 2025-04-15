@@ -3,6 +3,7 @@ import importlib
 import pkgutil
 
 from promptlab.evaluator.evaluator import Evaluator
+from promptlab.model.model import Model
 from promptlab.model.model_factory import ModelFactory
 from promptlab.types import InferenceModelConfig, EmbeddingModelConfig
 
@@ -24,10 +25,13 @@ class EvaluatorFactory:
     _evaluator_classes = import_evaluators()
 
     @staticmethod
-    def get_evaluator(metric:str, inference_model:InferenceModelConfig, embedding_model:EmbeddingModelConfig, evaluator:Evaluator = None) -> Evaluator:
-        inference_model = ModelFactory.get_model(inference_model)
-        embedding_model = ModelFactory.get_embedding_model(embedding_model)
-        
+    # def get_evaluator(metric:str, inference_model:InferenceModelConfig, embedding_model:EmbeddingModelConfig, evaluator:Evaluator = None) -> Evaluator:
+    def get_evaluator(metric:str, inference_model:Model, embedding_model:Model, evaluator:Evaluator = None) -> Evaluator:
+        # inference_model = ModelFactory.get_model(inference_model)
+        # embedding_model = ModelFactory.get_embedding_model(embedding_model)
+        inference_model = (inference_model)
+        embedding_model = (embedding_model)
+
         if evaluator is None:
             evaluator_class = EvaluatorFactory._evaluator_classes.get(metric)
             if evaluator_class is None:
