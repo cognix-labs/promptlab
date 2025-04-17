@@ -1,4 +1,4 @@
-from typing import overload, TypeVar
+from typing import Any, overload, TypeVar
 from datetime import datetime
 import json
 import re
@@ -135,7 +135,21 @@ class Asset:
         self.tracer.db_client.execute_query(SQLQuery.INSERT_ASSETS_QUERY, (template.name, template.version, template.description, AssetType.PROMPT_TEMPLATE.value,  binary, timestamp))
             
         return template
-    
+
+    def get(self, asset_name: str, version: int) -> Any:
+
+        asset = self.tracer.db_client.fetch_data(SQLQuery.SELECT_ASSET_QUERY, (asset_name, version))[0]
+        asset_type = asset['asset_type']
+
+        if asset_type == AssetType.DATASET.value:
+            binary = json.loads(asset['asset_binary'])
+            file_path = binary['file_path']
+            return Dataset(name=asset_name, version=version, description=asset['asset_description'], file_path=file_path)
+        
+        if  asset_type == AssetType.PROMPT_TEMPLATE.value:
+            system_prompt, user_prompt, _ = Utils.split_prompt_template(asset['asset_binary'])
+            return PromptTemplate(name=asset_name, version=version, description=asset['asset_description'], system_prompt=system_prompt, user_prompt=user_prompt)
+            
     def deploy(self, asset: T, target_dir: str) -> T:
 
         if isinstance(asset, PromptTemplate):

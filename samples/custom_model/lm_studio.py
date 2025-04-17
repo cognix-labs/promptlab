@@ -2,7 +2,7 @@ from typing import Any
 from openai import OpenAI
 
 from promptlab.model.model import EmbeddingModel, Model
-from promptlab.types import EmbeddingModelConfig, InferenceResult, InferenceModelConfig
+from promptlab.types import  InferenceResult, InferenceModelConfig
 
 class LmStudio(Model):
 
@@ -44,7 +44,7 @@ class LmStudio(Model):
     
 # class LmStudio_Embedding(EmbeddingModel):
 
-#     def __init__(self, model_config: EmbeddingModelConfig):
+#     def __init__(self, model_config: ):
 
 #         super().__init__(model_config)
 

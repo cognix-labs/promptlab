@@ -22,7 +22,7 @@ pt = pl.asset.create(prompt_template)
 
 # Create a new version of the prompt template
 prompt_template = PromptTemplate(
-    name="essay_feedback",
+    name=pt.name,
     description="A prompt for generating feedback on essays",
     system_prompt='''You are a helpful assistant who can provide feedback on essays. You follow the criteria below while writing feedback.                    
         Grammar & Spelling - The essay should have correct grammar, punctuation, and spelling.

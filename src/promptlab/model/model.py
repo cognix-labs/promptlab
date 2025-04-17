@@ -1,9 +1,30 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from dataclasses import dataclass
+from typing import Any, Optional
+from pydantic import BaseModel, HttpUrl
 
-from promptlab.types import EmbeddingModelConfig, InferenceResult, InferenceModelConfig, ModelConfig
+# class ModelConfig(BaseModel):
+#     type: str
+#     api_key: Optional[str] = None
+#     api_version: Optional[str] = None
+#     endpoint: Optional[HttpUrl] = None 
+#     model_deployment: str
 
+@dataclass
+class ModelConfig:
+    type: str
+    model_deployment: str
+    api_key: Optional[str] = None
+    api_version: Optional[str] = None
+    endpoint: Optional[str] = None
 
+@dataclass
+class InferenceResult:
+    inference: str
+    prompt_tokens: int
+    completion_tokens: int
+    latency_ms: int
+    
 class Model(ABC):
     
     def __init__(self, model_config: ModelConfig):

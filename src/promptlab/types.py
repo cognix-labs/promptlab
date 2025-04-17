@@ -5,40 +5,31 @@ from pydantic import BaseModel, HttpUrl, field_validator
 
 from promptlab.enums import TracerType
 from promptlab.evaluator.evaluator import Evaluator
+from promptlab.model.model import EmbeddingModel, Model
 from promptlab.utils import Utils
 
-class InferenceModelConfig(BaseModel):
+@dataclass
+class Dataset:
+    name: str
+    description: str
+    file_path: str
+    version: int = 0
+
+@dataclass
+class PromptTemplate:
+    name: str = None
+    description: str = None
+    system_prompt: str = None
+    user_prompt: str = None
+    version: int = 0
+
+# class ModelConfig(BaseModel):
     
-    type: str
-    api_key: Optional[str] = None
-    api_version: Optional[str] = None
-    endpoint: Optional[HttpUrl] = None 
-    inference_model_deployment: str
-
-    class config:
-        arbitrary_types_allowed=True
-
-class EmbeddingModelConfig(BaseModel):
-    
-    type: str
-    api_key: Optional[str] = None
-    api_version: Optional[str] = None
-    endpoint: Optional[HttpUrl] = None 
-    embedding_model_deployment: str
-
-    class config:
-        arbitrary_types_allowed=True
-
-class ModelConfig(BaseModel):
-    
-    type: str
-    api_key: Optional[str] = None
-    api_version: Optional[str] = None
-    endpoint: Optional[HttpUrl] = None 
-    model_deployment: str
-
-    # class config:
-    #     arbitrary_types_allowed=True
+#     type: str
+#     api_key: Optional[str] = None
+#     api_version: Optional[str] = None
+#     endpoint: Optional[HttpUrl] = None 
+#     model_deployment: str
 
 class EvaluationConfig(BaseModel):
 
@@ -57,16 +48,18 @@ class AssetConfig(BaseModel):
 
 class ExperimentConfig(BaseModel):
 
-    # inference_model: InferenceModelConfig
-    # embedding_model: EmbeddingModelConfig
-    inference_model: Any
-    embedding_model: Any
-    prompt_template: AssetConfig
-    dataset: AssetConfig
+    inference_model: Model
+    embedding_model: EmbeddingModel
+    prompt_template: PromptTemplate
+    dataset: Dataset
     evaluation: List[EvaluationConfig]
 
-    class Config:
-        extra = "forbid" 
+    # class Config:
+    #     extra = "forbid" 
+
+    model_config = {
+        "arbitrary_types_allowed": True
+    }
     
 class TracerConfig(BaseModel):
 
@@ -80,24 +73,11 @@ class TracerConfig(BaseModel):
     class Config:
         use_enum_values = True 
 
-@dataclass
-class InferenceResult:
-    inference: str
-    prompt_tokens: int
-    completion_tokens: int
-    latency_ms: int
+# @dataclass
+# class InferenceResult:
+#     inference: str
+#     prompt_tokens: int
+#     completion_tokens: int
+#     latency_ms: int
 
-@dataclass
-class Dataset:
-    name: str
-    description: str
-    file_path: str
-    version: int = 0
 
-@dataclass
-class PromptTemplate:
-    name: str = None
-    description: str = None
-    system_prompt: str = None
-    user_prompt: str = None
-    version: int = 0

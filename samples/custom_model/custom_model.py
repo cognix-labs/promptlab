@@ -12,7 +12,7 @@ pl = PromptLab(tracer_config)
 
 # Create a prompt template
 prompt_template = PromptTemplate(
-    name="essay_feedback031111",
+    name="essay_feedback",
     description="A prompt for generating feedback on essays",
     system_prompt="You are a helpful assistant who can provide feedback on essays.",
     user_prompt='''The essay topic is - <essay_topic>.
@@ -24,22 +24,13 @@ pt = pl.asset.create(prompt_template)
 
 # Create a dataset
 dataset = Dataset(
-    name="essay_samples031111",
+    name="essay_samples",
     description="dataset for evaluating the essay_feedback prompt",
     file_path="./samples/data/essay_feedback.jsonl",
 )
 ds = pl.asset.create(dataset)
 
-model_config ={
-                "type": "ollama",
-                "model_deployment": "llama3.2"
-            }
-embedding_model_config = {
-                "type": "ollama",
-                "model_deployment": "nomic-embed-text:latest",
-            }
-_ollama =  Ollama(model_config=model_config)
-_ollama_embedding = Ollama_Embedding(model_config=embedding_model_config)
+# Custom model
 inference_model = {
             "type": "lm_studio",
             "api_key": "lm-studio",
@@ -49,18 +40,20 @@ inference_model = {
 }
 lmstudio = LmStudio(inference_model)
 
+# Built in model
+embedding_model_config = {
+                "type": "ollama",
+                "model_deployment": "nomic-embed-text:latest",
+            }
+
+ollama_embedding = Ollama_Embedding(model_config=embedding_model_config)
+
 # Run an experiment
 experiment_config = {
     "inference_model" : lmstudio,
-    "embedding_model" : _ollama_embedding,
-    "prompt_template": {
-        "name": pt.name,
-        "version": pt.version
-    },
-    "dataset": {
-        "name": ds.name,
-        "version": ds.version
-    },
+    "embedding_model" : ollama_embedding,
+    "prompt_template": pt,
+    "dataset": ds,
     "evaluation": [
             {
                 "metric": "Fluency",

@@ -1,17 +1,15 @@
 from typing import Any
 import ollama
 
-from promptlab.model.model import EmbeddingModel, Model
-from promptlab.types import EmbeddingModelConfig, InferenceResult, InferenceModelConfig, ModelConfig
+from promptlab.model.model import EmbeddingModel, Model, InferenceResult, ModelConfig
+# from promptlab.types import InferenceResult, ModelConfig
 
 class Ollama(Model):
 
-    # def __init__(self, model_config: InferenceModelConfig):
     def __init__(self, model_config: ModelConfig):
 
         super().__init__(model_config)
 
-        # self.model_config = model_config
         self.client = ollama
         
     def __call__(self, system_prompt: str, user_prompt: str)->InferenceResult:
@@ -46,12 +44,10 @@ class Ollama(Model):
     
 class Ollama_Embedding(EmbeddingModel):
 
-    # def __init__(self, model_config: EmbeddingModelConfig):
     def __init__(self, model_config: ModelConfig):
 
         super().__init__(model_config)
 
-        # self.model_config = model_config
         self.client = ollama
     
     def __call__(self, text: str) -> Any:

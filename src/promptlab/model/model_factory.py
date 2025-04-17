@@ -3,12 +3,12 @@ from promptlab.model.azure_openai import AzOpenAI, AzOpenAI_Embedding
 from promptlab.model.model import EmbeddingModel
 from promptlab.model.model import Model
 from promptlab.model.ollama import Ollama, Ollama_Embedding
-from promptlab.types import InferenceModelConfig, EmbeddingModelConfig
+from promptlab.model.model import ModelConfig
 
 class ModelFactory:
 
     @staticmethod
-    def get_model(model_config: InferenceModelConfig) -> Model:
+    def get_model(model_config: ModelConfig) -> Model:
 
         connection_type = model_config.type
         
@@ -20,7 +20,7 @@ class ModelFactory:
             raise ValueError(f"Unknown connection type: {connection_type}")
         
     @staticmethod
-    def get_embedding_model(model_config: EmbeddingModelConfig) -> EmbeddingModel:
+    def get_embedding_model(model_config: ModelConfig) -> EmbeddingModel:
 
         connection_type = model_config.type
 
