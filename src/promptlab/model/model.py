@@ -1,14 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Optional
-from pydantic import BaseModel, HttpUrl
-
-# class ModelConfig(BaseModel):
-#     type: str
-#     api_key: Optional[str] = None
-#     api_version: Optional[str] = None
-#     endpoint: Optional[HttpUrl] = None 
-#     model_deployment: str
 
 @dataclass
 class ModelConfig:

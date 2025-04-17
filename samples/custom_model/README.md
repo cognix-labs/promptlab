@@ -1,68 +1,65 @@
 # Custom Metric
 
-This sample ([custom_metric.py](custom_metric.py)) demonstrates how to use PromptLab to use a custom evaluation metric. This also open ups the opprtunity to use external evaluation libraries like Ragas or Azure Evaluation SDK to use with PromptLab.
+This sample ([custom_metric.py](custom_model.py)) demonstrates how to use PromptLab to bring your own model to PromptLab. Here we shall use LMStudio API to build a new model class.
 
-## Creating custom metric 
+## Creating custom model 
 
-The following code snippet implements a metric using the evaluation library Ragas
+The following code snippet implements a LMStudio based model.
 
-    class RagasFactualCorrectness(Evaluator):
-        
-        def evaluate(self, data: dict):
+class LmStudio(Model):
 
-            inference = data["response"]
-            reference = data["reference"]
-            
-            sample = SingleTurnSample(
-                response=inference,
-                reference=reference
-            )
-            
-            evaluator_llm = LangchainLLMWrapper(ChatOllama(model=self.inference.model_config.inference_model_deployment))
+    def __init__(self, model_config: InferenceModelConfig):
 
-            scorer = FactualCorrectness(llm = evaluator_llm)
-            return scorer.single_turn_score(sample)
+        super().__init__(model_config)
 
-## Using custom metric
+        self.client = OpenAI(base_url=str(self.config.endpoint), api_key=self.config.api_key)
 
-The following code snippet demonstrate how to use the custom metric in the experiment.
+    def __call__(self, system_prompt: str, user_prompt: str)->InferenceResult:
 
-    length = LengthEvaluator()
-    factual_correctness = RagasFactualCorrectness()
+        payload = [
+            {
+                "role": "system",
+                "content": system_prompt
+            },
+            {
+                "role": "user",
+                "content": user_prompt
+            }
+        ]
+
+        completion = self.client.chat.completions.create(
+            model=self.config.model_deployment,
+            messages=payload
+        )
+       
+        latency_ms = 0
+        inference = completion.choices[0].message.content
+        prompt_token = 0
+        completion_token = 0
+
+        return InferenceResult(
+            inference=inference,
+            prompt_tokens=prompt_token,
+            completion_tokens=completion_token,
+            latency_ms=latency_ms
+        )
+
+## Using custom model
+
+The following code snippet demonstrate how to use the custom model in the experiment.
 
     experiment_config = {
-        "inference_model" : {
-                "type": "ollama",
-                "inference_model_deployment": "llama3.2",
-        },
-        "embedding_model" : {
-                "type": "ollama",
-                "embedding_model_deployment": "nomic-embed-text:latest",
-        },
-        "prompt_template": {
-            "name": pt.name,
-            "version": pt.version
-        },
-        "dataset": {
-            "name": ds.name,
-            "version": ds.version
-        },
+        "inference_model" : lmstudio,
+        "embedding_model" : ollama_embedding,
+        "prompt_template": pt,
+        "dataset": ds,
         "evaluation": [
                 {
-                    "metric": "LengthEvaluator",
+                    "metric": "Fluency",
                     "column_mapping": {
-                        "response":"$inference",
+                        "response":"$inference"
                     },
-                    "evaluator": length,
-                },   
-                {
-                    "metric": "RagasFactualCorrectness",
-                    "column_mapping": {
-                        "response":"$inference",
-                        "reference":"feedback"
-                    },
-                    "evaluator": factual_correctness,
-                },                    
+                },                
             ],    
     }
     pl.experiment.run(experiment_config)

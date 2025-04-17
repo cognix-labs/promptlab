@@ -57,22 +57,10 @@ An experiment evaluates the outcome of a prompt against a set of metrics for a g
 In the [quickstart.py](quickstart.py), we are using the prompt template and dataset created in the previous steps to design an experiment. 
 
     experiment_config = {
-        "inference_model" : {
-                "type": "ollama",
-                "inference_model_deployment": "llama3.2",
-        },
-        "embedding_model" : {
-                "type": "ollama",
-                "embedding_model_deployment": "nomic-embed-text:latest",
-        },
-        "prompt_template": {
-            "name": pt.name,
-            "version": pt.version
-        },
-        "dataset": {
-            "name": ds.name,
-            "version": ds.version
-        },
+        "inference_model" : ollama,
+        "embedding_model" : ollama_embedding,
+        "prompt_template": pt,
+        "dataset": ds,
         "evaluation": [
                 {
                     "metric": "SemanticSimilarity",

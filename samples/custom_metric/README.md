@@ -18,7 +18,7 @@ The following code snippet implements a metric using the evaluation library Raga
                 reference=reference
             )
             
-            evaluator_llm = LangchainLLMWrapper(ChatOllama(model=self.inference.model_config.inference_model_deployment))
+            evaluator_llm = LangchainLLMWrapper(ChatOllama(model=self.inference.config.model_deployment))
 
             scorer = FactualCorrectness(llm = evaluator_llm)
             return scorer.single_turn_score(sample)
@@ -31,22 +31,10 @@ The following code snippet demonstrate how to use the custom metric in the exper
     factual_correctness = RagasFactualCorrectness()
 
     experiment_config = {
-        "inference_model" : {
-                "type": "ollama",
-                "inference_model_deployment": "llama3.2",
-        },
-        "embedding_model" : {
-                "type": "ollama",
-                "embedding_model_deployment": "nomic-embed-text:latest",
-        },
-        "prompt_template": {
-            "name": pt.name,
-            "version": pt.version
-        },
-        "dataset": {
-            "name": ds.name,
-            "version": ds.version
-        },
+        "inference_model" : ollama,
+        "embedding_model" : ollama_embedding,
+        "prompt_template": pt,
+        "dataset": ds,
         "evaluation": [
                 {
                     "metric": "LengthEvaluator",

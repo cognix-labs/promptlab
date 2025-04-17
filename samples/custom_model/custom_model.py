@@ -1,7 +1,7 @@
 from promptlab import PromptLab
 from promptlab.types import PromptTemplate, Dataset
 from lm_studio import LmStudio
-from promptlab.model import Ollama, Ollama_Embedding
+from promptlab.model import Ollama_Embedding
 
 # Initialize PromptLab with SQLite storage
 tracer_config = {

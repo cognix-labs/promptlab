@@ -2,7 +2,6 @@ from typing import Any
 from openai import AzureOpenAI
 
 from promptlab.model.model import EmbeddingModel, Model, InferenceResult, ModelConfig
-# from promptlab.types import InferenceResult, ModelConfig
 import time
 
 

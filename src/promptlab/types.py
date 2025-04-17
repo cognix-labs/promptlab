@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from typing import Any, List, Optional
+from typing import List, Optional
 
-from pydantic import BaseModel, HttpUrl, field_validator
+from pydantic import BaseModel, field_validator
 
 from promptlab.enums import TracerType
 from promptlab.evaluator.evaluator import Evaluator
@@ -22,14 +22,6 @@ class PromptTemplate:
     system_prompt: str = None
     user_prompt: str = None
     version: int = 0
-
-# class ModelConfig(BaseModel):
-    
-#     type: str
-#     api_key: Optional[str] = None
-#     api_version: Optional[str] = None
-#     endpoint: Optional[HttpUrl] = None 
-#     model_deployment: str
 
 class EvaluationConfig(BaseModel):
 
@@ -54,9 +46,6 @@ class ExperimentConfig(BaseModel):
     dataset: Dataset
     evaluation: List[EvaluationConfig]
 
-    # class Config:
-    #     extra = "forbid" 
-
     model_config = {
         "arbitrary_types_allowed": True
     }
@@ -72,12 +61,3 @@ class TracerConfig(BaseModel):
     
     class Config:
         use_enum_values = True 
-
-# @dataclass
-# class InferenceResult:
-#     inference: str
-#     prompt_tokens: int
-#     completion_tokens: int
-#     latency_ms: int
-
-

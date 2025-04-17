@@ -1,7 +1,6 @@
-from typing import Any
 from openai import OpenAI
 
-from promptlab.model.model import EmbeddingModel, Model
+from promptlab.model.model import Model
 from promptlab.types import  InferenceResult, InferenceModelConfig
 
 class LmStudio(Model):
@@ -41,22 +40,3 @@ class LmStudio(Model):
             completion_tokens=completion_token,
             latency_ms=latency_ms
         )
-    
-# class LmStudio_Embedding(EmbeddingModel):
-
-#     def __init__(self, model_config: ):
-
-#         super().__init__(model_config)
-
-#         self.client = AzureOpenAI(
-#             api_key = self.config.api_key,  
-#             azure_endpoint=str(self.config.endpoint)
-#         )    
-
-#     def __call__(self, text: str) -> Any:
-#         embedding = self.client.embed(
-#                     model=self.model_config.embedding_model_deployment,
-#                     input=text,
-#                     )["embeddings"]
-
-#         return embedding

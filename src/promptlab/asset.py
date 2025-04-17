@@ -3,7 +3,6 @@ from datetime import datetime
 import json
 import re
 import os
-import uuid
 
 from promptlab.enums import AssetType
 from promptlab.db.sql import SQLQuery

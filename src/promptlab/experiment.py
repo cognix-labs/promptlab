@@ -1,12 +1,10 @@
 from datetime import datetime
-from typing import List, Dict, Tuple
+from typing import List
 import json
-import re
 import uuid
 
 from promptlab.config import ConfigValidator, ExperimentConfig
 from promptlab.db.sql import SQLQuery
-from promptlab.model.model_factory import ModelFactory
 from promptlab.evaluator.evaluator_factory import EvaluatorFactory
 from promptlab.tracer.tracer import Tracer
 from promptlab.utils import Utils
@@ -32,8 +30,7 @@ class Experiment:
 
     def init_batch_eval(self, eval_dataset, system_prompt, user_prompt, prompt_template_variables, experiment_config: ExperimentConfig) -> List:
 
-        # inference = ModelFactory.get_model(experiment_config.inference_model)
-        inference = (experiment_config.inference_model)
+        inference = experiment_config.inference_model
         experiment_id = str(uuid.uuid4())
         timestamp = datetime.now().isoformat()
 
