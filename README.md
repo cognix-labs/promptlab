@@ -9,17 +9,17 @@
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Core Concepts](#core-concepts)
-- [Supported Models](#supported-models)
-- [Examples](#examples)
-- [Documentation](#documentation)
-- [Articles & Tutorials](#articles--tutorials)
-- [Contributing](#contributing)
-- [License](#license)
+- [Overview](#overview-)
+- [Features](#features-)
+- [Installation](#installation-)
+- [Quick Start](#quick-start-)
+- [Core Concepts](#core-concepts-)
+- [Supported Models](#supported-models-)
+- [Examples](#examples-)
+- [Documentation](#documentation-)
+- [Articles & Tutorials](#articles--tutorials-)
+- [Contributing](#contributing-)
+- [License](#license-)
 
 ## Overview 🔍
 
