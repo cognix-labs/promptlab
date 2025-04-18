@@ -1,12 +1,57 @@
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Any, Protocol, runtime_checkable
 
 from pydantic import BaseModel, field_validator
 
 from promptlab.enums import TracerType
 from promptlab.evaluator.evaluator import Evaluator
-from promptlab.model.model import EmbeddingModel, Model
 from promptlab.utils import Utils
+
+@dataclass
+class InferenceResult:
+    inference: str
+    prompt_tokens: int
+    completion_tokens: int
+    latency_ms: int
+
+@dataclass
+class ModelConfig:
+    type: str
+    model_deployment: Optional[str] = None
+    api_key: Optional[str] = None
+    api_version: Optional[str] = None
+    endpoint: Optional[str] = None
+    inference_model_deployment: Optional[str] = None
+    embedding_model_deployment: Optional[str] = None
+
+@dataclass
+class InferenceModelConfig:
+    type: str
+    model_deployment: str
+    api_key: Optional[str] = None
+    api_version: Optional[str] = None
+    endpoint: Optional[str] = None
+
+@dataclass
+class EmbeddingModelConfig:
+    type: str
+    model_deployment: str
+    api_key: Optional[str] = None
+    api_version: Optional[str] = None
+    endpoint: Optional[str] = None
+
+@runtime_checkable
+class Model(Protocol):
+    def invoke(self, system_prompt: str, user_prompt: str) -> InferenceResult:
+        ...
+
+    async def ainvoke(self, system_prompt: str, user_prompt: str) -> InferenceResult:
+        ...
+
+@runtime_checkable
+class EmbeddingModel(Protocol):
+    def __call__(self, text: str) -> Any:
+        ...
 
 @dataclass
 class Dataset:
@@ -32,7 +77,7 @@ class EvaluationConfig(BaseModel):
     model_config = {
         "arbitrary_types_allowed": True
     }
-    
+
 class AssetConfig(BaseModel):
 
     name: str
@@ -49,15 +94,15 @@ class ExperimentConfig(BaseModel):
     model_config = {
         "arbitrary_types_allowed": True
     }
-    
+
 class TracerConfig(BaseModel):
 
-    type: TracerType  
+    type: TracerType
     db_file: str
 
     @field_validator('db_file')
-    def validate_db_server(cls, value):             
+    def validate_db_server(cls, value):
         return Utils.sanitize_path(value)
-    
+
     class Config:
-        use_enum_values = True 
+        use_enum_values = True
