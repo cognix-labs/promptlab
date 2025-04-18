@@ -24,8 +24,9 @@ python async_example.py
 This will:
 
 1. Create a prompt template and dataset
-2. Run an experiment asynchronously
-3. Start the PromptLab Studio asynchronously
+2. Create a custom evaluator for measuring response length
+3. Run an experiment asynchronously
+4. Start the PromptLab Studio asynchronously
 
 ## Key Features
 
@@ -63,6 +64,34 @@ pl.studio.start(8000)
 
 # Asynchronous start
 await pl.start_studio_async(8000)
+```
+
+### Custom Evaluators
+
+This example also demonstrates how to use custom evaluators with async functionality:
+
+```python
+# Define a custom evaluator
+class LengthEvaluator(Evaluator):
+    def evaluate(self, data: dict) -> str:
+        response = data.get("response", "")
+        return str(len(response))
+
+# Create an instance and use it in the experiment
+length_evaluator = LengthEvaluator()
+
+experiment_config = {
+    # ...
+    "evaluation": [
+        {
+            "metric": "LengthEvaluator",
+            "column_mapping": {
+                "response": "$inference"
+            },
+            "evaluator": length_evaluator
+        }
+    ]
+}
 ```
 
 ## Benefits

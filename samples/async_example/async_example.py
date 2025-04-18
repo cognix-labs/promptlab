@@ -2,6 +2,7 @@ import asyncio
 from promptlab import PromptLab
 from promptlab.types import PromptTemplate, Dataset, ModelConfig
 from promptlab.model.ollama import Ollama, Ollama_Embedding
+from custom_evaluator import LengthEvaluator
 
 async def main():
     # Initialize PromptLab with SQLite storage
@@ -42,6 +43,9 @@ async def main():
     ollama = Ollama(model_config=inference_model_config)
     ollama_embedding = Ollama_Embedding(model_config=embedding_model_config)
 
+    # Create the length evaluator instance
+    length_evaluator = LengthEvaluator()
+
     # Run an experiment asynchronously
     experiment_config = {
         "inference_model": ollama,
@@ -50,11 +54,11 @@ async def main():
         "dataset": ds,
         "evaluation": [
             {
-                "type": "custom",
-                "metric": "length",
+                "metric": "LengthEvaluator",
                 "column_mapping": {
                     "response": "$inference"
-                }
+                },
+                "evaluator": length_evaluator
             }
         ]
     }
