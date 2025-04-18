@@ -1,10 +1,10 @@
 import time
 import asyncio
+from typing import Any
 from openai import AzureOpenAI
 from openai import AsyncAzureOpenAI
 
-from promptlab.model.model import Model
-from promptlab.types import InferenceResult, ModelConfig
+from promptlab.model.model import EmbeddingModel, Model, InferenceResult, ModelConfig
 
 
 class AzOpenAI(Model):
@@ -13,7 +13,6 @@ class AzOpenAI(Model):
 
         super().__init__(model_config)
 
-        self.model_config = model_config
         self.client = AzureOpenAI(
             api_key=model_config.api_key,
             api_version=model_config.api_version,
@@ -95,3 +94,24 @@ class AzOpenAI(Model):
             completion_tokens=completion_token,
             latency_ms=latency_ms
         )
+
+class AzOpenAI_Embedding(EmbeddingModel):
+
+    def __init__(self, model_config: ModelConfig):
+
+        super().__init__(model_config)
+
+        self.client = AzureOpenAI(
+            api_key=model_config.api_key,
+            api_version=model_config.api_version,
+            azure_endpoint=str(model_config.endpoint)
+        )
+
+    def __call__(self, text: str) -> Any:
+
+        embedding = self.client.embeddings.create(
+                                                    input =text,
+                                                    model=self.config.model_deployment
+                                                 ).data[0].embedding
+
+        return embedding

@@ -1,5 +1,4 @@
 from promptlab import PromptLab
-from promptlab.model.ollama import Ollama, Ollama_Embedding
 from promptlab.types import PromptTemplate, Dataset
 from factual_correctness import RagasFactualCorrectness
 from length import LengthEvaluator
@@ -31,28 +30,27 @@ dataset = Dataset(
 )
 ds = pl.asset.create(dataset)
 
-# model instnace
-model_config ={
-                "type": "ollama",
-                "model_deployment": "llama3.2"
-            }
-ollama =  Ollama(model_config=model_config)
-
-embedding_model_config = {
-                "type": "ollama",
-                "model_deployment": "nomic-embed-text:latest",
-            }
-ollama_embedding = Ollama_Embedding(model_config=embedding_model_config)
-
 length = LengthEvaluator()
 factual_correctness = RagasFactualCorrectness()
 
 # Run an experiment
 experiment_config = {
-    "inference_model" : ollama,
-    "embedding_model" : ollama_embedding,
-    "prompt_template": pt,
-    "dataset": ds,
+    "inference_model" : {
+            "type": "ollama",
+            "inference_model_deployment": "llama3.2",
+    },
+    "embedding_model" : {
+            "type": "ollama",
+            "embedding_model_deployment": "nomic-embed-text:latest",
+    },
+    "prompt_template": {
+        "name": pt.name,
+        "version": pt.version
+    },
+    "dataset": {
+        "name": ds.name,
+        "version": ds.version
+    },
     "evaluation": [
             {
                 "metric": "LengthEvaluator",

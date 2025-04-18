@@ -12,8 +12,6 @@ Install the python package using pip. It's highly recommended to use a virtual e
 
 The frist step to use PromptLab, is to initialize the PromptLab object. PromptLab uses `sqlite` for database. Please check [Tracer](../../docs/README.md#tracer) to learn more about it.
 
-In the [quickstart.py](quickstart.py), the `def create_prompt_lab(tracer_type: str, tracer_db_file_path: str) -> PromptLab:` function creates the PromptLab object.
-
 Once the PromptLab object is ready, you can start the PromptLab Studio to check the assets and experiments.
 
     prompt_lab.studio.start(8000)
@@ -22,18 +20,20 @@ Once the PromptLab object is ready, you can start the PromptLab Studio to check 
 
 A prompt template is a prompt with or without placeholders. Please check [Prompt Template](../../docs/README.md#prompt-template) to learn more about it.
 
-In the [quickstart.py](quickstart.py), the `def create_prompt_template(prompt_lab: PromptLab) -> str:` method demonstrates how to create a prompt template.
-
 A  prompt template has two main attributes - `system_prompt` and `user_prompt`. The sample prompt used in this example is -
 
-    system_prompt = 'You are a helpful assistant who can provide feedback on essays.'
-    user_prompt = '''The essay topic is - <essay_topic>.
+    prompt_template = PromptTemplate(
+        name="essay_feedback",
+        description="A prompt for generating feedback on essays",
+        system_prompt="You are a helpful assistant who can provide feedback on essays.",
+        user_prompt='''The essay topic is - <essay_topic>.
+            The submitted essay is - <essay>
+            Now write feedback on this essay.
+            '''
+    )
+    pt = pl.asset.create(prompt_template)
 
-    The submitted essay is - <essay>
-    Now write feedback on this essay.
-    '''
-
-Here, `<context>` and `<question>` are placeholders that will be replaced with real data before sending to the LLM. PromptLab will search the dataset for columns with these exact names and use their values to replace the corresponding placeholders. Ensure that the dataset contains columns named `context` and `question` to avoid errors.
+Here, `<essay_topic>` and `<essay>` are placeholders that will be replaced with real data before sending to the LLM. PromptLab will search the dataset for columns with these exact names and use their values to replace the corresponding placeholders. Ensure that the dataset contains columns named `essay_topic` and `essay` to avoid errors.
 
 ![PromptLab Studio](../../img/studio-pt.png)
 
@@ -41,7 +41,12 @@ Here, `<context>` and `<question>` are placeholders that will be replaced with r
 
 A dataset is a jsonl file to design the experiment. Please check [Dataset](../../docs/README.md#dataset) to learn more about it.
 
-In the [quickstart.py](quickstart.py), the `def create_dataset(prompt_lab: PromptLab, file_path: str) -> str:` method demonstrates how to create a dataset.
+    dataset = Dataset(
+        name="essay_samples",
+        description="dataset for evaluating the essay_feedback prompt",
+        file_path="./samples/data/essay_feedback.jsonl",
+    )
+    ds = pl.asset.create(dataset)
 
 ![PromptLab Studio](../../img/studio-ds.png)
 
@@ -49,17 +54,34 @@ In the [quickstart.py](quickstart.py), the `def create_dataset(prompt_lab: Promp
 
 An experiment evaluates the outcome of a prompt against a set of metrics for a given dataset. Developers can modify hyperparameters (such as prompt template and models) and compare experiment results to determine the best prompt for deployment in production. Please check [Experiment](../../docs/README.md#experiment) to learn more about it.
 
-In the [quickstart.py](quickstart.py), we are using the prompt template and dataset created in the previous steps to design an experiment. The `def create_experiment(prompt_lab: PromptLab, endpoint:str, prompt_template_id: str, prompt_template_version: int, dataset_id: str, dataset_version: int):
-` method demonstrates how to create and run an expriment.
+In the [quickstart.py](quickstart.py), we are using the prompt template and dataset created in the previous steps to design an experiment. 
 
-![PromptLab Studio](../../img/studio-home.png)
+    experiment_config = {
+        "inference_model" : ollama,
+        "embedding_model" : ollama_embedding,
+        "prompt_template": pt,
+        "dataset": ds,
+        "evaluation": [
+                {
+                    "metric": "SemanticSimilarity",
+                    "column_mapping": {
+                        "response":"$inference",
+                        "reference":"feedback"
+                    },
+                },
+                {
+                    "metric": "Fluency",
+                    "column_mapping": {
+                        "response":"$inference"
+                    },
+                },
+            ],    
+    }
+    pl.experiment.run(experiment_config)
 
-You can compare multiple experiments.
 
-![PromptLab Studio](../../img/studio-exp-compare.png)
+![PromptLab Studio](../../img/studio-exp.png)
 
-## Deploy prompt
+Details of the experiment.
 
-Once the developer is happy with a prompt template, they can deploy it to production. Please check [Deployment](../../docs/README.md#deployment) to learn more about it. 
-
-In the [quickstart.py](quickstart.py), the `deploy_prompt_template(prompt_lab: PromptLab)` method demonstrates how to deploy a prompt template.
+![PromptLab Studio](../../img/studio-exp-details.png)

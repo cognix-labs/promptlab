@@ -1,8 +1,7 @@
 from promptlab import PromptLab
-from promptlab.model.ollama import Ollama, Ollama_Embedding
 from promptlab.types import PromptTemplate, Dataset
-from factual_correctness import RagasFactualCorrectness
-from length import LengthEvaluator
+from lm_studio import LmStudio
+from promptlab.model import Ollama_Embedding
 
 # Initialize PromptLab with SQLite storage
 tracer_config = {
@@ -31,44 +30,37 @@ dataset = Dataset(
 )
 ds = pl.asset.create(dataset)
 
-# model instnace
-model_config ={
-                "type": "ollama",
-                "model_deployment": "llama3.2"
-            }
-ollama =  Ollama(model_config=model_config)
+# Custom model
+inference_model = {
+            "type": "lm_studio",
+            "api_key": "lm-studio",
+            "api_version": "v1",
+            "endpoint": "http://localhost:1234/v1",
+            "model_deployment": "llama-3.2-3b-instruct",
+}
+lmstudio = LmStudio(inference_model)
 
+# Built in model
 embedding_model_config = {
                 "type": "ollama",
                 "model_deployment": "nomic-embed-text:latest",
             }
-ollama_embedding = Ollama_Embedding(model_config=embedding_model_config)
 
-length = LengthEvaluator()
-factual_correctness = RagasFactualCorrectness()
+ollama_embedding = Ollama_Embedding(model_config=embedding_model_config)
 
 # Run an experiment
 experiment_config = {
-    "inference_model" : ollama,
+    "inference_model" : lmstudio,
     "embedding_model" : ollama_embedding,
     "prompt_template": pt,
     "dataset": ds,
     "evaluation": [
             {
-                "metric": "LengthEvaluator",
+                "metric": "Fluency",
                 "column_mapping": {
-                    "response":"$inference",
+                    "response":"$inference"
                 },
-                "evaluator": length,
-            },   
-            {
-                "metric": "RagasFactualCorrectness",
-                "column_mapping": {
-                    "response":"$inference",
-                    "reference":"feedback"
-                },
-                "evaluator": factual_correctness,
-            },                    
+            },                
         ],    
 }
 pl.experiment.run(experiment_config)

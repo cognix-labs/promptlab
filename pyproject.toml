@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "promptlab"
-version = "0.0.5"
+version = "0.0.6"
 description = "PromptLab is a free, lightweight, open-source experimentation tool for Gen AI applications."
 readme = "README.md"
-authors = [{name = "Raihan Alam", email = "raihan.alam@gmail.com"}]
+authors = [{name = "ra1han", email = "hello@pl.com"}]
 license = {file = "LICENSE"}
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -21,14 +21,14 @@ dependencies = [
     "flask>=3.0.0",
     "flask-cors>=5.0.0",
     "click>=8.0.0",
-    "ragas>=0.2.0",
     "ollama>=0.4.7",
     "langchain_ollama>=0.2.3",
     "langchain-ollama",
     "asyncio>=3.4.3",
     "aiohttp>=3.8.0",
     "fastapi>=0.100.0",
-    "uvicorn>=0.22.0"
+    "uvicorn>=0.22.0",
+    "numpy",
 ]
 requires-python = ">=3.8"
 

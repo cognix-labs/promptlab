@@ -8,6 +8,7 @@
 </div>
 
 ## 📋 Table of Contents
+
 - [Overview](#overview)
 - [Features](#features)
 - [Installation](#installation)
@@ -25,6 +26,7 @@
 PromptLab is a free, lightweight, open-source experimentation tool for Gen AI applications. It streamlines prompt engineering, making it easy to set up experiments, evaluate prompts, and track them in production - all without requiring any cloud services or complex infrastructure.
 
 With PromptLab, you can:
+
 - Create and manage prompt templates with versioning
 - Build and maintain evaluation datasets
 - Run experiments with different models and prompts
@@ -152,17 +154,22 @@ asyncio.run(main())
 ## Core Concepts 🧩
 
 ### Tracer
+
 Storage that maintains assets and experiments. Currently uses SQLite for simplicity and portability.
 
 ### Assets
+
 Immutable artifacts used in experiments, with automatic versioning:
+
 - **Prompt Templates**: Prompts with optional placeholders for dynamic content
 - **Datasets**: JSONL files containing evaluation data
 
 ### Experiments
+
 Evaluate prompts against datasets using specified models and metrics.
 
 ### PromptLab Studio
+
 A local web interface for visualizing experiments and comparing results.
 
 ## Supported Models 🤖
@@ -173,9 +180,12 @@ A local web interface for visualizing experiments and comparing results.
 
 ## Examples 📚
 
-- [Quickstart](https://github.com/imum-ai/promptlab/tree/main/samples/quickstart): Basic usage of PromptLab
+- [Quickstart](https://github.com/imum-ai/promptlab/tree/main/samples/quickstart): Getting started with PromptLab
+- [Asset versioning](https://github.com/imum-ai/promptlab/tree/main/samples/asset_versioning): Versioning Prompts and Datasets
 - [Custom Metric](https://github.com/imum-ai/promptlab/tree/main/samples/custom_metric): Creating custom evaluation metrics
+
 - [Async Example](https://github.com/imum-ai/promptlab/tree/main/samples/async_example): Using async functionality for improved performance
+- [Custom Model](https://github.com/imum-ai/promptlab/tree/main/samples/custom_model): Bring your own model for evaluation
 
 ## Documentation 📖
 

@@ -1,9 +1,9 @@
+from typing import Any
 import ollama
 import asyncio
 import time
 
-from promptlab.model.model import Model
-from promptlab.types import InferenceResult, ModelConfig
+from promptlab.model.model import EmbeddingModel, Model, InferenceResult, ModelConfig
 
 class Ollama(Model):
 
@@ -11,7 +11,6 @@ class Ollama(Model):
 
         super().__init__(model_config)
 
-        self.model_config = model_config
         self.client = ollama
 
     def invoke(self, system_prompt: str, user_prompt: str):
@@ -85,3 +84,19 @@ class Ollama(Model):
             completion_tokens=completion_token,
             latency_ms=latency_ms
         )
+
+class Ollama_Embedding(EmbeddingModel):
+
+    def __init__(self, model_config: ModelConfig):
+
+        super().__init__(model_config)
+
+        self.client = ollama
+
+    def __call__(self, text: str) -> Any:
+        embedding = self.client.embed(
+                    model=self.config.model_deployment,
+                    input=text,
+                    )["embeddings"]
+
+        return embedding

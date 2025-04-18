@@ -1,6 +1,6 @@
 from promptlab.evaluator.evaluator import Evaluator
 
-class FluencyEvaluator(Evaluator):
+class Fluency(Evaluator):
     
     def evaluate(self, data: dict):
 
@@ -71,6 +71,6 @@ class FluencyEvaluator(Evaluator):
 
         user_prompt = user_prompt.replace("{{feedback}}", inference)
 
-        inference_result = self.inference_model.invoke(system_prompt, user_prompt)
+        inference_result = self.inference(system_prompt, user_prompt)
 
         return inference_result.inference    

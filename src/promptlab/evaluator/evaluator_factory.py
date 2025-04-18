@@ -1,96 +1,36 @@
 import os
-from typing import Any
-from ragas import SingleTurnSample
-import ragas
-from ragas.embeddings import LangchainEmbeddingsWrapper
-from ragas.llms import LangchainLLMWrapper
-from langchain_openai import AzureChatOpenAI
-from langchain_openai import AzureOpenAIEmbeddings
-from langchain_ollama import ChatOllama, OllamaEmbeddings
+import importlib
+import pkgutil
 
-from promptlab.enums import EvalLibrary, ModelType
 from promptlab.evaluator.evaluator import Evaluator
-from promptlab.model.model_factory import ModelFactory
-from promptlab.types import ModelConfig
+from promptlab.model.model import Model
 
-class RagasMetricEval(Evaluator):
-
-    def __init__(self, metric_class):
-
-        self.metric_class = metric_class
-
-    def evaluate(self, data: dict) -> str:
-
-        sample = SingleTurnSample(**data)
-        val = self.metric_class.single_turn_score(sample)
-
-        return val
+def import_evaluators():
+    """Dynamically import all evaluator modules"""
+    evaluator_classes = {}
+    package = 'promptlab.evaluator'
+    
+    for _, module_name, _ in pkgutil.iter_modules([os.path.dirname(__file__)]):
+        if module_name != 'evaluator_factory' and module_name != 'evaluator':
+            module = importlib.import_module(f'{package}.{module_name}')
+            for attr_name in dir(module):
+                attr = getattr(module, attr_name)
+                if isinstance(attr, type) and issubclass(attr, Evaluator) and attr != Evaluator:
+                    evaluator_classes[attr.__name__] = attr
+    return evaluator_classes
     
 class EvaluatorFactory:
-    
+    _evaluator_classes = import_evaluators()
+
     @staticmethod
-    def get_evaluator(eval_library: str, metric:str, model:ModelConfig, evaluator:Evaluator = None) -> Evaluator:
-        
-        if eval_library == EvalLibrary.RAGAS.value:
-    
-            if model.type == ModelType.AZURE_OPENAI.value:
-                
-                os.environ["AZURE_OPENAI_API_KEY"] = model.api_key
+    def get_evaluator(metric:str, inference_model:Model, embedding_model:Model, evaluator:Evaluator = None) -> Evaluator:
+        if evaluator is None:
+            evaluator_class = EvaluatorFactory._evaluator_classes.get(metric)
+            if evaluator_class is None:
+                raise ValueError(f"Unknown evaluator: {metric}")
+            evaluator = evaluator_class()
 
-                evaluator_llm = LangchainLLMWrapper(AzureChatOpenAI(
-                    openai_api_version=model.api_version,
-                    azure_endpoint=str(model.endpoint),
-                    azure_deployment=model.inference_model_deployment,
-                    model=model.inference_model_deployment,
-                    validate_base_url=False,
-                ))
+        evaluator.inference = inference_model
+        evaluator.embedding = embedding_model
 
-                evaluator_embeddings = LangchainEmbeddingsWrapper(AzureOpenAIEmbeddings(
-                    openai_api_version=model.api_version,
-                    azure_endpoint=str(model.endpoint),
-                    azure_deployment=model.embedding_model_deployment,
-                    model=model.embedding_model_deployment,
-                ))
-
-            if model.type == ModelType.OLLAMA.value:
-
-                evaluator_llm = LangchainLLMWrapper(ChatOllama(model=model.inference_model_deployment))
-                evaluator_embeddings = LangchainEmbeddingsWrapper(OllamaEmbeddings(model=model.embedding_model_deployment))
-
-            metric_params = {
-                "LLMContextPrecisionWithoutReference": {"llm": evaluator_llm},
-                "LLMContextPrecisionWithReference": {"llm": evaluator_llm},
-                "NonLLMContextPrecisionWithReference": {},
-                "LLMContextRecall": {"llm": evaluator_llm},
-                "NonLLMContextRecall": {},
-                "ContextEntityRecall": {"llm": evaluator_llm},
-                "NoiseSensitivity": {"llm": evaluator_llm},
-                "ResponseRelevancy": {"llm": evaluator_llm, "embeddings":evaluator_embeddings},
-                "Faithfulness": {"llm": evaluator_llm},
-                "FaithfulnesswithHHEM": {"llm": evaluator_llm},
-                "FactualCorrectness": {"llm": evaluator_llm},
-                "SemanticSimilarity": {"embeddings": evaluator_embeddings},
-                "NonLLMStringSimilarity": {},
-                "BleuScore": {},
-                "RougeScore": {},
-                "ExactMatch": {},
-                "StringPresence": {},
-                "DataCompyScore": {},
-                "LLMSQLEquivalence": {"llm": evaluator_llm},
-                "AspectCritic": {"llm": evaluator_llm},
-                "SimpleCriteriaScore": {"llm": evaluator_llm},
-                "SummarizationScore": {"llm": evaluator_llm},
-            }
-            constructor_params = metric_params.get(metric, {})
-
-            metric_class = getattr(ragas.metrics, metric)
-            metric_class = metric_class(**constructor_params)
-
-            return RagasMetricEval(metric_class)    
-        
-        if eval_library == EvalLibrary.CUSTOM.value:
-            inference_model = ModelFactory.get_model(model)
-            evaluator.inference_model = inference_model
-            return evaluator
-        else:
-            raise ValueError(f"Unknown evaluation strategy: {eval_library}")
+        return evaluator
