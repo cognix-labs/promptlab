@@ -38,14 +38,14 @@ class DeepSeek(Model):
         chat_completion = self.client.chat.completions.create(
             model=self.deployment,
             messages=payload,
-            extra_headers=extra_headers if extra_headers else None
+            extra_headers=extra_headers if extra_headers else None,
         )
         end_time = time.time()
         inference = chat_completion.choices[0].message.content
 
         # Some providers might not return usage info
-        prompt_token = getattr(chat_completion.usage, 'prompt_tokens', 0)
-        completion_token = getattr(chat_completion.usage, 'completion_tokens', 0)
+        prompt_token = getattr(chat_completion.usage, "prompt_tokens", 0)
+        completion_token = getattr(chat_completion.usage, "completion_tokens", 0)
 
         # Calculate latency
         latency_ms = (end_time - start_time) * 1000
@@ -79,7 +79,7 @@ class DeepSeek(Model):
         chat_completion = await self.async_client.chat.completions.create(
             model=self.deployment,
             messages=payload,
-            extra_headers=extra_headers if extra_headers else None
+            extra_headers=extra_headers if extra_headers else None,
         )
 
         end_time = time.time()
@@ -88,8 +88,8 @@ class DeepSeek(Model):
         inference = chat_completion.choices[0].message.content
 
         # Some providers might not return usage info
-        prompt_token = getattr(chat_completion.usage, 'prompt_tokens', 0)
-        completion_token = getattr(chat_completion.usage, 'completion_tokens', 0)
+        prompt_token = getattr(chat_completion.usage, "prompt_tokens", 0)
+        completion_token = getattr(chat_completion.usage, "completion_tokens", 0)
 
         return InferenceResult(
             inference=inference,
@@ -121,7 +121,7 @@ class DeepSeek_Embedding(EmbeddingModel):
             response = self.client.embeddings.create(
                 model=self.model_config.embedding_model_deployment,
                 input=text,
-                extra_headers=extra_headers if extra_headers else None
+                extra_headers=extra_headers if extra_headers else None,
             )
             embedding = response.data[0].embedding
         except Exception as e:
@@ -130,6 +130,7 @@ class DeepSeek_Embedding(EmbeddingModel):
             print(f"Warning: Embedding failed with error: {e}")
             # Return a dummy embedding of 1536 dimensions (common size)
             import numpy as np
+
             embedding = np.zeros(1536).tolist()
 
         return embedding

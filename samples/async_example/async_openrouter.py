@@ -19,7 +19,8 @@ async def main():
 
     # Create a prompt template
     prompt_template = PromptTemplate(
-        name="async_openrouter_example_" + str(int(time.time())),  # Add timestamp to make name unique
+        name="async_openrouter_example_"
+        + str(int(time.time())),  # Add timestamp to make name unique
         description="A prompt for testing async functionality with OpenRouter models",
         system_prompt="You are a helpful assistant who can provide concise answers.",
         user_prompt="Please answer this question: <question>",
@@ -28,7 +29,8 @@ async def main():
 
     # Create a dataset
     dataset = Dataset(
-        name="async_questions_" + str(int(time.time())),  # Add timestamp to make name unique
+        name="async_questions_"
+        + str(int(time.time())),  # Add timestamp to make name unique
         description="Sample questions for async testing",
         file_path="./questions.jsonl",
     )
@@ -38,7 +40,9 @@ async def main():
     # Get API key from environment variable
     openrouter_api_key = os.environ.get("OPENROUTER_API_KEY")
     if not openrouter_api_key:
-        raise ValueError("OPENROUTER_API_KEY environment variable is not set. Please set it in the .env file.")
+        raise ValueError(
+            "OPENROUTER_API_KEY environment variable is not set. Please set it in the .env file."
+        )
 
     # Get model name from environment variable or use default
     model_name = os.environ.get("OPENROUTER_MODEL", "openai/o4-mini")
@@ -47,7 +51,7 @@ async def main():
         type="openrouter",
         api_key=openrouter_api_key,
         endpoint="https://openrouter.ai/api/v1",
-        inference_model_deployment=model_name
+        inference_model_deployment=model_name,
     )
 
     # Initialize model object
@@ -61,7 +65,7 @@ async def main():
         type="openrouter",
         api_key=openrouter_api_key,
         endpoint="https://openrouter.ai/api/v1",
-        embedding_model_deployment=embedding_model_name
+        embedding_model_deployment=embedding_model_name,
     )
 
     # Initialize embedding model
@@ -96,12 +100,17 @@ async def main():
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Run PromptLab in async mode with OpenRouter models")
+    parser = argparse.ArgumentParser(
+        description="Run PromptLab in async mode with OpenRouter models"
+    )
     parser.add_argument("--model", type=str, help="OpenRouter model name")
-    parser.add_argument("--embedding-model", type=str, help="OpenRouter embedding model name")
+    parser.add_argument(
+        "--embedding-model", type=str, help="OpenRouter embedding model name"
+    )
     parser.add_argument("--port", type=int, help="Port for PromptLab Studio")
     parser.add_argument("--api-key", type=str, help="OpenRouter API key")
     return parser.parse_args()
+
 
 if __name__ == "__main__":
     args = parse_args()
