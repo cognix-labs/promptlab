@@ -7,7 +7,8 @@ class TracerType(Enum):
 
 class ModelType(Enum):
     AZURE_OPENAI = "azure_openai"
-    DEEPSEEK = "deepseek"
+    DEEPSEEK = "deepseek"  # For backward compatibility
+    OPENROUTER = "openrouter"
     OLLAMA = "ollama"
 
 

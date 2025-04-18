@@ -176,7 +176,8 @@ A local web interface for visualizing experiments and comparing results.
 
 - **Azure OpenAI**: Connect to Azure-hosted OpenAI models
 - **Ollama**: Run experiments with locally-hosted models
-- **DeepSeek**: Use DeepSeek's AI models
+- **OpenRouter**: Access a wide range of AI models (OpenAI, Anthropic, DeepSeek, Mistral, etc.) via OpenRouter API
+- **Custom Models**: Integrate your own model implementations
 
 ## Examples 📚
 
@@ -184,7 +185,7 @@ A local web interface for visualizing experiments and comparing results.
 - [Asset versioning](https://github.com/imum-ai/promptlab/tree/main/samples/asset_versioning): Versioning Prompts and Datasets
 - [Custom Metric](https://github.com/imum-ai/promptlab/tree/main/samples/custom_metric): Creating custom evaluation metrics
 
-- [Async Example](https://github.com/imum-ai/promptlab/tree/main/samples/async_example): Using async functionality for improved performance
+- [Async Example](https://github.com/imum-ai/promptlab/tree/main/samples/async_example): Using async functionality with Ollama and OpenRouter models for improved performance
 - [Custom Model](https://github.com/imum-ai/promptlab/tree/main/samples/custom_model): Bring your own model for evaluation
 
 ## Documentation 📖

@@ -154,7 +154,7 @@ class Experiment:
         """
         Asynchronous version of batch evaluation
         """
-        inference_model = ModelFactory.get_model(experiment_config.model)
+        inference_model = experiment_config.inference_model
         experiment_id = str(uuid.uuid4())
         timestamp = datetime.now().isoformat()
 

@@ -1,6 +1,6 @@
 # Async Example
 
-This example demonstrates how to use the async functionality in PromptLab.
+This example demonstrates how to use the async functionality in PromptLab with various models including local models via Ollama and cloud models via OpenRouter.
 
 ## Overview
 
@@ -14,18 +14,50 @@ This allows for more efficient processing, especially when dealing with large da
 
 ## Running the Example
 
-To run this example:
+### Using Ollama (Local Models)
+
+To run this example with Ollama (local models):
 
 ```bash
 cd samples/async_example
 python async_example.py
 ```
 
+### Using OpenRouter Models
+
+To run this example with models available through OpenRouter:
+
+1. First, copy the example environment file and add your OpenRouter API key:
+
+```bash
+cp .env.example .env
+# Edit .env to add your OpenRouter API key
+```
+
+2. Run the example with OpenRouter:
+
+```bash
+python async_openrouter.py
+```
+
+You can also specify parameters via command line:
+
+```bash
+python async_openrouter.py --model "openai/gpt-4" --port 8000 --api-key "your_openrouter_api_key"
+```
+
+Available command-line options:
+
+- `--model`: OpenRouter model to use for inference (e.g., "openai/gpt-4", "anthropic/claude-3-opus", "deepseek/deepseek-chat-v3-0324")
+- `--embedding-model`: OpenRouter model to use for embeddings
+- `--port`: Port for PromptLab Studio
+- `--api-key`: OpenRouter API key
+
 This will:
 
 1. Create a prompt template and dataset
 2. Create a custom evaluator for measuring response length
-3. Run an experiment asynchronously
+3. Run an experiment asynchronously with OpenRouter models
 4. Start the PromptLab Studio asynchronously
 
 ## Key Features
@@ -100,3 +132,20 @@ experiment_config = {
 - **Better Resource Utilization**: Make efficient use of system resources
 - **Responsive Applications**: Keep your application responsive while processing large datasets
 - **Scalability**: Handle more concurrent operations
+- **Model Flexibility**: Use local models (Ollama) or cloud models via OpenRouter
+
+## Using OpenRouter Models
+
+This example demonstrates how to use various AI models through OpenRouter's API. OpenRouter provides a unified API for accessing a wide range of AI models from different providers.
+
+### Configuration
+
+To use OpenRouter models, you need to:
+
+1. Get an API key from [OpenRouter](https://openrouter.ai/)
+2. Set the API key in the `.env` file or pass it via command line
+3. Choose an OpenRouter model (default is `openai/gpt-3.5-turbo`)
+
+### Available OpenRouter Models
+
+Check the [OpenRouter documentation](https://openrouter.ai/models) for the most up-to-date list of available models.
