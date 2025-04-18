@@ -35,7 +35,7 @@ With PromptLab, you can:
 - Deploy optimized prompts to production
 
 <div align="center">
-    <img alt="PromptLab Studio" src="img/studio-home.png" style="max-width:800px">
+    <img alt="PromptLab Studio" src="img/studio-exp.png" style="max-width:800px">
 </div>
 
 ## Features ✨
