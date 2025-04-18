@@ -4,6 +4,7 @@ import os
 import time
 import pytest
 from unittest.mock import patch, MagicMock
+from tests.fixtures.test_utils import MockModel
 
 # Add the src directory to the Python path
 sys.path.insert(0, os.path.abspath('./src'))
@@ -16,31 +17,6 @@ async def test_async_promptlab():
         from promptlab.types import ModelConfig
         from promptlab.model.model import Model
 
-        # Create a mock model for testing
-        class MockModel(Model):
-            def __init__(self, model_config):
-                super().__init__(model_config)
-
-            def invoke(self, system_prompt, user_prompt):
-                """Synchronous invocation"""
-                time.sleep(0.5)  # Simulate network delay
-                return {
-                    "inference": f"Response to: {user_prompt}",
-                    "prompt_tokens": 10,
-                    "completion_tokens": 20,
-                    "latency_ms": 500
-                }
-
-            async def ainvoke(self, system_prompt, user_prompt):
-                """Asynchronous invocation"""
-                await asyncio.sleep(0.5)  # Simulate network delay
-                return {
-                    "inference": f"Async response to: {user_prompt}",
-                    "prompt_tokens": 10,
-                    "completion_tokens": 20,
-                    "latency_ms": 500
-                }
-
         print("✅ Successfully imported PromptLab modules")
 
         # Test async model invocation
@@ -50,7 +26,8 @@ async def test_async_promptlab():
             embedding_model_deployment="mock-model"
         )
 
-        model = MockModel(model_config)
+        # Use the fixture model with 0.5s delay
+        model = MockModel(model_config=model_config, delay_seconds=0.5)
 
         # Test synchronous invocation
         start_time = time.time()

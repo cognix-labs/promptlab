@@ -3,32 +3,10 @@ import time
 import sys
 import os
 import pytest
+from tests.fixtures.test_utils import MockModel
 
 # Add the src directory to the Python path
 sys.path.insert(0, os.path.abspath('./src'))
-
-class MockModel:
-    """A mock model for testing async functionality"""
-
-    async def ainvoke(self, system_prompt, user_prompt):
-        """Async invocation that simulates a delay"""
-        await asyncio.sleep(0.5)  # Simulate network delay
-        return {
-            "inference": f"Response to: {user_prompt}",
-            "prompt_tokens": 10,
-            "completion_tokens": 20,
-            "latency_ms": 500
-        }
-
-    def invoke(self, system_prompt, user_prompt):
-        """Synchronous invocation"""
-        time.sleep(0.5)  # Simulate network delay
-        return {
-            "inference": f"Response to: {user_prompt}",
-            "prompt_tokens": 10,
-            "completion_tokens": 20,
-            "latency_ms": 500
-        }
 
 @pytest.mark.asyncio
 async def test_parallel_execution():
@@ -37,7 +15,8 @@ async def test_parallel_execution():
 
     # Create test data
     prompts = [f"Test prompt {i}" for i in range(10)]
-    model = MockModel()
+    # Use the fixture model with 0.5s delay
+    model = MockModel(delay_seconds=0.5)
 
     # Test synchronous execution
     start_time = time.time()
