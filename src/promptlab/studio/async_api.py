@@ -2,6 +2,7 @@ import json
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict, Any
+import asyncio
 
 from promptlab.db.sql import SQLQuery
 from promptlab.types import TracerConfig
@@ -30,7 +31,11 @@ class AsyncStudioApi:
         @self.app.get("/experiments")
         async def get_experiments():
             try:               
-                experiments = self.tracer_config.db_client.fetch_data(SQLQuery.SELECT_EXPERIMENTS_QUERY)
+                # Run blocking DB call in a separate thread
+                experiments = await asyncio.to_thread(
+                    self.tracer_config.db_client.fetch_data,
+                    SQLQuery.SELECT_EXPERIMENTS_QUERY
+                )
                 
                 # Process experiments and remove asset_binary
                 processed_experiments = []
@@ -50,7 +55,12 @@ class AsyncStudioApi:
         @self.app.get("/prompttemplates")
         async def get_prompt_templates():
             try:               
-                prompt_templates = self.tracer_config.db_client.fetch_data(SQLQuery.SELECT_ASSET_BY_TYPE_QUERY, (AssetType.PROMPT_TEMPLATE.value,))
+                # Run blocking DB call in a separate thread
+                prompt_templates = await asyncio.to_thread(
+                    self.tracer_config.db_client.fetch_data,
+                    SQLQuery.SELECT_ASSET_BY_TYPE_QUERY,
+                    (AssetType.PROMPT_TEMPLATE.value,)
+                )
                 
                 processed_templates = []
                 for template in prompt_templates:
@@ -69,7 +79,12 @@ class AsyncStudioApi:
         @self.app.get("/datasets")
         async def get_datasets():
             try:               
-                datasets = self.tracer_config.db_client.fetch_data(SQLQuery.SELECT_ASSET_BY_TYPE_QUERY, (AssetType.DATASET.value,))
+                # Run blocking DB call in a separate thread
+                datasets = await asyncio.to_thread(
+                    self.tracer_config.db_client.fetch_data,
+                    SQLQuery.SELECT_ASSET_BY_TYPE_QUERY,
+                    (AssetType.DATASET.value,)
+                )
 
                 processed_datasets = []
                 for dataset in datasets:

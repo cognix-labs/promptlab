@@ -26,16 +26,18 @@ class DeepSeek(Model):
                 "content": user_prompt
             }
         ]
+        start_time = time.time()
         chat_completion = self.client.chat.completions.create(
             model=self.deployment,
             messages=payload
         )
+        end_time = time.time()
         inference = chat_completion.choices[0].message.content
         prompt_token = chat_completion.usage.prompt_tokens
         completion_token = chat_completion.usage.completion_tokens
 
         # Calculate latency
-        latency_ms = 0  # Not provided by the API directly
+        latency_ms = (end_time - start_time) * 1000
 
         return InferenceResult(
             inference=inference,

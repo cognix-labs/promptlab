@@ -17,7 +17,6 @@ class InferenceResult:
 @dataclass
 class ModelConfig:
     type: str
-    model_deployment: Optional[str] = None
     api_key: Optional[str] = None
     api_version: Optional[str] = None
     endpoint: Optional[str] = None
@@ -27,7 +26,7 @@ class ModelConfig:
 @dataclass
 class InferenceModelConfig:
     type: str
-    model_deployment: str
+    inference_model_deployment: str
     api_key: Optional[str] = None
     api_version: Optional[str] = None
     endpoint: Optional[str] = None
@@ -35,7 +34,7 @@ class InferenceModelConfig:
 @dataclass
 class EmbeddingModelConfig:
     type: str
-    model_deployment: str
+    embedding_model_deployment: str
     api_key: Optional[str] = None
     api_version: Optional[str] = None
     endpoint: Optional[str] = None

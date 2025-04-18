@@ -111,7 +111,7 @@ class AzOpenAI_Embedding(EmbeddingModel):
 
         embedding = self.client.embeddings.create(
                                                     input =text,
-                                                    model=self.config.model_deployment
+                                                    model=self.model_config.embedding_model_deployment
                                                  ).data[0].embedding
 
         return embedding

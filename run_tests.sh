@@ -13,7 +13,6 @@ pip install pytest pytest-asyncio pytest-cov
 # Run unit tests
 echo "Running unit tests..."
 pytest tests/unit -v --cov=src/promptlab
-python -m unittest discover tests/unit
 
 # Run integration tests
 echo "Running integration tests..."

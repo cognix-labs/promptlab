@@ -30,7 +30,7 @@ With PromptLab, you can:
 - Create and manage prompt templates with versioning
 - Build and maintain evaluation datasets
 - Run experiments with different models and prompts
-- Evaluate results using built-in or custom metrics
+- Evaluate model performance using built-in and custom metrics
 - Compare experiment results side-by-side
 - Deploy optimized prompts to production
 

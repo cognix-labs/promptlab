@@ -95,7 +95,7 @@ class Ollama_Embedding(EmbeddingModel):
 
     def __call__(self, text: str) -> Any:
         embedding = self.client.embed(
-                    model=self.config.model_deployment,
+                    model=self.model_config.embedding_model_deployment,
                     input=text,
                     )["embeddings"]
 

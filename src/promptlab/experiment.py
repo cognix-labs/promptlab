@@ -128,7 +128,14 @@ class Experiment:
         Process a single record asynchronously
         """
         inference_result = await inference_model.ainvoke(system_prompt, user_prompt)
-        evaluation = self.evaluate(inference_result.inference, eval_record, experiment_config)
+
+        # Run potentially blocking evaluation in a separate thread
+        evaluation = await asyncio.to_thread(
+            self.evaluate,
+            inference_result.inference,
+            eval_record,
+            experiment_config
+        )
 
         eval_result = dict()
         eval_result["experiment_id"] = experiment_id
