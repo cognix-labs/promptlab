@@ -1,6 +1,7 @@
 import asyncio
 from promptlab import PromptLab
-from promptlab.types import PromptTemplate, Dataset
+from promptlab.types import PromptTemplate, Dataset, ModelConfig
+from promptlab.model.ollama import Ollama, Ollama_Embedding
 
 async def main():
     # Initialize PromptLab with SQLite storage
@@ -27,21 +28,26 @@ async def main():
     )
     ds = pl.asset.create(dataset)
 
+    # Create model instances
+    inference_model_config = ModelConfig(
+        type="ollama",
+        inference_model_deployment="llama2"
+    )
+    embedding_model_config = ModelConfig(
+        type="ollama",
+        embedding_model_deployment="llama2"
+    )
+
+    # Initialize model objects
+    ollama = Ollama(model_config=inference_model_config)
+    ollama_embedding = Ollama_Embedding(model_config=embedding_model_config)
+
     # Run an experiment asynchronously
     experiment_config = {
-        "model": {
-            "type": "ollama",
-            "inference_model_deployment": "llama2",
-            "embedding_model_deployment": "llama2"
-        },
-        "prompt_template": {
-            "name": pt.name,
-            "version": pt.version
-        },
-        "dataset": {
-            "name": ds.name,
-            "version": ds.version
-        },
+        "inference_model": ollama,
+        "embedding_model": ollama_embedding,
+        "prompt_template": pt,
+        "dataset": ds,
         "evaluation": [
             {
                 "type": "custom",
@@ -52,10 +58,10 @@ async def main():
             }
         ]
     }
-    
+
     # Run the experiment asynchronously
     await pl.run_experiment_async(experiment_config)
-    
+
     # Start the PromptLab Studio asynchronously
     await pl.start_studio_async(8000)
 
