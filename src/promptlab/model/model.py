@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+<<<<<<< HEAD
 from dataclasses import dataclass
 from typing import Any, Optional
 
@@ -9,6 +10,12 @@ class ModelConfig:
     api_key: Optional[str] = None
     api_version: Optional[str] = None
     endpoint: Optional[str] = None
+=======
+from typing import Any
+
+from promptlab.types import EmbeddingModelConfig, InferenceResult, InferenceModelConfig
+
+>>>>>>> main
 
 @dataclass
 class InferenceResult:
