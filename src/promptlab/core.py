@@ -5,10 +5,9 @@ from promptlab.studio.async_studio import AsyncStudio
 from promptlab.tracer.tracer_factory import TracerFactory
 from promptlab.config import ConfigValidator, TracerConfig
 
+
 class PromptLab:
-
     def __init__(self, tracer_config: dict):
-
         tracer_config = TracerConfig(**tracer_config)
         ConfigValidator.validate_tracer_config(tracer_config)
 

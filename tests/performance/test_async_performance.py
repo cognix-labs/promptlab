@@ -6,7 +6,8 @@ import pytest
 from tests.fixtures.test_utils import MockModel
 
 # Add the src directory to the Python path
-sys.path.insert(0, os.path.abspath('./src'))
+sys.path.insert(0, os.path.abspath("./src"))
+
 
 @pytest.mark.asyncio
 async def test_parallel_execution():
@@ -32,7 +33,7 @@ async def test_parallel_execution():
     for prompt in prompts:
         task = model.ainvoke("System prompt", prompt)
         tasks.append(task)
-    async_results = await asyncio.gather(*tasks)
+    await asyncio.gather(*tasks)  # Run tasks, ignore results
     async_time = time.time() - start_time
 
     print(f"Synchronous execution time: {sync_time:.2f} seconds")
@@ -46,6 +47,7 @@ async def test_parallel_execution():
         print("❌ Async execution is not significantly faster")
         return False
 
+
 @pytest.mark.asyncio
 async def main():
     """Run the tests"""
@@ -57,6 +59,7 @@ async def main():
         return
 
     print("All tests passed!")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

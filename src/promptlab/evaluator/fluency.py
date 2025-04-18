@@ -1,9 +1,8 @@
 from promptlab.evaluator.evaluator import Evaluator
 
-class Fluency(Evaluator):
-    
-    def evaluate(self, data: dict):
 
+class Fluency(Evaluator):
+    def evaluate(self, data: dict):
         system_prompt = """
                         # Instruction
                         ## Goal
@@ -66,11 +65,11 @@ class Fluency(Evaluator):
                     # Tasks
                     ## Please provide your assessment Score for the previous FEEDBACK based on the Definitions above. The Score you give MUST be a integer score (i.e., "1", "2"...) based on the levels of the definitions. Only reply with the numeric score. Do not add any other text or explanation score.
                         """
-        
+
         inference = data["response"]
 
         user_prompt = user_prompt.replace("{{feedback}}", inference)
 
         inference_result = self.inference(system_prompt, user_prompt)
 
-        return inference_result.inference    
+        return inference_result.inference

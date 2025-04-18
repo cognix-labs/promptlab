@@ -5,30 +5,21 @@ import time
 
 from promptlab.model.model import EmbeddingModel, Model, InferenceResult, ModelConfig
 
+
 class Ollama(Model):
-
     def __init__(self, model_config: ModelConfig):
-
         super().__init__(model_config)
 
         self.client = ollama
 
     def invoke(self, system_prompt: str, user_prompt: str):
-
         payload = [
-            {
-                "role": "system",
-                "content": system_prompt
-            },
-            {
-                "role": "user",
-                "content": user_prompt
-            }
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
         ]
 
         chat_completion = self.client.chat(
-            model=self.model_config.inference_model_deployment,
-            messages=payload
+            model=self.model_config.inference_model_deployment, messages=payload
         )
 
         latency_ms = chat_completion.total_duration
@@ -40,7 +31,7 @@ class Ollama(Model):
             inference=inference,
             prompt_tokens=prompt_token,
             completion_tokens=completion_token,
-            latency_ms=latency_ms
+            latency_ms=latency_ms,
         )
 
     async def ainvoke(self, system_prompt: str, user_prompt: str) -> InferenceResult:
@@ -49,14 +40,8 @@ class Ollama(Model):
         Note: Ollama doesn't have a native async API, so we run it in a thread pool
         """
         payload = [
-            {
-                "role": "system",
-                "content": system_prompt
-            },
-            {
-                "role": "user",
-                "content": user_prompt
-            }
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
         ]
 
         start_time = time.time()
@@ -66,9 +51,8 @@ class Ollama(Model):
         chat_completion = await loop.run_in_executor(
             None,
             lambda: self.client.chat(
-                model=self.model_config.inference_model_deployment,
-                messages=payload
-            )
+                model=self.model_config.inference_model_deployment, messages=payload
+            ),
         )
 
         end_time = time.time()
@@ -82,21 +66,20 @@ class Ollama(Model):
             inference=inference,
             prompt_tokens=prompt_token,
             completion_tokens=completion_token,
-            latency_ms=latency_ms
+            latency_ms=latency_ms,
         )
 
+
 class Ollama_Embedding(EmbeddingModel):
-
     def __init__(self, model_config: ModelConfig):
-
         super().__init__(model_config)
 
         self.client = ollama
 
     def __call__(self, text: str) -> Any:
         embedding = self.client.embed(
-                    model=self.model_config.embedding_model_deployment,
-                    input=text,
-                    )["embeddings"]
+            model=self.model_config.embedding_model_deployment,
+            input=text,
+        )["embeddings"]
 
         return embedding

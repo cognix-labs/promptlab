@@ -12,24 +12,21 @@ class DeepSeek(Model):
 
         self.model_config = model_config
         self.deployment = model_config.inference_model_deployment
-        self.client = OpenAI(api_key=model_config.api_key, base_url=str(model_config.endpoint))
-        self.async_client = AsyncOpenAI(api_key=model_config.api_key, base_url=str(model_config.endpoint))
+        self.client = OpenAI(
+            api_key=model_config.api_key, base_url=str(model_config.endpoint)
+        )
+        self.async_client = AsyncOpenAI(
+            api_key=model_config.api_key, base_url=str(model_config.endpoint)
+        )
 
     def invoke(self, system_prompt: str, user_prompt: str):
         payload = [
-            {
-                "role": "system",
-                "content": system_prompt
-            },
-            {
-                "role": "user",
-                "content": user_prompt
-            }
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
         ]
         start_time = time.time()
         chat_completion = self.client.chat.completions.create(
-            model=self.deployment,
-            messages=payload
+            model=self.deployment, messages=payload
         )
         end_time = time.time()
         inference = chat_completion.choices[0].message.content
@@ -43,7 +40,7 @@ class DeepSeek(Model):
             inference=inference,
             prompt_tokens=prompt_token,
             completion_tokens=completion_token,
-            latency_ms=latency_ms
+            latency_ms=latency_ms,
         )
 
     async def ainvoke(self, system_prompt: str, user_prompt: str) -> InferenceResult:
@@ -51,21 +48,14 @@ class DeepSeek(Model):
         Asynchronous invocation of the DeepSeek model
         """
         payload = [
-            {
-                "role": "system",
-                "content": system_prompt
-            },
-            {
-                "role": "user",
-                "content": user_prompt
-            }
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
         ]
 
         start_time = time.time()
 
         chat_completion = await self.async_client.chat.completions.create(
-            model=self.deployment,
-            messages=payload
+            model=self.deployment, messages=payload
         )
 
         end_time = time.time()
@@ -79,5 +69,5 @@ class DeepSeek(Model):
             inference=inference,
             prompt_tokens=prompt_token,
             completion_tokens=completion_token,
-            latency_ms=latency_ms
+            latency_ms=latency_ms,
         )

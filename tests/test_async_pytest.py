@@ -6,7 +6,8 @@ import time
 from unittest.mock import patch, MagicMock
 
 # Add the src directory to the Python path
-sys.path.insert(0, os.path.abspath('./src'))
+sys.path.insert(0, os.path.abspath("./src"))
+
 
 @pytest.mark.asyncio
 async def test_async_model_invocation():
@@ -26,7 +27,7 @@ async def test_async_model_invocation():
                 inference=f"Response to: {user_prompt}",
                 prompt_tokens=10,
                 completion_tokens=20,
-                latency_ms=100
+                latency_ms=100,
             )
 
         async def ainvoke(self, system_prompt, user_prompt):
@@ -36,14 +37,14 @@ async def test_async_model_invocation():
                 inference=f"Async response to: {user_prompt}",
                 prompt_tokens=10,
                 completion_tokens=20,
-                latency_ms=100
+                latency_ms=100,
             )
 
     # Create a model config
     model_config = ModelConfig(
         type="mock",
         inference_model_deployment="mock-model",
-        embedding_model_deployment="mock-model"
+        embedding_model_deployment="mock-model",
     )
 
     # Create a model instance
@@ -76,26 +77,32 @@ async def test_async_model_invocation():
         assert result.completion_tokens == 20
         assert result.latency_ms == 100
 
+
 @pytest.mark.asyncio
 async def test_experiment_async_execution():
     """Test async experiment execution"""
     from promptlab.experiment import Experiment
-    from promptlab.types import ExperimentConfig
 
     # Create a mock tracer
     tracer = MagicMock()
-    tracer.db_client.fetch_data.return_value = [{"asset_binary": "system: test\nuser: test", "file_path": "test.jsonl"}]
+    tracer.db_client.fetch_data.return_value = [
+        {"asset_binary": "system: test\nuser: test", "file_path": "test.jsonl"}
+    ]
 
     # Create a mock dataset
     dataset = [{"id": 1, "text": "test"}]
 
     # Mock the Utils.load_dataset method
-    with patch('promptlab.experiment.Utils') as mock_utils:
+    with patch("promptlab.experiment.Utils") as mock_utils:
         mock_utils.load_dataset.return_value = dataset
-        mock_utils.split_prompt_template.return_value = ("system: test", "user: test", [])
+        mock_utils.split_prompt_template.return_value = (
+            "system: test",
+            "user: test",
+            [],
+        )
 
         # Mock the ExperimentConfig validation
-        with patch('promptlab.experiment.ExperimentConfig') as mock_config_class:
+        with patch("promptlab.experiment.ExperimentConfig") as mock_config_class:
             # Make the mock return itself when called with **kwargs
             mock_instance = MagicMock()
             mock_config_class.return_value = mock_instance
@@ -114,7 +121,7 @@ async def test_experiment_async_execution():
             experiment = Experiment(tracer)
 
             # Mock the init_batch_eval_async method
-            with patch.object(experiment, 'init_batch_eval_async') as mock_batch_eval:
+            with patch.object(experiment, "init_batch_eval_async") as mock_batch_eval:
                 mock_batch_eval.return_value = asyncio.Future()
                 mock_batch_eval.return_value.set_result([{"experiment_id": "test"}])
 
@@ -126,6 +133,7 @@ async def test_experiment_async_execution():
 
                 # Check that tracer.trace was called
                 tracer.trace.assert_called_once()
+
 
 @pytest.mark.asyncio
 async def test_async_studio():
@@ -139,9 +147,9 @@ async def test_async_studio():
     async_studio = AsyncStudio(tracer_config)
 
     # Mock the start_web_server method
-    with patch.object(async_studio, 'start_web_server') as mock_web_server:
+    with patch.object(async_studio, "start_web_server") as mock_web_server:
         # Mock the start_api_server method
-        with patch.object(async_studio, 'start_api_server') as mock_api_server:
+        with patch.object(async_studio, "start_api_server") as mock_api_server:
             mock_api_server.return_value = asyncio.Future()
             mock_api_server.return_value.set_result(None)
 
@@ -165,26 +173,31 @@ async def test_async_studio():
             # Check that start_api_server was called
             mock_api_server.assert_called_once_with(8001)
 
+
 @pytest.mark.asyncio
 async def test_promptlab_async_methods():
     """Test PromptLab async methods"""
     from promptlab.core import PromptLab
 
     # Create a mock tracer config
-    tracer_config = {
-        "type": "sqlite",
-        "db_file": ":memory:"
-    }
+    tracer_config = {"type": "sqlite", "db_file": ":memory:"}
 
     # Mock the TracerFactory
-    with patch('promptlab.core.TracerFactory') as mock_factory:
+    with patch("promptlab.core.TracerFactory") as mock_factory:
+        # Set up the mock factory
+        mock_tracer = MagicMock()
+        mock_factory.get_tracer.return_value = mock_tracer
+
         # Mock the ConfigValidator
-        with patch('promptlab.core.ConfigValidator') as mock_validator:
+        with patch("promptlab.core.ConfigValidator") as mock_validator:
+            # Set up the mock validator
+            mock_validator.validate_tracer_config.return_value = None
+
             # Create a PromptLab instance
             promptlab = PromptLab(tracer_config)
 
             # Mock the experiment.run_async method
-            with patch.object(promptlab.experiment, 'run_async') as mock_run_async:
+            with patch.object(promptlab.experiment, "run_async") as mock_run_async:
                 mock_run_async.return_value = asyncio.Future()
                 mock_run_async.return_value.set_result(None)
 
@@ -196,7 +209,9 @@ async def test_promptlab_async_methods():
                 mock_run_async.assert_called_once_with(experiment_config)
 
             # Mock the async_studio.start_async method
-            with patch.object(promptlab.async_studio, 'start_async') as mock_start_async:
+            with patch.object(
+                promptlab.async_studio, "start_async"
+            ) as mock_start_async:
                 mock_start_async.return_value = asyncio.Future()
                 mock_start_async.return_value.set_result(None)
 

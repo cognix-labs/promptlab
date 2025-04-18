@@ -3,19 +3,17 @@ import sys
 import os
 import time
 import pytest
-from unittest.mock import patch, MagicMock
 from tests.fixtures.test_utils import MockModel
 
 # Add the src directory to the Python path
-sys.path.insert(0, os.path.abspath('./src'))
+sys.path.insert(0, os.path.abspath("./src"))
+
 
 @pytest.mark.asyncio
 async def test_async_promptlab():
     """Test the async functionality in PromptLab"""
     try:
-        from promptlab import PromptLab
         from promptlab.types import ModelConfig
-        from promptlab.model.model import Model
 
         print("✅ Successfully imported PromptLab modules")
 
@@ -23,7 +21,7 @@ async def test_async_promptlab():
         model_config = ModelConfig(
             type="mock",
             inference_model_deployment="mock-model",
-            embedding_model_deployment="mock-model"
+            embedding_model_deployment="mock-model",
         )
 
         # Use the fixture model with 0.5s delay
@@ -43,7 +41,7 @@ async def test_async_promptlab():
         for i in range(5):
             task = model.ainvoke("System prompt", f"Test prompt {i}")
             tasks.append(task)
-        async_results = await asyncio.gather(*tasks)
+        await asyncio.gather(*tasks)  # Run tasks, ignore results
         async_time = time.time() - start_time
 
         print(f"Synchronous model invocation time: {sync_time:.2f} seconds")
@@ -63,6 +61,7 @@ async def test_async_promptlab():
         print(f"❌ Error: {e}")
         return False
 
+
 @pytest.mark.asyncio
 async def main():
     """Run the tests"""
@@ -72,6 +71,7 @@ async def main():
     await test_async_promptlab()
 
     print("All tests completed!")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

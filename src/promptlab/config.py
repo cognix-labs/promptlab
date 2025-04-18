@@ -4,8 +4,8 @@ from pathlib import Path
 from promptlab.enums import TracerType
 from promptlab.types import ExperimentConfig, TracerConfig
 
-class ConfigValidator:
 
+class ConfigValidator:
     @staticmethod
     def validate_tracer_config(tracer_config: TracerConfig):
         validate_db_type(tracer_config.type)
@@ -16,24 +16,26 @@ class ConfigValidator:
         validate_prompt_template(experiment_config.prompt_template.name)
         validate_dataset(experiment_config.dataset.name)
 
-def validate_db_type(db_type: str) -> None:
 
+def validate_db_type(db_type: str) -> None:
     valid_types = set(item.value for item in TracerType)
-    
+
     if not isinstance(db_type, str):
         raise ValueError(f"Database type must be a string, got {type(db_type)}")
-    
+
     if db_type not in valid_types:
-        raise ValueError(f"Unsupported database type: {db_type}. Must be one of: {', '.join(valid_types)}")
+        raise ValueError(
+            f"Unsupported database type: {db_type}. Must be one of: {', '.join(valid_types)}"
+        )
+
 
 def validate_db_file_exists(db_file: str) -> None:
-
     if not isinstance(db_file, str):
         raise ValueError(f"Database file path must be a string, got {type(db_file)}")
-    
+
     try:
         path = Path(db_file)
-        
+
         # Check if file exists
         if path.exists():
             if not path.is_file():
@@ -47,18 +49,18 @@ def validate_db_file_exists(db_file: str) -> None:
                 raise ValueError(f"Parent directory does not exist: {parent_dir}")
             if not os.access(parent_dir, os.W_OK):
                 raise ValueError(f"Parent directory is not writable: {parent_dir}")
-                
+
     except Exception as e:
         if isinstance(e, ValueError):
             raise
         raise ValueError(f"Invalid database file path: {str(e)}")
 
-def validate_prompt_template(name: str) -> None:
 
+def validate_prompt_template(name: str) -> None:
     if not isinstance(name, str):
         raise ValueError(f"Name must be a string, got {type(name)}")
 
-def validate_dataset(name: str) -> None:
 
+def validate_dataset(name: str) -> None:
     if not isinstance(name, str):
         raise ValueError(f"Name must be a string, got {type(name)}")

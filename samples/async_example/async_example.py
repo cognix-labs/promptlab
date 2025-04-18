@@ -4,12 +4,10 @@ from promptlab.types import PromptTemplate, Dataset, ModelConfig
 from promptlab.model.ollama import Ollama, Ollama_Embedding
 from custom_evaluator import LengthEvaluator
 
+
 async def main():
     # Initialize PromptLab with SQLite storage
-    tracer_config = {
-        "type": "sqlite",
-        "db_file": "./promptlab.db"
-    }
+    tracer_config = {"type": "sqlite", "db_file": "./promptlab.db"}
     pl = PromptLab(tracer_config)
 
     # Create a prompt template
@@ -17,7 +15,7 @@ async def main():
         name="async_example",
         description="A prompt for testing async functionality",
         system_prompt="You are a helpful assistant who can provide concise answers.",
-        user_prompt="Please answer this question: <question>"
+        user_prompt="Please answer this question: <question>",
     )
     pt = pl.asset.create(prompt_template)
 
@@ -25,18 +23,16 @@ async def main():
     dataset = Dataset(
         name="async_questions",
         description="Sample questions for async testing",
-        file_path="./questions.jsonl"
+        file_path="./questions.jsonl",
     )
     ds = pl.asset.create(dataset)
 
     # Create model instances
     inference_model_config = ModelConfig(
-        type="ollama",
-        inference_model_deployment="llama2"
+        type="ollama", inference_model_deployment="llama2"
     )
     embedding_model_config = ModelConfig(
-        type="ollama",
-        embedding_model_deployment="llama2"
+        type="ollama", embedding_model_deployment="llama2"
     )
 
     # Initialize model objects
@@ -55,12 +51,10 @@ async def main():
         "evaluation": [
             {
                 "metric": "LengthEvaluator",
-                "column_mapping": {
-                    "response": "$inference"
-                },
-                "evaluator": length_evaluator
+                "column_mapping": {"response": "$inference"},
+                "evaluator": length_evaluator,
             }
-        ]
+        ],
     }
 
     # Run the experiment asynchronously
@@ -68,6 +62,7 @@ async def main():
 
     # Start the PromptLab Studio asynchronously
     await pl.start_studio_async(8000)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

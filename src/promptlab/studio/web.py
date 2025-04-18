@@ -1,8 +1,8 @@
 import http
 import pkg_resources
 
-class StudioWebHandler(http.server.SimpleHTTPRequestHandler):
 
+class StudioWebHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/":
             self.path = pkg_resources.resource_filename("web", "index.html")
