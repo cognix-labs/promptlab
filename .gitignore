@@ -169,5 +169,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
-tests/temp.py
-tests/test_core.py
+test/temp.py
+test/test_core.py
+
+.idea

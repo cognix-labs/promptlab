@@ -3,6 +3,7 @@ from typing import Dict, List
 
 from promptlab.config import ExperimentConfig, TracerConfig
 
+
 class Tracer(ABC):
     def __init__(self, tracer_config: TracerConfig):
         pass
@@ -12,5 +13,7 @@ class Tracer(ABC):
         pass
 
     @abstractmethod
-    def trace(self,experiment_config: ExperimentConfig, experiment_summary: List[Dict]):
+    def trace(
+        self, experiment_config: ExperimentConfig, experiment_summary: List[Dict]
+    ):
         pass
