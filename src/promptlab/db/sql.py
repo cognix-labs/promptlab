@@ -67,53 +67,53 @@ class SQLQuery:
             """
 
     INSERT_ASSETS_QUERY = """INSERT INTO assets(
-                                    asset_name, 
-                                    asset_version, 
-                                    asset_description, 
-                                    asset_type, 
+                                    asset_name,
+                                    asset_version,
+                                    asset_description,
+                                    asset_type,
                                     asset_binary,
                                     created_at
                                 ) VALUES(?, ?, ?, ?, ?, ?)"""
 
-    SELECT_ASSET_QUERY = """SELECT  asset_name, 
-                                    asset_description, 
-                                    asset_version, 
-                                    asset_type, 
+    SELECT_ASSET_QUERY = """SELECT  asset_name,
+                                    asset_description,
+                                    asset_version,
+                                    asset_type,
                                     asset_binary,
                                     created_at
                             FROM assets
                             WHERE asset_name = ? AND asset_version = ?"""
 
-    SELECT_ASSET_BY_NAME_QUERY = """SELECT  asset_name, 
-                                    asset_description, 
-                                    asset_version, 
-                                    asset_type, 
+    SELECT_ASSET_BY_NAME_QUERY = """SELECT  asset_name,
+                                    asset_description,
+                                    asset_version,
+                                    asset_type,
                                     asset_binary,
                                     created_at
                             FROM assets
                             WHERE asset_name = ? AND asset_version = (SELECT MAX(asset_version) FROM assets WHERE asset_name = ?)"""
 
-    SELECT_ASSET_BY_TYPE_QUERY = """SELECT  
-                                    asset_name, 
-                                    asset_description, 
-                                    asset_version, 
-                                    asset_type, 
+    SELECT_ASSET_BY_TYPE_QUERY = """SELECT
+                                    asset_name,
+                                    asset_description,
+                                    asset_version,
+                                    asset_type,
                                     asset_binary,
                                     is_deployed,
                                     deployment_time,
                                     created_at
                             FROM assets WHERE asset_type = ?"""
 
-    SELECT_DATASET_FILE_PATH_QUERY = """SELECT 
-                                            json_extract(asset_binary, '$.file_path') AS file_path 
-                                        FROM assets 
+    SELECT_DATASET_FILE_PATH_QUERY = """SELECT
+                                            json_extract(asset_binary, '$.file_path') AS file_path
+                                        FROM assets
                                         WHERE asset_name =  ? AND asset_version = ?"""
 
     SELECT_EXPERIMENTS_QUERY = """
                                 SELECT
                                     e.experiment_id,
-                                    concat(json_extract(model, '$.inference_model_type'), ' - ' ,json_extract(model, '$.inference_model_name')) AS inference_model,
-                                    concat(json_extract(model, '$.embedding_model_type'), ' - ' ,json_extract(model, '$.embedding_model_name')) AS embedding_model,
+                                    (json_extract(model, '$.inference_model_type') || ' - ' || json_extract(model, '$.inference_model_name')) AS inference_model,
+                                    (json_extract(model, '$.embedding_model_type') || ' - ' || json_extract(model, '$.embedding_model_name')) AS embedding_model,
                                     json_extract(asset, '$.prompt_template_name') AS prompt_template_name,
                                     json_extract(asset, '$.prompt_template_version') AS prompt_template_version,
                                     json_extract(asset, '$.dataset_name') AS dataset_name,
@@ -126,8 +126,8 @@ class SQLQuery:
                                     er.evaluation as evaluation,
                                     a.asset_binary
                                 FROM experiments e
-                                JOIN experiment_result er on 
-                                    e.experiment_id = er.experiment_id 
+                                JOIN experiment_result er on
+                                    e.experiment_id = er.experiment_id
                                 JOIN assets a ON
                                     a.asset_name = prompt_template_name AND a.asset_version = prompt_template_version
                                 """

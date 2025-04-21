@@ -12,6 +12,18 @@ PromptLab now supports asynchronous operations for:
 
 This allows for more efficient processing, especially when dealing with large datasets or multiple concurrent operations.
 
+## Prerequisites
+
+Before running these examples, make sure you have:
+
+1. Installed all required dependencies using the requirements.txt file:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. Set up your API keys in the `.env` file
+
 ## Running the Example
 
 ### Using Ollama (Local Models)
@@ -137,6 +149,19 @@ experiment_config = {
 ## Using OpenRouter Models
 
 This example demonstrates how to use various AI models through OpenRouter's API. OpenRouter provides a unified API for accessing a wide range of AI models from different providers.
+
+## Troubleshooting
+
+If you encounter errors when running the examples, check the following:
+
+1. **Flask Async Support**: If you see errors like `RuntimeError: Install Flask with the 'async' extra in order to use async views`, install Flask with async support:
+   ```bash
+   pip install "flask[async]"
+   ```
+
+2. **Dataset Loading**: Make sure the `questions.jsonl` file exists in the correct location.
+
+3. **API Keys**: Ensure you have set valid API keys in the `.env` file.
 
 ### Configuration
 

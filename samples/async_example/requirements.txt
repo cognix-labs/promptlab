@@ -1,0 +1,3 @@
+promptlab
+flask[async]
+python-dotenv
