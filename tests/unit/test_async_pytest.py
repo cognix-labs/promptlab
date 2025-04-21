@@ -281,7 +281,7 @@ async def test_experiment_concurrency_limit():
     """Test the concurrency limit in experiment async execution"""
     from promptlab.experiment import Experiment
     from promptlab.model.model import Model
-    from promptlab.types import ModelConfig, InferenceResult, ExperimentConfig
+    from promptlab.types import ModelConfig, InferenceResult
     import time
 
     # Create a mock model with a delay and tracking
