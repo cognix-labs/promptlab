@@ -32,7 +32,7 @@ async def main():
         name="async_questions_"
         + str(int(time.time())),  # Add timestamp to make name unique
         description="Sample questions for async testing",
-        file_path="./questions.jsonl",
+        file_path="./questions.jsonl",  # Using local copy in the same directory
     )
     ds = pl.asset.create(dataset)
 
