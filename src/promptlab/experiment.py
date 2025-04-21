@@ -158,7 +158,7 @@ class Experiment:
         timestamp = datetime.now().isoformat()
 
         # Get max concurrent tasks from model config or use default
-        max_concurrent_tasks = getattr(inference_model, 'max_concurrent_tasks', 5)
+        max_concurrent_tasks = getattr(inference_model, "max_concurrent_tasks", 5)
 
         exp_summary = []
 
