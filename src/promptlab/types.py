@@ -24,6 +24,7 @@ class ModelConfig:
     endpoint: Optional[str] = None
     inference_model_deployment: Optional[str] = None
     embedding_model_deployment: Optional[str] = None
+    max_concurrent_tasks: int = 5
 
 
 @dataclass

@@ -22,9 +22,4 @@ pytest tests/integration -v
 echo "Running performance tests..."
 pytest tests/performance -v
 
-# Deactivate the virtual environment
-deactivate
 
-# Clean up the virtual environment
-echo "Cleaning up virtual environment..."
-rm -rf venv

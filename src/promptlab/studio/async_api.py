@@ -1,7 +1,7 @@
 import json
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 import asyncio
+from flask import Flask, jsonify
+from flask_cors import CORS
 
 from promptlab.db.sql import SQLQuery
 from promptlab.types import TracerConfig
@@ -12,21 +12,13 @@ from promptlab.enums import AssetType
 class AsyncStudioApi:
     def __init__(self, tracer_config: TracerConfig):
         self.tracer_config = tracer_config
-        self.app = FastAPI(title="PromptLab Studio API")
-
-        # Add CORS middleware
-        self.app.add_middleware(
-            CORSMiddleware,
-            allow_origins=["*"],
-            allow_credentials=True,
-            allow_methods=["*"],
-            allow_headers=["*"],
-        )
+        self.app = Flask(__name__)
+        CORS(self.app, resources={r"/*": {"origins": "*"}})
 
         self._setup_routes()
 
     def _setup_routes(self):
-        @self.app.get("/experiments")
+        @self.app.route("/experiments", methods=["GET"])
         async def get_experiments():
             try:
                 # Run blocking DB call in a separate thread
@@ -49,14 +41,18 @@ class AsyncStudioApi:
                     experiment_data["user_prompt_template"] = user_prompt
                     processed_experiments.append(experiment_data)
 
-                return {"experiments": processed_experiments}
+                return jsonify({"experiments": processed_experiments})
 
             except Exception as e:
-                raise HTTPException(
-                    status_code=500, detail=f"An unexpected error occurred: {str(e)}"
-                )
+                return jsonify(
+                    {
+                        "status": "error",
+                        "message": "An unexpected error occurred",
+                        "error": str(e),
+                    }
+                ), 500
 
-        @self.app.get("/prompttemplates")
+        @self.app.route("/prompttemplates", methods=["GET"])
         async def get_prompt_templates():
             try:
                 # Run blocking DB call in a separate thread
@@ -79,14 +75,18 @@ class AsyncStudioApi:
                     experiment_data["user_prompt_template"] = user_prompt
                     processed_templates.append(experiment_data)
 
-                return {"prompt_templates": processed_templates}
+                return jsonify({"prompt_templates": processed_templates})
 
             except Exception as e:
-                raise HTTPException(
-                    status_code=500, detail=f"An unexpected error occurred: {str(e)}"
-                )
+                return jsonify(
+                    {
+                        "status": "error",
+                        "message": "An unexpected error occurred",
+                        "error": str(e),
+                    }
+                ), 500
 
-        @self.app.get("/datasets")
+        @self.app.route("/datasets", methods=["GET"])
         async def get_datasets():
             try:
                 # Run blocking DB call in a separate thread
@@ -104,16 +104,24 @@ class AsyncStudioApi:
                     data["file_path"] = file_path
                     processed_datasets.append(data)
 
-                return {"datasets": processed_datasets}
+                return jsonify({"datasets": processed_datasets})
 
             except Exception as e:
-                raise HTTPException(
-                    status_code=500, detail=f"An unexpected error occurred: {str(e)}"
-                )
+                return jsonify(
+                    {
+                        "status": "error",
+                        "message": "An unexpected error occurred",
+                        "error": str(e),
+                    }
+                ), 500
 
     async def run(self, host: str = "127.0.0.1", port: int = 5000):
-        import uvicorn
+        # Use Flask's async support
+        from werkzeug.serving import run_simple
 
-        config = uvicorn.Config(self.app, host=host, port=port)
-        server = uvicorn.Server(config)
-        await server.serve()
+        # Create a task to run the Flask app
+        def run_flask_app():
+            run_simple(host, port, self.app, use_reloader=False, threaded=True)
+
+        # Run the Flask app in a separate thread
+        await asyncio.to_thread(run_flask_app)

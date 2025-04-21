@@ -138,23 +138,23 @@ async def test_experiment_async_execution():
 @pytest.mark.asyncio
 async def test_async_studio():
     """Test async studio"""
-    from promptlab.studio.async_studio import AsyncStudio
+    from promptlab.studio.studio import Studio
 
     # Create a mock tracer config
     tracer_config = MagicMock()
 
-    # Create an async studio instance
-    async_studio = AsyncStudio(tracer_config)
+    # Create a studio instance
+    studio = Studio(tracer_config)
 
     # Mock the start_web_server method
-    with patch.object(async_studio, "start_web_server") as mock_web_server:
-        # Mock the start_api_server method
-        with patch.object(async_studio, "start_api_server") as mock_api_server:
+    with patch.object(studio, "start_web_server") as mock_web_server:
+        # Mock the start_api_server_async method
+        with patch.object(studio, "start_api_server_async") as mock_api_server:
             mock_api_server.return_value = asyncio.Future()
             mock_api_server.return_value.set_result(None)
 
             # Create a task that will be cancelled
-            task = asyncio.create_task(async_studio.start_async(8000))
+            task = asyncio.create_task(studio.start_async(8000))
 
             # Wait a bit for the task to start
             await asyncio.sleep(0.1)
@@ -170,7 +170,7 @@ async def test_async_studio():
             # Check that start_web_server was called
             mock_web_server.assert_called_once_with(8000)
 
-            # Check that start_api_server was called
+            # Check that start_api_server_async was called
             mock_api_server.assert_called_once_with(8001)
 
 
@@ -203,9 +203,9 @@ async def test_promptlab_async_methods():
                 # Check that experiment.run_async was called
                 mock_run_async.assert_called_once_with(experiment_config)
 
-            # Mock the async_studio.start_async method
+            # Mock the studio.start_async method
             with patch.object(
-                promptlab.async_studio, "start_async"
+                promptlab.studio, "start_async"
             ) as mock_start_async:
                 mock_start_async.return_value = asyncio.Future()
                 mock_start_async.return_value.set_result(None)
@@ -213,5 +213,166 @@ async def test_promptlab_async_methods():
                 # Test start_studio_async
                 await promptlab.start_studio_async(8000)
 
-                # Check that async_studio.start_async was called
+                # Check that studio.start_async was called
                 mock_start_async.assert_called_once_with(8000)
+
+
+@pytest.mark.asyncio
+async def test_model_max_concurrent_tasks():
+    """Test the max_concurrent_tasks parameter in Model class"""
+    from promptlab.model.model import Model
+    from promptlab.types import ModelConfig, InferenceResult
+    import time
+
+    # Create a mock model with a delay
+    class DelayedMockModel(Model):
+        def __init__(self, model_config):
+            super().__init__(model_config)
+            self.invocation_times = []
+
+        def invoke(self, system_prompt, user_prompt):
+            """Synchronous invocation"""
+            time.sleep(0.1)
+            return InferenceResult(
+                inference=f"Response to: {user_prompt}",
+                prompt_tokens=10,
+                completion_tokens=20,
+                latency_ms=100,
+            )
+
+        async def ainvoke(self, system_prompt, user_prompt):
+            """Asynchronous invocation with recording start time"""
+            self.invocation_times.append(time.time())
+            await asyncio.sleep(0.5)  # Simulate a slow API call
+            return InferenceResult(
+                inference=f"Async response to: {user_prompt}",
+                prompt_tokens=10,
+                completion_tokens=20,
+                latency_ms=500,
+            )
+
+    # The test for max_concurrent_tasks is not directly testable in this way
+    # because the Model class itself doesn't implement the concurrency limit
+    # The concurrency limit is implemented in the Experiment class
+    # So we'll just verify that the max_concurrent_tasks attribute is set correctly
+
+    # Test with default max_concurrent_tasks (5)
+    model_config_default = ModelConfig(
+        type="mock",
+        inference_model_deployment="mock-model",
+    )
+    model_default = DelayedMockModel(model_config_default)
+
+    # Test with custom max_concurrent_tasks (2)
+    model_config_limited = ModelConfig(
+        type="mock",
+        inference_model_deployment="mock-model",
+        max_concurrent_tasks=2
+    )
+    model_limited = DelayedMockModel(model_config_limited)
+
+    # Verify that the max_concurrent_tasks attribute is set correctly
+    assert model_default.max_concurrent_tasks == 5
+    assert model_limited.max_concurrent_tasks == 2
+
+
+@pytest.mark.asyncio
+async def test_experiment_concurrency_limit():
+    """Test the concurrency limit in experiment async execution"""
+    from promptlab.experiment import Experiment
+    from promptlab.model.model import Model
+    from promptlab.types import ModelConfig, InferenceResult, ExperimentConfig
+    import time
+
+    # Create a mock model with a delay and tracking
+    class TrackedModel(Model):
+        def __init__(self, model_config):
+            super().__init__(model_config)
+            self.invocation_times = []
+            self.active_count = 0
+            self.max_observed_concurrency = 0
+
+        def invoke(self, system_prompt, user_prompt):
+            return InferenceResult(
+                inference="Test response",
+                prompt_tokens=10,
+                completion_tokens=20,
+                latency_ms=100,
+            )
+
+        async def ainvoke(self, system_prompt, user_prompt):
+            # Track concurrency
+            self.active_count += 1
+            self.max_observed_concurrency = max(self.max_observed_concurrency, self.active_count)
+            self.invocation_times.append(time.time())
+
+            # Simulate work
+            await asyncio.sleep(0.2)
+
+            # Reduce active count
+            self.active_count -= 1
+
+            return InferenceResult(
+                inference="Test async response",
+                prompt_tokens=10,
+                completion_tokens=20,
+                latency_ms=200,
+            )
+
+    # Create a mock tracer
+    tracer = MagicMock()
+    tracer.db_client.fetch_data.return_value = [
+        {"asset_binary": "system: test\nuser: test", "file_path": "test.jsonl"}
+    ]
+
+    # Create a mock dataset with multiple records
+    dataset = [{"id": i, "text": f"test {i}"} for i in range(10)]
+
+    # Mock the Utils.load_dataset method
+    with patch("promptlab.experiment.Utils") as mock_utils:
+        mock_utils.load_dataset.return_value = dataset
+        mock_utils.split_prompt_template.return_value = (
+            "system: test",
+            "user: test",
+            [],
+        )
+        mock_utils.prepare_prompts = lambda item, sys, usr, vars: (sys, usr)
+
+        # Create a model with limited concurrency
+        model_config = ModelConfig(
+            type="mock",
+            inference_model_deployment="mock-model",
+            max_concurrent_tasks=3  # Limit to 3 concurrent tasks
+        )
+        model = TrackedModel(model_config)
+
+        # Create an experiment instance
+        experiment = Experiment(tracer)
+
+        # Create a mock experiment config
+        experiment_config = MagicMock()
+        # Set up the nested attributes
+        prompt_template = MagicMock()
+        prompt_template.name = "test"
+        prompt_template.version = 1
+        dataset = MagicMock()
+        dataset.name = "test"
+        dataset.version = 1
+
+        # Attach the mocks to the experiment_config
+        experiment_config.prompt_template = prompt_template
+        experiment_config.dataset = dataset
+        experiment_config.inference_model = model
+        experiment_config.evaluation = []
+
+        # Run the experiment asynchronously
+        await experiment.init_batch_eval_async(
+            dataset,
+            "system: test",
+            "user: test",
+            [],
+            experiment_config
+        )
+
+        # Check that the concurrency limit was respected
+        assert model.max_observed_concurrency <= 3, "Concurrency limit was not respected"

@@ -138,23 +138,23 @@ async def test_experiment_async_execution():
 @pytest.mark.asyncio
 async def test_async_studio():
     """Test async studio"""
-    from promptlab.studio.async_studio import AsyncStudio
+    from promptlab.studio.studio import Studio
 
     # Create a mock tracer config
     tracer_config = MagicMock()
 
-    # Create an async studio instance
-    async_studio = AsyncStudio(tracer_config)
+    # Create a studio instance
+    studio = Studio(tracer_config)
 
     # Mock the start_web_server method
-    with patch.object(async_studio, "start_web_server") as mock_web_server:
-        # Mock the start_api_server method
-        with patch.object(async_studio, "start_api_server") as mock_api_server:
+    with patch.object(studio, "start_web_server") as mock_web_server:
+        # Mock the start_api_server_async method
+        with patch.object(studio, "start_api_server_async") as mock_api_server:
             mock_api_server.return_value = asyncio.Future()
             mock_api_server.return_value.set_result(None)
 
             # Create a task that will be cancelled
-            task = asyncio.create_task(async_studio.start_async(8000))
+            task = asyncio.create_task(studio.start_async(8000))
 
             # Wait a bit for the task to start
             await asyncio.sleep(0.1)
@@ -170,7 +170,7 @@ async def test_async_studio():
             # Check that start_web_server was called
             mock_web_server.assert_called_once_with(8000)
 
-            # Check that start_api_server was called
+            # Check that start_api_server_async was called
             mock_api_server.assert_called_once_with(8001)
 
 
@@ -208,9 +208,9 @@ async def test_promptlab_async_methods():
                 # Check that experiment.run_async was called
                 mock_run_async.assert_called_once_with(experiment_config)
 
-            # Mock the async_studio.start_async method
+            # Mock the studio.start_async method
             with patch.object(
-                promptlab.async_studio, "start_async"
+                promptlab.studio, "start_async"
             ) as mock_start_async:
                 mock_start_async.return_value = asyncio.Future()
                 mock_start_async.return_value.set_result(None)
@@ -218,5 +218,5 @@ async def test_promptlab_async_methods():
                 # Test start_studio_async
                 await promptlab.start_studio_async(8000)
 
-                # Check that async_studio.start_async was called
+                # Check that studio.start_async was called
                 mock_start_async.assert_called_once_with(8000)

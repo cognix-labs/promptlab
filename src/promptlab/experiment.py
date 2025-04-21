@@ -91,18 +91,18 @@ class Experiment:
         prompt_template_variables,
         experiment_config: ExperimentConfig,
     ) -> List:
-        inference = experiment_config.inference_model
+        inference_model = experiment_config.inference_model
         experiment_id = str(uuid.uuid4())
         timestamp = datetime.now().isoformat()
 
         exp_summary = []
 
         for eval_record in eval_dataset:
-            system_prompt, user_prompt = self.prepare_prompts(
+            sys_prompt, usr_prompt = self.prepare_prompts(
                 eval_record, system_prompt, user_prompt, prompt_template_variables
             )
 
-            inference_result = inference(system_prompt, user_prompt)
+            inference_result = inference_model(sys_prompt, usr_prompt)
             evaluation = self.evaluate(
                 inference_result.inference, eval_record, experiment_config
             )
@@ -151,14 +151,16 @@ class Experiment:
         experiment_config: ExperimentConfig,
     ) -> List:
         """
-        Asynchronous version of batch evaluation
+        Asynchronous version of batch evaluation with concurrency limit
         """
         inference_model = experiment_config.inference_model
         experiment_id = str(uuid.uuid4())
         timestamp = datetime.now().isoformat()
 
+        # Get max concurrent tasks from model config or use default
+        max_concurrent_tasks = getattr(inference_model, 'max_concurrent_tasks', 5)
+
         exp_summary = []
-        tasks = []
 
         # Prepare all prompts first
         prepared_prompts = []
@@ -168,18 +170,26 @@ class Experiment:
             )
             prepared_prompts.append((eval_record, sys_prompt, usr_prompt))
 
-        # Create tasks for async execution
-        for eval_record, sys_prompt, usr_prompt in prepared_prompts:
-            task = asyncio.create_task(
-                self._process_record_async(
+        # Process in batches with limited concurrency
+        semaphore = asyncio.Semaphore(max_concurrent_tasks)
+
+        async def process_with_semaphore(record, s_prompt, u_prompt):
+            async with semaphore:
+                return await self._process_record_async(
                     inference_model,
-                    sys_prompt,
-                    usr_prompt,
-                    eval_record,
+                    s_prompt,
+                    u_prompt,
+                    record,
                     experiment_id,
                     timestamp,
                     experiment_config,
                 )
+
+        # Create tasks for async execution with semaphore
+        tasks = []
+        for eval_record, sys_prompt, usr_prompt in prepared_prompts:
+            task = asyncio.create_task(
+                process_with_semaphore(eval_record, sys_prompt, usr_prompt)
             )
             tasks.append(task)
 
@@ -202,7 +212,7 @@ class Experiment:
         """
         Process a single record asynchronously
         """
-        inference_result = await inference_model.ainvoke(system_prompt, user_prompt)
+        inference_result = await inference_model(system_prompt, user_prompt)
 
         # Run potentially blocking evaluation in a separate thread
         evaluation = await asyncio.to_thread(

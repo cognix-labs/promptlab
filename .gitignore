@@ -173,3 +173,4 @@ test/temp.py
 test/test_core.py
 
 .idea
+ide_docs/*
