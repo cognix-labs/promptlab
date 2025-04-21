@@ -101,12 +101,14 @@ class TestAsyncSupport(unittest.TestCase):
         model = AzOpenAI(model_config)
 
         # Mock the invoke method
-        model.invoke = MagicMock(return_value=InferenceResult(
-            inference="Test response",
-            prompt_tokens=10,
-            completion_tokens=20,
-            latency_ms=100
-        ))
+        model.invoke = MagicMock(
+            return_value=InferenceResult(
+                inference="Test response",
+                prompt_tokens=10,
+                completion_tokens=20,
+                latency_ms=100,
+            )
+        )
 
         # Instead of testing the async method directly, we'll test the __call__ method
         # which should handle both sync and async contexts

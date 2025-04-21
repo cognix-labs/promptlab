@@ -204,9 +204,7 @@ async def test_promptlab_async_methods():
                 mock_run_async.assert_called_once_with(experiment_config)
 
             # Mock the studio.start_async method
-            with patch.object(
-                promptlab.studio, "start_async"
-            ) as mock_start_async:
+            with patch.object(promptlab.studio, "start_async") as mock_start_async:
                 mock_start_async.return_value = asyncio.Future()
                 mock_start_async.return_value.set_result(None)
 
@@ -265,9 +263,7 @@ async def test_model_max_concurrent_tasks():
 
     # Test with custom max_concurrent_tasks (2)
     model_config_limited = ModelConfig(
-        type="mock",
-        inference_model_deployment="mock-model",
-        max_concurrent_tasks=2
+        type="mock", inference_model_deployment="mock-model", max_concurrent_tasks=2
     )
     model_limited = DelayedMockModel(model_config_limited)
 
@@ -303,7 +299,9 @@ async def test_experiment_concurrency_limit():
         async def ainvoke(self, system_prompt, user_prompt):
             # Track concurrency
             self.active_count += 1
-            self.max_observed_concurrency = max(self.max_observed_concurrency, self.active_count)
+            self.max_observed_concurrency = max(
+                self.max_observed_concurrency, self.active_count
+            )
             self.invocation_times.append(time.time())
 
             # Simulate work
@@ -342,7 +340,7 @@ async def test_experiment_concurrency_limit():
         model_config = ModelConfig(
             type="mock",
             inference_model_deployment="mock-model",
-            max_concurrent_tasks=3  # Limit to 3 concurrent tasks
+            max_concurrent_tasks=3,  # Limit to 3 concurrent tasks
         )
         model = TrackedModel(model_config)
 
@@ -367,12 +365,10 @@ async def test_experiment_concurrency_limit():
 
         # Run the experiment asynchronously
         await experiment.init_batch_eval_async(
-            dataset,
-            "system: test",
-            "user: test",
-            [],
-            experiment_config
+            dataset, "system: test", "user: test", [], experiment_config
         )
 
         # Check that the concurrency limit was respected
-        assert model.max_observed_concurrency <= 3, "Concurrency limit was not respected"
+        assert model.max_observed_concurrency <= 3, (
+            "Concurrency limit was not respected"
+        )
