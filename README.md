@@ -142,10 +142,10 @@ async def main():
     pl = PromptLab(tracer_config)
 
     # Run experiment asynchronously
-    await pl.run_experiment_async(experiment_config)
+    await pl.experiment.run_async(experiment_config)
 
     # Start the PromptLab Studio asynchronously
-    await pl.start_studio_async(8000)
+    await pl.studio.start_async(8000)
 
 # Run the async main function
 asyncio.run(main())

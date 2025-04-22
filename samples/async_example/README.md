@@ -95,7 +95,7 @@ Experiments can be run asynchronously:
 pl.experiment.run(experiment_config)
 
 # Asynchronous execution
-await pl.run_experiment_async(experiment_config)
+await pl.experiment.run_async(experiment_config)
 ```
 
 ### Async Studio

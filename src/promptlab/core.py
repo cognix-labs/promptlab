@@ -16,11 +16,3 @@ class PromptLab:
         self.asset = Asset(self.tracer)
         self.experiment = Experiment(self.tracer)
         self.studio = Studio(self.tracer)
-
-    # async def run_experiment_async(self, experiment_config: dict):
-    #     """Run an experiment asynchronously"""
-    #     return await self.experiment.run_async(experiment_config)
-
-    # async def start_studio_async(self, port: int = 8000):
-    #     """Start the studio asynchronously"""
-    #     return await self.studio.start_async(port)

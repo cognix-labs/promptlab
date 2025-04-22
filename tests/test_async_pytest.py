@@ -201,9 +201,9 @@ async def test_promptlab_async_methods():
                 mock_run_async.return_value = asyncio.Future()
                 mock_run_async.return_value.set_result(None)
 
-                # Test run_experiment_async
+                # Test experiment.run_async
                 experiment_config = {"test": "config"}
-                await promptlab.run_experiment_async(experiment_config)
+                await promptlab.experiment.run_async(experiment_config)
 
                 # Check that experiment.run_async was called
                 mock_run_async.assert_called_once_with(experiment_config)

@@ -169,8 +169,8 @@ class TestAsyncSupport(unittest.TestCase):
                     promptlab = PromptLab(tracer_config)
 
                     # Check that the promptlab has the expected methods
-                    self.assertTrue(hasattr(promptlab, "run_experiment_async"))
-                    self.assertTrue(hasattr(promptlab, "start_studio_async"))
+                    self.assertTrue(hasattr(promptlab, "experiment.run_async"))
+                    self.assertTrue(hasattr(promptlab, "studio.start_async"))
                     # No longer has async_studio attribute after refactoring
                     self.assertTrue(hasattr(promptlab, "studio"))
 
