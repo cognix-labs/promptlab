@@ -18,7 +18,7 @@ dependencies = [
     "pydantic>=2.0.0",
     "requests>=2.25.0",
     "openai>=1.60.0",
-    "flask>=3.0.0",
+    "flask[async]>=3.0.0",
     "flask-cors>=5.0.0",
     "click>=8.0.0",
     "langchain-ollama",

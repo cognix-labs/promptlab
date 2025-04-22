@@ -90,13 +90,13 @@ async def main():
     }
 
     # Run the experiment asynchronously
-    await pl.run_experiment_async(experiment_config)
+    await pl.experiment.run_async(experiment_config)
 
     # Get port from environment variable or use default
     port = int(os.environ.get("PROMPTLAB_PORT", 8000))
 
     # Start the PromptLab Studio asynchronously
-    await pl.start_studio_async(port)
+    await pl.studio.start_async(port)
 
 
 def parse_args():

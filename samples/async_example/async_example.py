@@ -23,16 +23,16 @@ async def main():
     dataset = Dataset(
         name="async_questions",
         description="Sample questions for async testing",
-        file_path="./questions.jsonl",
+        file_path="./samples/async_example/questions.jsonl",
     )
     ds = pl.asset.create(dataset)
 
     # Create model instances
     inference_model_config = ModelConfig(
-        type="ollama", inference_model_deployment="llama2"
+        type="ollama", inference_model_deployment="llama3.2"
     )
     embedding_model_config = ModelConfig(
-        type="ollama", embedding_model_deployment="llama2"
+        type="ollama", embedding_model_deployment="llama3.2"
     )
 
     # Initialize model objects
@@ -58,10 +58,10 @@ async def main():
     }
 
     # Run the experiment asynchronously
-    await pl.run_experiment_async(experiment_config)
+    await pl.experiment.run_async(experiment_config)
 
     # Start the PromptLab Studio asynchronously
-    await pl.start_studio_async(8000)
+    await pl.studio.start_async(8000)
 
 
 if __name__ == "__main__":
