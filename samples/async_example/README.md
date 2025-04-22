@@ -107,7 +107,7 @@ The PromptLab Studio can be started asynchronously:
 pl.studio.start(8000)
 
 # Asynchronous start
-await pl.start_studio_async(8000)
+await pl.studio.start_async(8000)
 ```
 
 ### Custom Evaluators

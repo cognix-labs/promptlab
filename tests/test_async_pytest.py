@@ -213,8 +213,8 @@ async def test_promptlab_async_methods():
                 mock_start_async.return_value = asyncio.Future()
                 mock_start_async.return_value.set_result(None)
 
-                # Test start_studio_async
-                await promptlab.start_studio_async(8000)
+                # Test studio.start_async
+                await promptlab.studio.start_async(8000)
 
                 # Check that studio.start_async was called
                 mock_start_async.assert_called_once_with(8000)
