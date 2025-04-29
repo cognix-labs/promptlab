@@ -174,3 +174,6 @@ test/test_core.py
 
 .idea
 ide_docs/*
+
+# SQLite file
+*.db
