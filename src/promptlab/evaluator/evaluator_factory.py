@@ -21,7 +21,16 @@ def import_evaluators():
                     and issubclass(attr, Evaluator)
                     and attr != Evaluator
                 ):
-                    evaluator_classes[attr.__name__] = attr
+                    _cls = attr
+                    _alias = attr_name
+                    evaluator_classes[_alias] = _cls
+
+                # if (
+                #     isinstance(attr, type)
+                #     and not issubclass(attr, Evaluator)
+                # ):
+                #     alias = attr_name
+                    
     return evaluator_classes
 
 

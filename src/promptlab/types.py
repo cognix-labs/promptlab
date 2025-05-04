@@ -18,12 +18,12 @@ class InferenceResult:
 
 @dataclass
 class ModelConfig:
-    type: str
+    model_deployment: str
     api_key: Optional[str] = None
     api_version: Optional[str] = None
     endpoint: Optional[str] = None
-    inference_model_deployment: Optional[str] = None
-    embedding_model_deployment: Optional[str] = None
+    # inference_model_deployment: Optional[str] = None
+    # embedding_model_deployment: Optional[str] = None
     max_concurrent_tasks: int = 5
 
 

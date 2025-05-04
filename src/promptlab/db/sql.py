@@ -112,8 +112,8 @@ class SQLQuery:
     SELECT_EXPERIMENTS_QUERY = """
                                 SELECT
                                     e.experiment_id,
-                                    (json_extract(model, '$.inference_model_type') || ' - ' || json_extract(model, '$.inference_model_name')) AS inference_model,
-                                    (json_extract(model, '$.embedding_model_type') || ' - ' || json_extract(model, '$.embedding_model_name')) AS embedding_model,
+                                    json_extract(model, '$.inference_model_config.model_deployment') AS inference_model,
+                                    json_extract(model, '$.embedding_model_config.model_deployment') AS embedding_model,
                                     json_extract(asset, '$.prompt_template_name') AS prompt_template_name,
                                     json_extract(asset, '$.prompt_template_version') AS prompt_template_version,
                                     json_extract(asset, '$.dataset_name') AS dataset_name,

@@ -19,7 +19,7 @@ class Ollama(Model):
         ]
 
         chat_completion = self.client.chat(
-            model=self.model_config.inference_model_deployment, messages=payload
+            model=self.model_config.model_deployment, messages=payload
         )
 
         latency_ms = chat_completion.total_duration
@@ -51,7 +51,7 @@ class Ollama(Model):
         chat_completion = await loop.run_in_executor(
             None,
             lambda: self.client.chat(
-                model=self.model_config.inference_model_deployment, messages=payload
+                model=self.model_config.model_deployment, messages=payload
             ),
         )
 
@@ -78,7 +78,7 @@ class Ollama_Embedding(EmbeddingModel):
 
     def __call__(self, text: str) -> Any:
         embedding = self.client.embed(
-            model=self.model_config.embedding_model_deployment,
+            model=self.model_config.model_deployment,
             input=text,
         )["embeddings"]
 

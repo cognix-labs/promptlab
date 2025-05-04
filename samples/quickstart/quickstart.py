@@ -1,6 +1,8 @@
+import os
+import sqlite3
 from promptlab import PromptLab
 from promptlab.model.ollama import Ollama, Ollama_Embedding
-from promptlab.types import PromptTemplate, Dataset
+from promptlab.types import ModelConfig, PromptTemplate, Dataset
 
 # Initialize PromptLab with SQLite storage
 tracer_config = {"type": "sqlite", "db_file": "./promptlab.db"}
@@ -16,7 +18,10 @@ prompt_template = PromptTemplate(
         Now write feedback on this essay.
         """,
 )
-pt = pl.asset.create(prompt_template)
+try:
+    pt = pl.asset.create(prompt_template)
+except sqlite3.IntegrityError as e:
+    print(f"Asset already exists: {e}")
 
 # Create a dataset
 dataset = Dataset(
@@ -24,31 +29,44 @@ dataset = Dataset(
     description="dataset for evaluating the essay_feedback prompt",
     file_path="./samples/data/essay_feedback.jsonl",
 )
-ds = pl.asset.create(dataset)
+try:
+    ds = pl.asset.create(dataset)
+except sqlite3.IntegrityError as e:
+    print(f"Asset already exists: {e}")
+
+# Get assets
+pt = pl.asset.get(
+    asset_name="essay_feedback",
+    version=0
+)
+
+ds = pl.asset.get(
+    asset_name="essay_samples",
+    version=0
+)
 
 # model instnace
-model_config = {"type": "ollama", "model_deployment": "llama3.2"}
-ollama = Ollama(model_config=model_config)
+model = Ollama(
+            model_config = ModelConfig(model_deployment="llama3.2")
+        )
 
-embedding_model_config = {
-    "type": "ollama",
-    "model_deployment": "nomic-embed-text:latest",
-}
-ollama_embedding = Ollama_Embedding(model_config=embedding_model_config)
+embedding_model = Ollama_Embedding(
+            model_config = ModelConfig(model_deployment="nomic-embed-text:latest")
+        )
 
 # Run an experiment
 experiment_config = {
-    "inference_model": ollama,
-    "embedding_model": ollama_embedding,
+    "inference_model": model,
+    "embedding_model": embedding_model,
     "prompt_template": pt,
     "dataset": ds,
     "evaluation": [
         {
-            "metric": "SemanticSimilarity",
+            "metric": "semantic_similarity",
             "column_mapping": {"response": "$inference", "reference": "feedback"},
         },
         {
-            "metric": "Fluency",
+            "metric": "fluency",
             "column_mapping": {"response": "$inference"},
         },
     ],
