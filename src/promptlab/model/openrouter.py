@@ -1,5 +1,5 @@
+from ast import List
 import time
-from typing import Any
 from openai import OpenAI
 from openai import AsyncOpenAI
 
@@ -110,7 +110,7 @@ class OpenRouter_Embedding(EmbeddingModel):
             api_key=model_config.api_key, base_url=str(model_config.endpoint)
         )
 
-    def __call__(self, text: str) -> Any:
+    def __call__(self, text: str) -> List[float]:
         # Add OpenRouter-specific headers
         extra_headers = {
             "HTTP-Referer": "https://promptlab.local",

@@ -6,6 +6,7 @@ from pydantic import BaseModel, field_validator
 from promptlab.enums import TracerType
 from promptlab.evaluator.evaluator import Evaluator
 from promptlab._utils import Utils
+from promptlab.model.model import EmbeddingModel, Model
 
 
 @dataclass
@@ -54,7 +55,7 @@ class Model(Protocol):
 
 @runtime_checkable
 class EmbeddingModel(Protocol):
-    def __call__(self, text: str) -> Any: ...
+    def __call__(self, text: str) -> List[float]: ...
 
 
 @dataclass

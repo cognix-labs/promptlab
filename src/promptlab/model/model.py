@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Union, Awaitable
+from typing import List, Union, Awaitable
 import asyncio
 
 from promptlab.types import InferenceResult, ModelConfig
@@ -46,5 +46,5 @@ class EmbeddingModel(ABC):
         self.model_config = model_config
 
     @abstractmethod
-    def __call__(self, text: str) -> Any:
+    def __call__(self, text: str) -> List[float]:
         pass

@@ -1,5 +1,5 @@
+from ast import List
 import time
-from typing import Any
 from openai import OpenAI
 from openai import AsyncOpenAI
 
@@ -107,7 +107,7 @@ class DeepSeek_Embedding(EmbeddingModel):
             api_key=model_config.api_key, base_url=str(model_config.endpoint)
         )
 
-    def __call__(self, text: str) -> Any:
+    def __call__(self, text: str) -> List[float]:
         # Check if we're using OpenRouter
         extra_headers = {}
         if "openrouter.ai" in str(self.model_config.endpoint):

@@ -1,4 +1,4 @@
-from typing import Any
+from ast import List
 import ollama
 import asyncio
 import time
@@ -76,7 +76,7 @@ class Ollama_Embedding(EmbeddingModel):
 
         self.client = ollama
 
-    def __call__(self, text: str) -> Any:
+    def __call__(self, text: str) -> List[float]:
         embedding = self.client.embed(
             model=self.model_config.model_deployment,
             input=text,

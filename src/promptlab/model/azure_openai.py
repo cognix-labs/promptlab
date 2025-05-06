@@ -1,5 +1,5 @@
+from ast import List
 import time
-from typing import Any
 from openai import AzureOpenAI
 from openai import AsyncAzureOpenAI
 
@@ -88,7 +88,7 @@ class AzOpenAI_Embedding(EmbeddingModel):
             azure_endpoint=str(model_config.endpoint),
         )
 
-    def __call__(self, text: str) -> Any:
+    def __call__(self, text: str) -> List[float]:
         embedding = (
             self.client.embeddings.create(
                 input=text, model=self.model_config.embedding_model_deployment
