@@ -20,7 +20,19 @@ The SDK/CLI can also launch the PromptLab Studio, a web interface that runs loca
 
 ### Tracer
 
-Tracer is storage that stores the assets and experiments. Currently only supported tracer is a `SQLite` based tracer. Initializing the PromptLab object will try to the load the SQLite database file. If the file doesn't exist, PromptLab will create the file.
+Tracer is storage layer that persist the assets and experiments. 
+Supported tracers -
+
+1. SQLite
+
+`SQLite` based tracer is used for locally running using PromptLab. Initializing the PromptLab object will try to load the SQLite database file from the given path. If the file doesn't exist, PromptLab will create the file.
+
+    tracer_config = {"type": "sqlite", "db_file": "./promptlab.db"}
+    pl = PromptLab(tracer_config)
+
+2. API (upcoming)
+
+`API` based tracer is used for team collaboration.
 
 ### PromptLab Studio
 
@@ -116,3 +128,7 @@ Fields definition:
 - metric (mandatory): name of the metric from the specific library
 - column_mapping (mandatory): column mapping to map the metric paramaeters with dataset columns and the inference output. To map a parameter to inference output, use `$inference`.
 - evaluator (required for custom metric): it's the evaluator object that's required for custom metrics. 
+
+### Metric
+
+jjjjjjj
