@@ -8,7 +8,7 @@ from promptlab.enums import AssetType
 from promptlab.db.sql import SQLQuery
 from promptlab.tracer.tracer import Tracer
 from promptlab.types import Dataset, PromptTemplate
-from promptlab.utils import Utils
+from promptlab.utils import _Utils
 
 T = TypeVar("T", Dataset, PromptTemplate)
 
@@ -152,7 +152,7 @@ class Asset:
             SQLQuery.SELECT_ASSET_BY_NAME_QUERY, (template.name, template.name)
         )[0]
         system_prompt, user_prompt, prompt_template_variables = (
-            Utils.split_prompt_template(prompt_template["asset_binary"])
+            _Utils.split_prompt_template(prompt_template["asset_binary"])
         )
 
         template.description = (
@@ -205,7 +205,7 @@ class Asset:
             )
 
         if asset_type == AssetType.PROMPT_TEMPLATE.value:
-            system_prompt, user_prompt, _ = Utils.split_prompt_template(
+            system_prompt, user_prompt, _ = _Utils.split_prompt_template(
                 asset["asset_binary"]
             )
             return PromptTemplate(

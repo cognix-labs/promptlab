@@ -8,7 +8,7 @@ from promptlab.config import ConfigValidator, ExperimentConfig
 from promptlab.db.sql import SQLQuery
 from promptlab.evaluator.evaluator_factory import EvaluatorFactory
 from promptlab.tracer.tracer import Tracer
-from promptlab.utils import Utils
+from promptlab.utils import _Utils
 
 
 class Experiment:
@@ -30,14 +30,14 @@ class Experiment:
             ),
         )[0]
         system_prompt, user_prompt, prompt_template_variables = (
-            Utils.split_prompt_template(prompt_template["asset_binary"])
+            _Utils.split_prompt_template(prompt_template["asset_binary"])
         )
 
         eval_dataset_path = self.tracer.db_client.fetch_data(
             SQLQuery.SELECT_DATASET_FILE_PATH_QUERY,
             (experiment_config.dataset.name, experiment_config.dataset.version),
         )[0]
-        eval_dataset = Utils.load_dataset(eval_dataset_path["file_path"])
+        eval_dataset = _Utils.load_dataset(eval_dataset_path["file_path"])
 
         exp_summary = self.init_batch_eval(
             eval_dataset,
@@ -64,14 +64,14 @@ class Experiment:
             ),
         )[0]
         system_prompt, user_prompt, prompt_template_variables = (
-            Utils.split_prompt_template(prompt_template["asset_binary"])
+            _Utils.split_prompt_template(prompt_template["asset_binary"])
         )
 
         eval_dataset_path = self.tracer.db_client.fetch_data(
             SQLQuery.SELECT_DATASET_FILE_PATH_QUERY,
             (experiment_config.dataset.name, experiment_config.dataset.version),
         )[0]
-        eval_dataset = Utils.load_dataset(eval_dataset_path["file_path"])
+        eval_dataset = _Utils.load_dataset(eval_dataset_path["file_path"])
 
         exp_summary = await self.init_batch_eval_async(
             eval_dataset,

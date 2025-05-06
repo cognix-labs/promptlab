@@ -5,7 +5,7 @@ from pydantic import BaseModel, field_validator
 
 from promptlab.enums import TracerType
 from promptlab.evaluator.evaluator import Evaluator
-from promptlab.utils import Utils
+from promptlab.utils import _Utils
 
 
 @dataclass
@@ -103,7 +103,7 @@ class TracerConfig(BaseModel):
 
     @field_validator("db_file")
     def validate_db_server(cls, value):
-        return Utils.sanitize_path(value)
+        return _Utils.sanitize_path(value)
 
     class Config:
         use_enum_values = True
