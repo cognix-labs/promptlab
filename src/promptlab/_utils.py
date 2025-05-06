@@ -4,7 +4,7 @@ import re
 from typing import Dict, List, Tuple
 
 
-class _Utils:
+class Utils:
     @staticmethod
     def sanitize_path(value: str) -> str:
         if any(char in value for char in '<>"|?*'):
@@ -19,7 +19,7 @@ class _Utils:
 
     @staticmethod
     def load_dataset(dataset_path: str) -> List[Dict]:
-        dataset_path = _Utils.sanitize_path(dataset_path)
+        dataset_path = Utils.sanitize_path(dataset_path)
 
         dataset = []
         with open(dataset_path, "r") as file:

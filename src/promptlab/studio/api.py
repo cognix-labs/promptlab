@@ -4,7 +4,7 @@ from flask_cors import CORS
 
 from promptlab.db.sql import SQLQuery
 from promptlab.types import TracerConfig
-from promptlab.utils import _Utils
+from promptlab._utils import Utils
 from promptlab.enums import AssetType
 
 
@@ -27,7 +27,7 @@ class StudioApi:
                 # Process experiments and remove asset_binary
                 processed_experiments = []
                 for experiment in experiments:
-                    system_prompt, user_prompt, _ = _Utils.split_prompt_template(
+                    system_prompt, user_prompt, _ = Utils.split_prompt_template(
                         experiment["asset_binary"]
                     )
                     # Create new dict without asset_binary
@@ -59,7 +59,7 @@ class StudioApi:
 
                 processed_templates = []
                 for template in prompt_templates:
-                    system_prompt, user_prompt, _ = _Utils.split_prompt_template(
+                    system_prompt, user_prompt, _ = Utils.split_prompt_template(
                         template["asset_binary"]
                     )
 

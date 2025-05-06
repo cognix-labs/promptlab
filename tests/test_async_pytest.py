@@ -93,9 +93,9 @@ async def test_experiment_async_execution():
     dataset = [{"id": 1, "text": "test"}]
 
     # Mock the Utils.load_dataset method
-    with patch("promptlab.experiment.Utils") as mock_utils:
-        mock_utils.load_dataset.return_value = dataset
-        mock_utils.split_prompt_template.return_value = (
+    with patch("promptlab.experiment.Utils") as mockUtils:
+        mockUtils.load_dataset.return_value = dataset
+        mockUtils.split_prompt_template.return_value = (
             "system: test",
             "user: test",
             [],

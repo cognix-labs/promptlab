@@ -93,9 +93,9 @@ async def test_experiment_async_execution():
     dataset = [{"id": 1, "text": "test"}]
 
     # Mock the Utils.load_dataset method
-    with patch("promptlab.experiment.Utils") as mock_utils:
-        mock_utils.load_dataset.return_value = dataset
-        mock_utils.split_prompt_template.return_value = (
+    with patch("promptlab.experiment.Utils") as mockUtils:
+        mockUtils.load_dataset.return_value = dataset
+        mockUtils.split_prompt_template.return_value = (
             "system: test",
             "user: test",
             [],
@@ -327,14 +327,14 @@ async def test_experiment_concurrency_limit():
     dataset = [{"id": i, "text": f"test {i}"} for i in range(10)]
 
     # Mock the Utils.load_dataset method
-    with patch("promptlab.experiment.Utils") as mock_utils:
-        mock_utils.load_dataset.return_value = dataset
-        mock_utils.split_prompt_template.return_value = (
+    with patch("promptlab.experiment.Utils") as mockUtils:
+        mockUtils.load_dataset.return_value = dataset
+        mockUtils.split_prompt_template.return_value = (
             "system: test",
             "user: test",
             [],
         )
-        mock_utils.prepare_prompts = lambda item, sys, usr, vars: (sys, usr)
+        mockUtils.prepare_prompts = lambda item, sys, usr, vars: (sys, usr)
 
         # Create a model with limited concurrency
         model_config = ModelConfig(
