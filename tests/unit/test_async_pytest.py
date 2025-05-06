@@ -81,7 +81,7 @@ async def test_async_model_invocation():
 @pytest.mark.asyncio
 async def test_experiment_async_execution():
     """Test async experiment execution"""
-    from promptlab.experiment import Experiment
+    from promptlab._experiment import Experiment
 
     # Create a mock tracer
     tracer = MagicMock()
@@ -275,7 +275,7 @@ async def test_model_max_concurrent_tasks():
 @pytest.mark.asyncio
 async def test_experiment_concurrency_limit():
     """Test the concurrency limit in experiment async execution"""
-    from promptlab.experiment import Experiment
+    from promptlab._experiment import Experiment
     from promptlab.model.model import Model
     from promptlab.types import ModelConfig, InferenceResult
     import time

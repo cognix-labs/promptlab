@@ -122,7 +122,7 @@ class TestAsyncSupport(unittest.TestCase):
 
     def test_experiment_async_methods(self):
         """Test that Experiment class has async methods"""
-        from promptlab.experiment import Experiment
+        from promptlab._experiment import Experiment
         from promptlab.tracer.tracer import Tracer
 
         # Create a mock tracer

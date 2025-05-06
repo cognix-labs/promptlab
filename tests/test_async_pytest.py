@@ -81,7 +81,7 @@ async def test_async_model_invocation():
 @pytest.mark.asyncio
 async def test_experiment_async_execution():
     """Test async experiment execution"""
-    from promptlab.experiment import Experiment
+    from promptlab._experiment import Experiment
 
     # Create a mock tracer
     tracer = MagicMock()
