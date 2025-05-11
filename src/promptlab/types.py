@@ -6,7 +6,7 @@ from pydantic import BaseModel, field_validator
 from promptlab.enums import TracerType
 from promptlab.evaluator.evaluator import Evaluator
 from promptlab._utils import Utils
-from promptlab.model.model import EmbeddingModel, Model
+# from promptlab.model.model import EmbeddingModel, Model
 
 
 @dataclass

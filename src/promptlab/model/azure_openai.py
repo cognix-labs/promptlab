@@ -1,5 +1,5 @@
-from ast import List
 import time
+from typing import List
 from openai import AzureOpenAI
 from openai import AsyncAzureOpenAI
 
