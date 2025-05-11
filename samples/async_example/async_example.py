@@ -11,8 +11,9 @@ async def main():
     pl = PromptLab(tracer_config)
 
     # Create a prompt template
+    prompt_name = "async_example"
     prompt_template = PromptTemplate(
-        name="async_example",
+        name=prompt_name,
         description="A prompt for testing async functionality",
         system_prompt="You are a helpful assistant who can provide concise answers.",
         user_prompt="Please answer this question: <question>",
@@ -20,32 +21,28 @@ async def main():
     pt = pl.asset.create(prompt_template)
 
     # Create a dataset
+    dataset_name = "async_questions"
     dataset = Dataset(
-        name="async_questions",
+        name=dataset_name,
         description="Sample questions for async testing",
         file_path="./samples/async_example/questions.jsonl",
     )
     ds = pl.asset.create(dataset)
 
-    # Create model instances
-    inference_model_config = ModelConfig(
-        type="ollama", inference_model_deployment="llama3.2"
-    )
-    embedding_model_config = ModelConfig(
-        type="ollama", embedding_model_deployment="llama3.2"
-    )
+    # Retrieve assets
+    pt = pl.asset.get(asset_name = prompt_name, version=0)
+    ds = pl.asset.get(asset_name = dataset_name, version=0)
 
     # Initialize model objects
-    ollama = Ollama(model_config=inference_model_config)
-    ollama_embedding = Ollama_Embedding(model_config=embedding_model_config)
+    inference_model = Ollama(model_config = ModelConfig(model_deployment="llama3.2"))
+    embedding_model = Ollama_Embedding(model_config = ModelConfig(model_deployment="llama3.2"))
 
-    # Create the length evaluator instance
     length_evaluator = LengthEvaluator()
 
     # Run an experiment asynchronously
     experiment_config = {
-        "inference_model": ollama,
-        "embedding_model": ollama_embedding,
+        "inference_model": inference_model,
+        "embedding_model": embedding_model,
         "prompt_template": pt,
         "dataset": ds,
         "evaluation": [
