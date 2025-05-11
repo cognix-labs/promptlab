@@ -25,7 +25,7 @@ Supported tracers -
 
 1. SQLite
 
-`SQLite` based tracer is used for locally running using PromptLab. Initializing the PromptLab object will try to load the SQLite database file from the given path. If the file doesn't exist, PromptLab will create the file.
+`SQLite` based tracer is used for locally running PromptLab. Initializing the PromptLab object will try to load the SQLite database file from the given path. If the file doesn't exist, PromptLab will create the file.
 
     tracer_config = {"type": "sqlite", "db_file": "./promptlab.db"}
     pl = PromptLab(tracer_config)

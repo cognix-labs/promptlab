@@ -1,10 +1,10 @@
 # Quickstart
 
-This sample ([quickstart.py](quickstart.py)) demonstrates how to use PromptLab to evaluate a basic prompt to provide feedback to essays submitted by students. 
+This sample ([quickstart.py](quickstart.py)) demonstrates how to use PromptLab to evaluate a simple prompt. 
 
 ## Install Python Package
 
-Install the Python package using pip. It's highly recommended to use a virtual environment.
+It's highly recommended to use a virtual environment (using venv or conda or uv).
 
 ```bash
 pip install promptlab
@@ -18,7 +18,6 @@ The first step to use PromptLab is to initialize the PromptLab object. Please ch
 tracer_config = {"type": "sqlite", "db_file": "./promptlab.db"}
 pl = PromptLab(tracer_config)
 ```
-
 
 Once the PromptLab object is ready, you can start the PromptLab Studio to check the assets and experiments.
 
@@ -37,13 +36,13 @@ prompt_name = "essay_feedback"
 prompt_description = "A prompt for generating feedback on essays"
 system_prompt = "You are a helpful assistant who can provide feedback on essays."
 user_prompt = """The essay topic is - <essay_topic>.
-The submitted essay is - <essay>
-Now write feedback on this essay."""
+               The submitted essay is - <essay>
+               Now write feedback on this essay."""
 prompt_template = PromptTemplate(name=prompt_name, description=prompt_description, system_prompt=system_prompt, user_prompt=user_prompt)
 pt = pl.asset.create(prompt_template)
 ```
 
-Here, `<essay_topic>` and `<essay>` are placeholders that will be replaced with real data before sending to the LLM. PromptLab will search the dataset for columns with these exact names and use their values to replace the corresponding placeholders. Ensure that the dataset contains columns named `essay_topic` and `essay` to avoid errors.
+Here, `<essay_topic>` and `<essay>` are placeholders that will be replaced with real data before sending to the LLM. PromptLab will search the dataset for columns with these exact names and use their values to replace the corresponding placeholders. Ensure that the dataset contains columns named `essay_topic` and `essay`.
 
 ![PromptLab Studio](../../img/studio-pt.png)
 
