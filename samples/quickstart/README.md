@@ -2,9 +2,9 @@
 
 This sample ([quickstart.py](quickstart.py)) demonstrates how to use PromptLab to evaluate a simple prompt. 
 
-## Install Python Package
+## Installation and Setup
 
-It's highly recommended to use a virtual environment (using venv or conda or uv).
+It's highly recommended to use a virtual environment (try venv or conda or uv).
 
 ```bash
 pip install promptlab
