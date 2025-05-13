@@ -13,7 +13,7 @@ class RagasFactualCorrectness(Evaluator):
         sample = SingleTurnSample(response=inference, reference=reference)
 
         evaluator_llm = LangchainLLMWrapper(
-            ChatOllama(model=self.inference.config.model_deployment)
+            ChatOllama(model=self.inference.model_config.model_deployment)
         )
 
         scorer = FactualCorrectness(llm=evaluator_llm)
