@@ -1,5 +1,5 @@
 from promptlab import PromptLab
-from promptlab.types import PromptTemplate, Dataset
+from promptlab.types import ModelConfig, PromptTemplate, Dataset
 from lm_studio import LmStudio
 from promptlab.model import Ollama_Embedding
 
@@ -28,23 +28,8 @@ dataset = Dataset(name=dataset_name, description=dataset_description, file_path=
 pt = pl.asset.get(asset_name = prompt_name, version=0)
 ds = pl.asset.get(asset_name = dataset_name, version=0)
 
-# Custom model
-inference_model = {
-    "type": "lm_studio",
-    "api_key": "lm-studio",
-    "api_version": "v1",
-    "endpoint": "http://localhost:1234/v1",
-    "model_deployment": "llama-3.2-3b-instruct",
-}
-lmstudio = LmStudio(inference_model)
-
-# Built in model
-embedding_model_config = {
-    "type": "ollama",
-    "model_deployment": "nomic-embed-text:latest",
-}
-
-ollama_embedding = Ollama_Embedding(model_config=embedding_model_config)
+lmstudio = LmStudio(model_config = ModelConfig(model_deployment="llama-3.2-3b-instruct", api_key="lm-studio", api_version="v1", endpoint="http://localhost:1234/v1"))
+ollama_embedding = Ollama_Embedding(model_config = ModelConfig(model_deployment="nomic-embed-text:latest"))
 
 # Run an experiment
 experiment_config = {
