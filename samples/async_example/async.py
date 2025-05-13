@@ -2,7 +2,6 @@ import asyncio
 from promptlab import PromptLab
 from promptlab.types import PromptTemplate, Dataset, ModelConfig
 from promptlab.model.ollama import Ollama, Ollama_Embedding
-from custom_evaluator import LengthEvaluator
 
 
 async def main():
@@ -11,22 +10,20 @@ async def main():
     pl = PromptLab(tracer_config)
 
     # Create a prompt template
-    prompt_name = "async_example"
-    prompt_template = PromptTemplate(
-        name=prompt_name,
-        description="A prompt for testing async functionality",
-        system_prompt="You are a helpful assistant who can provide concise answers.",
-        user_prompt="Please answer this question: <question>",
-    )
+    prompt_name = "essay_feedback"
+    prompt_description = "A prompt for generating feedback on essays"
+    system_prompt = "You are a helpful assistant who can provide feedback on essays."
+    user_prompt = """The essay topic is - <essay_topic>.
+                The submitted essay is - <essay>
+                Now write feedback on this essay."""
+    prompt_template = PromptTemplate(name=prompt_name, description=prompt_description, system_prompt=system_prompt, user_prompt=user_prompt)
     pt = pl.asset.create(prompt_template)
 
     # Create a dataset
-    dataset_name = "async_questions"
-    dataset = Dataset(
-        name=dataset_name,
-        description="Sample questions for async testing",
-        file_path="./samples/async_example/questions.jsonl",
-    )
+    dataset_name = "essay_samples"
+    dataset_description = "dataset for evaluating the essay_feedback prompt"
+    dataset_file_path = "./samples/data/essay_feedback.jsonl"
+    dataset = Dataset(name=dataset_name, description=dataset_description, file_path=dataset_file_path)
     ds = pl.asset.create(dataset)
 
     # Retrieve assets
@@ -37,8 +34,6 @@ async def main():
     inference_model = Ollama(model_config = ModelConfig(model_deployment="llama3.2"))
     embedding_model = Ollama_Embedding(model_config = ModelConfig(model_deployment="llama3.2"))
 
-    length_evaluator = LengthEvaluator()
-
     # Run an experiment asynchronously
     experiment_config = {
         "inference_model": inference_model,
@@ -47,10 +42,13 @@ async def main():
         "dataset": ds,
         "evaluation": [
             {
-                "metric": "LengthEvaluator",
+                "metric": "semantic_similarity",
+                "column_mapping": {"response": "$inference", "reference": "feedback"},
+            },
+            {
+                "metric": "fluency",
                 "column_mapping": {"response": "$inference"},
-                "evaluator": length_evaluator,
-            }
+            },
         ],
     }
 
