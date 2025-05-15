@@ -6,7 +6,6 @@ from pydantic import BaseModel, field_validator
 from promptlab.enums import TracerType
 from promptlab.evaluator.evaluator import Evaluator
 from promptlab._utils import Utils
-# from promptlab.model.model import EmbeddingModel, Model
 
 
 @dataclass
@@ -89,6 +88,7 @@ class AssetConfig(BaseModel):
 
 
 class ExperimentConfig(BaseModel):
+    name: str = None
     inference_model: Model
     embedding_model: EmbeddingModel
     prompt_template: PromptTemplate

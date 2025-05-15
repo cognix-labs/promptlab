@@ -92,7 +92,7 @@ class Experiment:
         experiment_config: ExperimentConfig,
     ) -> List:
         inference_model = experiment_config.inference_model
-        experiment_id = str(uuid.uuid4())
+        experiment_id = experiment_config.name if experiment_config.name else str(uuid.uuid4())
         timestamp = datetime.now().isoformat()
 
         exp_summary = []
