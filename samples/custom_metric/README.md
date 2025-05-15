@@ -1,6 +1,6 @@
 # Custom Metric
 
-This sample ([custom_metric.py](custom_metric.py)) demonstrates how to use PromptLab to use a custom evaluation metric. This also open ups the opprtunity to use external evaluation libraries like Ragas or Azure Evaluation SDK to use with PromptLab.
+This sample ([custom_metric.py](custom_metric.py)) demonstrates how to create custom evaluation metric. This also opens up the opprtunity to use external evaluation libraries like Ragas or Azure Evaluation SDK to use with PromptLab.
 
 ## Creating custom metric 
 
@@ -27,7 +27,6 @@ The following code snippet demonstrate how to use the custom metric in the exper
     length = LengthEvaluator()
     factual_correctness = RagasFactualCorrectness()
 
-    # Run an experiment
     experiment_config = {
         "inference_model": inference_model,
         "embedding_model": embedding_model,
@@ -48,3 +47,4 @@ The following code snippet demonstrate how to use the custom metric in the exper
             },
         ],
     }
+    pl.experiment.run(experiment_config)

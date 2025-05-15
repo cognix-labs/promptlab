@@ -17,14 +17,14 @@ async def main():
                 The submitted essay is - <essay>
                 Now write feedback on this essay."""
     prompt_template = PromptTemplate(name=prompt_name, description=prompt_description, system_prompt=system_prompt, user_prompt=user_prompt)
-    # pt = pl.asset.create(prompt_template)
+    pt = pl.asset.create(prompt_template)
 
     # Create a dataset
     dataset_name = "essay_samples"
     dataset_description = "dataset for evaluating the essay_feedback prompt"
     dataset_file_path = "./samples/data/essay_feedback.jsonl"
     dataset = Dataset(name=dataset_name, description=dataset_description, file_path=dataset_file_path)
-    # ds = pl.asset.create(dataset)
+    ds = pl.asset.create(dataset)
 
     # Retrieve assets
     pt = pl.asset.get(asset_name = prompt_name, version=0)
@@ -34,7 +34,6 @@ async def main():
     inference_model = Ollama(model_config = ModelConfig(model_deployment="llama3.2"))
     embedding_model = Ollama_Embedding(model_config = ModelConfig(model_deployment="llama3.2"))
 
-    # Run an experiment asynchronously
     experiment_config = {
         "inference_model": inference_model,
         "embedding_model": embedding_model,
@@ -51,7 +50,6 @@ async def main():
             },
         ],
     }
-
     # Run the experiment asynchronously
     await pl.experiment.run_async(experiment_config)
 
