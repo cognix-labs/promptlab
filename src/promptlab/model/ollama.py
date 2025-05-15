@@ -1,7 +1,6 @@
 from typing import List
 import ollama
 import asyncio
-import time
 
 from promptlab.model.model import EmbeddingModel, Model, InferenceResult, ModelConfig
 
@@ -44,8 +43,6 @@ class Ollama(Model):
             {"role": "user", "content": user_prompt},
         ]
 
-        # start_time = time.time()
-
         # Run the synchronous Ollama call in a thread pool
         loop = asyncio.get_event_loop()
         chat_completion = await loop.run_in_executor(
@@ -54,9 +51,6 @@ class Ollama(Model):
                 model=self.model_config.model_deployment, messages=payload
             ),
         )
-
-        # end_time = time.time()
-        # latency_ms = (end_time - start_time) * 1000
 
         latency_ms = chat_completion.total_duration/1000000
         inference = chat_completion.message.content
