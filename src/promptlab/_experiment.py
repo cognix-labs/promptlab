@@ -29,9 +29,7 @@ class Experiment:
                 experiment_config.prompt_template.version,
             ),
         )[0]
-        system_prompt, user_prompt, prompt_template_variables = (
-            Utils.split_prompt_template(prompt_template["asset_binary"])
-        )
+        system_prompt, user_prompt, prompt_template_variables = Utils.split_prompt_template(prompt_template["asset_binary"])
 
         eval_dataset_path = self.tracer.db_client.fetch_data(
             SQLQuery.SELECT_DATASET_FILE_PATH_QUERY,
@@ -63,10 +61,8 @@ class Experiment:
                 experiment_config.prompt_template.version,
             ),
         )[0]
-        system_prompt, user_prompt, prompt_template_variables = (
-            Utils.split_prompt_template(prompt_template["asset_binary"])
-        )
-
+        system_prompt, user_prompt, prompt_template_variables = Utils.split_prompt_template(prompt_template["asset_binary"])
+        
         eval_dataset_path = self.tracer.db_client.fetch_data(
             SQLQuery.SELECT_DATASET_FILE_PATH_QUERY,
             (experiment_config.dataset.name, experiment_config.dataset.version),
