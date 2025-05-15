@@ -2,7 +2,7 @@ from openai import OpenAI
 import asyncio
 
 from promptlab.model.model import Model
-from promptlab.types import InferenceResult, InferenceModelConfig, ModelConfig
+from promptlab.types import InferenceResult, ModelConfig
 
 
 class LmStudio(Model):

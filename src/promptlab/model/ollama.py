@@ -44,7 +44,7 @@ class Ollama(Model):
             {"role": "user", "content": user_prompt},
         ]
 
-        start_time = time.time()
+        # start_time = time.time()
 
         # Run the synchronous Ollama call in a thread pool
         loop = asyncio.get_event_loop()
@@ -55,9 +55,10 @@ class Ollama(Model):
             ),
         )
 
-        end_time = time.time()
-        latency_ms = (end_time - start_time) * 1000
+        # end_time = time.time()
+        # latency_ms = (end_time - start_time) * 1000
 
+        latency_ms = chat_completion.total_duration/1000000
         inference = chat_completion.message.content
         prompt_token = chat_completion.eval_count
         completion_token = chat_completion.prompt_eval_count
