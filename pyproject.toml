@@ -42,4 +42,4 @@ promptlab = ["web/*.html"]
 where = ["src"]
 
 [project.scripts]
-promptlab = "promptlab.cli:main"
+promptlab = "promptlab._cli:promptlab"
