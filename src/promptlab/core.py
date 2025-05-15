@@ -2,7 +2,7 @@ from promptlab.asset import Asset
 from promptlab._experiment import Experiment
 from promptlab.studio.studio import Studio
 from promptlab.tracer.tracer_factory import TracerFactory
-from promptlab.config import ConfigValidator, TracerConfig
+from promptlab._config import ConfigValidator, TracerConfig
 
 
 class PromptLab:

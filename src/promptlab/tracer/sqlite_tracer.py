@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Dict, List
 import json
 
-from promptlab.config import ExperimentConfig, TracerConfig
+from promptlab._config import ExperimentConfig, TracerConfig
 from promptlab.db.sqlite import SQLiteClient
 from promptlab.tracer.tracer import Tracer
 from promptlab.db.sql import SQLQuery

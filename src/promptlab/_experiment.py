@@ -4,7 +4,7 @@ import json
 import uuid
 import asyncio
 
-from promptlab.config import ConfigValidator, ExperimentConfig
+from promptlab._config import ConfigValidator, ExperimentConfig
 from promptlab.db.sql import SQLQuery
 from promptlab.evaluator.evaluator_factory import EvaluatorFactory
 from promptlab.tracer.tracer import Tracer

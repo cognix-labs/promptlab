@@ -1,4 +1,4 @@
-from promptlab.config import TracerConfig
+from promptlab._config import TracerConfig
 from promptlab.enums import TracerType
 from promptlab.tracer.sqlite_tracer import SQLiteTracer
 from promptlab.tracer.tracer import Tracer

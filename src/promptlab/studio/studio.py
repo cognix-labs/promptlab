@@ -3,7 +3,7 @@ from http.server import HTTPServer
 from typing import Optional
 import threading
 
-from promptlab.config import TracerConfig
+from promptlab._config import TracerConfig
 from promptlab.studio.api import StudioApi
 from promptlab.studio.async_api import AsyncStudioApi
 from promptlab.studio.web import StudioWebHandler

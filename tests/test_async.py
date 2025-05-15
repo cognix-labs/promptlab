@@ -140,7 +140,7 @@ class TestAsyncSupport(unittest.TestCase):
     def test_async_studio(self):
         """Test that Studio class has async methods"""
         from promptlab.studio.studio import Studio
-        from promptlab.config import TracerConfig
+        from promptlab._config import TracerConfig
 
         # Create a mock tracer config
         tracer_config = MagicMock(spec=TracerConfig)
