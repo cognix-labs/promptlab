@@ -13,7 +13,5 @@ class Tracer(ABC):
         pass
 
     @abstractmethod
-    def trace(
-        self, experiment_config: ExperimentConfig, experiment_summary: List[Dict]
-    ):
+    def trace(self, experiment_config: ExperimentConfig, experiment_summary: List[Dict]):
         pass

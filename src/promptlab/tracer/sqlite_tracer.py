@@ -17,9 +17,7 @@ class SQLiteTracer(Tracer):
         self.db_client.execute_query(SQLQuery.CREATE_EXPERIMENTS_TABLE_QUERY)
         self.db_client.execute_query(SQLQuery.CREATE_EXPERIMENT_RESULT_TABLE_QUERY)
 
-    def trace(
-        self, experiment_config: ExperimentConfig, experiment_summary: List[Dict]
-    ) -> None:
+    def trace(self, experiment_config: ExperimentConfig, experiment_summary: List[Dict]) -> None:
         timestamp = datetime.now().isoformat()
         experiment_id = experiment_summary[0]["experiment_id"]
 
