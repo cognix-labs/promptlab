@@ -108,13 +108,11 @@ async def test_experiment_async_execution():
 
             # Create a mock experiment config
             experiment_config = {}
-            # We'll patch the validation in the Experiment class
-
-            # Create an experiment instance
+            # We'll patch the validation in the Experiment class            # Create an experiment instance
             experiment = Experiment(tracer)
 
-            # Mock the init_batch_eval_async method
-            with patch.object(experiment, "init_batch_eval_async") as mock_batch_eval:
+            # Mock the _init_batch_eval_async method (note the leading underscore)
+            with patch.object(experiment, "_init_batch_eval_async") as mock_batch_eval:
                 mock_batch_eval.return_value = asyncio.Future()
                 mock_batch_eval.return_value.set_result([{"experiment_id": "test"}])
 
@@ -311,13 +309,11 @@ async def test_experiment_concurrency_limit():
     tracer = MagicMock()
     tracer.db_client.fetch_data.return_value = [
         {"asset_binary": "system: test\nuser: test", "file_path": "test.jsonl"}
-    ]
-
-    # Create a mock dataset with multiple records
+    ]    # Create a mock dataset with multiple records
     dataset = [{"id": i, "text": f"test {i}"} for i in range(10)]
 
     # Mock the Utils.load_dataset method
-    with patch("promptlab.experiment.Utils") as mockUtils:
+    with patch("promptlab._utils.Utils") as mockUtils:
         mockUtils.load_dataset.return_value = dataset
         mockUtils.split_prompt_template.return_value = (
             "system: test",
@@ -351,10 +347,8 @@ async def test_experiment_concurrency_limit():
         experiment_config.prompt_template = prompt_template
         experiment_config.dataset = dataset
         experiment_config.inference_model = model
-        experiment_config.evaluation = []
-
-        # Run the experiment asynchronously
-        await experiment.init_batch_eval_async(
+        experiment_config.evaluation = []        # Run the experiment asynchronously
+        await experiment._init_batch_eval_async(
             dataset, "system: test", "user: test", [], experiment_config
         )
 
