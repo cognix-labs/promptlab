@@ -309,7 +309,7 @@ async def test_experiment_concurrency_limit():
     tracer = MagicMock()
     tracer.db_client.fetch_data.return_value = [
         {"asset_binary": "system: test\nuser: test", "file_path": "test.jsonl"}
-    ]    # Create a mock dataset with multiple records
+    ]  # Create a mock dataset with multiple records
     dataset = [{"id": i, "text": f"test {i}"} for i in range(10)]
 
     # Mock the Utils.load_dataset method
@@ -347,7 +347,7 @@ async def test_experiment_concurrency_limit():
         experiment_config.prompt_template = prompt_template
         experiment_config.dataset = dataset
         experiment_config.inference_model = model
-        experiment_config.evaluation = []        # Run the experiment asynchronously
+        experiment_config.evaluation = []  # Run the experiment asynchronously
         await experiment._init_batch_eval_async(
             dataset, "system: test", "user: test", [], experiment_config
         )
