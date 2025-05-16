@@ -19,10 +19,9 @@ async def test_async_promptlab():
 
         # Test async model invocation
         model_config = ModelConfig(
-            type="mock",
-            inference_model_deployment="mock-model",
-            embedding_model_deployment="mock-model",
+            model_deployment="mock-model",
         )
+
 
         # Use the fixture model with 0.5s delay
         model = MockModel(model_config=model_config, delay_seconds=0.5)

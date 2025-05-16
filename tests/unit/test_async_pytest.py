@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.abspath("./src"))
 
 @pytest.mark.asyncio
 async def test_async_model_invocation():
-    """Test async model invocation"""
+    """Test async model invocation""" 
     from promptlab.model.model import Model
     from promptlab.types import ModelConfig, InferenceResult
 
@@ -38,13 +38,9 @@ async def test_async_model_invocation():
                 prompt_tokens=10,
                 completion_tokens=20,
                 latency_ms=100,
-            )
-
-    # Create a model config
+            )    # Create a model config
     model_config = ModelConfig(
-        type="mock",
-        inference_model_deployment="mock-model",
-        embedding_model_deployment="mock-model",
+        model_deployment="mock-model",
     )
 
     # Create a model instance
@@ -87,22 +83,18 @@ async def test_experiment_async_execution():
     tracer = MagicMock()
     tracer.db_client.fetch_data.return_value = [
         {"asset_binary": "system: test\nuser: test", "file_path": "test.jsonl"}
-    ]
-
-    # Create a mock dataset
+    ]    # Create a mock dataset
     dataset = [{"id": 1, "text": "test"}]
 
     # Mock the Utils.load_dataset method
-    with patch("promptlab.experiment.Utils") as mockUtils:
+    with patch("promptlab._utils.Utils") as mockUtils:
         mockUtils.load_dataset.return_value = dataset
         mockUtils.split_prompt_template.return_value = (
             "system: test",
             "user: test",
             [],
-        )
-
-        # Mock the ExperimentConfig validation
-        with patch("promptlab.experiment.ExperimentConfig") as mock_config_class:
+        )        # Mock the ExperimentConfig validation
+        with patch("promptlab._config.ExperimentConfig") as mock_config_class:
             # Make the mock return itself when called with **kwargs
             mock_instance = MagicMock()
             mock_config_class.return_value = mock_instance
@@ -252,18 +244,15 @@ async def test_model_max_concurrent_tasks():
     # The test for max_concurrent_tasks is not directly testable in this way
     # because the Model class itself doesn't implement the concurrency limit
     # The concurrency limit is implemented in the Experiment class
-    # So we'll just verify that the max_concurrent_tasks attribute is set correctly
-
-    # Test with default max_concurrent_tasks (5)
+    # So we'll just verify that the max_concurrent_tasks attribute is set correctly    # Test with default max_concurrent_tasks (5)
     model_config_default = ModelConfig(
-        type="mock",
-        inference_model_deployment="mock-model",
+        model_deployment="mock-model",
     )
     model_default = DelayedMockModel(model_config_default)
 
     # Test with custom max_concurrent_tasks (2)
     model_config_limited = ModelConfig(
-        type="mock", inference_model_deployment="mock-model", max_concurrent_tasks=2
+        model_deployment="mock-model", max_concurrent_tasks=2
     )
     model_limited = DelayedMockModel(model_config_limited)
 
@@ -334,12 +323,9 @@ async def test_experiment_concurrency_limit():
             "user: test",
             [],
         )
-        mockUtils.prepare_prompts = lambda item, sys, usr, vars: (sys, usr)
-
-        # Create a model with limited concurrency
+        mockUtils.prepare_prompts = lambda item, sys, usr, vars: (sys, usr)        # Create a model with limited concurrency
         model_config = ModelConfig(
-            type="mock",
-            inference_model_deployment="mock-model",
+            model_deployment="mock-model",
             max_concurrent_tasks=3,  # Limit to 3 concurrent tasks
         )
         model = TrackedModel(model_config)

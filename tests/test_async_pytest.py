@@ -42,10 +42,9 @@ async def test_async_model_invocation():
 
     # Create a model config
     model_config = ModelConfig(
-        type="mock",
-        inference_model_deployment="mock-model",
-        embedding_model_deployment="mock-model",
+        model_deployment="mock-model",
     )
+
 
     # Create a model instance
     model = MockModel(model_config)
