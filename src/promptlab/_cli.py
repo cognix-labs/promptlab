@@ -7,14 +7,18 @@ def promptlab():
     """PromptLab CLI tool for experiment tracking and visualization"""
     pass
 
+
 @promptlab.group()
 def studio():
     """Studio related commands"""
     pass
 
+
 @studio.command()
-@click.option('-d', '--db', required=True, help='Path to the SQLite file')
-@click.option('-p', '--port', default=8000, show_default=True, help='Port to run the Studio on')
+@click.option("-d", "--db", required=True, help="Path to the SQLite file")
+@click.option(
+    "-p", "--port", default=8000, show_default=True, help="Port to run the Studio on"
+)
 def start(db, port):
     """Start the studio server"""
 
@@ -26,5 +30,6 @@ def start(db, port):
 
     click.echo(f"Running on port: {port}")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     promptlab()

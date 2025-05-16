@@ -15,6 +15,7 @@ class InferenceResult:
     completion_tokens: int
     latency_ms: int
 
+
 @dataclass
 class ModelConfig:
     model_deployment: str
@@ -23,14 +24,19 @@ class ModelConfig:
     endpoint: Optional[str] = None
     max_concurrent_tasks: int = 5
 
+
 @runtime_checkable
 class Model(Protocol):
     def invoke(self, system_prompt: str, user_prompt: str) -> InferenceResult: ...
-    async def ainvoke(self, system_prompt: str, user_prompt: str) -> InferenceResult: ...
+    async def ainvoke(
+        self, system_prompt: str, user_prompt: str
+    ) -> InferenceResult: ...
+
 
 @runtime_checkable
 class EmbeddingModel(Protocol):
     def __call__(self, text: str) -> List[float]: ...
+
 
 @dataclass
 class Dataset:
@@ -38,6 +44,7 @@ class Dataset:
     description: str
     file_path: str
     version: int = 0
+
 
 @dataclass
 class PromptTemplate:
@@ -47,11 +54,13 @@ class PromptTemplate:
     user_prompt: str = None
     version: int = 0
 
+
 class EvaluationConfig(BaseModel):
     metric: str
     column_mapping: dict
     evaluator: Optional[Evaluator] = None
     model_config = {"arbitrary_types_allowed": True}
+
 
 class ExperimentConfig(BaseModel):
     name: str = None
@@ -61,6 +70,7 @@ class ExperimentConfig(BaseModel):
     dataset: Dataset
     evaluation: List[EvaluationConfig]
     model_config = {"arbitrary_types_allowed": True}
+
 
 class TracerConfig(BaseModel):
     type: TracerType

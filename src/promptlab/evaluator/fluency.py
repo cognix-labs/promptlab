@@ -74,4 +74,5 @@ class Fluency(Evaluator):
 
         return inference_result.inference
 
+
 fluency = Fluency

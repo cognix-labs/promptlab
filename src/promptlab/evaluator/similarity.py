@@ -20,4 +20,5 @@ class SemanticSimilarity(Evaluator):
 
         return score.tolist()[0]
 
+
 semantic_similarity = SemanticSimilarity

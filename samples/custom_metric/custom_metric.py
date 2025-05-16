@@ -15,23 +15,32 @@ system_prompt = "You are a helpful assistant who can provide feedback on essays.
 user_prompt = """The essay topic is - <essay_topic>.
                The submitted essay is - <essay>
                Now write feedback on this essay."""
-prompt_template = PromptTemplate(name=prompt_name, description=prompt_description, system_prompt=system_prompt, user_prompt=user_prompt)
+prompt_template = PromptTemplate(
+    name=prompt_name,
+    description=prompt_description,
+    system_prompt=system_prompt,
+    user_prompt=user_prompt,
+)
 pt = pl.asset.create(prompt_template)
 
 # Create a dataset
 dataset_name = "essay_samples"
 dataset_description = "dataset for evaluating the essay_feedback prompt"
 dataset_file_path = "./samples/data/essay_feedback.jsonl"
-dataset = Dataset(name=dataset_name, description=dataset_description, file_path=dataset_file_path)
+dataset = Dataset(
+    name=dataset_name, description=dataset_description, file_path=dataset_file_path
+)
 ds = pl.asset.create(dataset)
 
 # Retrieve assets
-pt = pl.asset.get(asset_name = prompt_name, version=0)
-ds = pl.asset.get(asset_name = dataset_name, version=0)
+pt = pl.asset.get(asset_name=prompt_name, version=0)
+ds = pl.asset.get(asset_name=dataset_name, version=0)
 
 # model instnace
-inference_model = Ollama(model_config = ModelConfig(model_deployment="llama3.2"))
-embedding_model = Ollama_Embedding(model_config = ModelConfig(model_deployment="nomic-embed-text:latest"))
+inference_model = Ollama(model_config=ModelConfig(model_deployment="llama3.2"))
+embedding_model = Ollama_Embedding(
+    model_config=ModelConfig(model_deployment="nomic-embed-text:latest")
+)
 
 length = LengthEvaluator()
 factual_correctness = RagasFactualCorrectness()
