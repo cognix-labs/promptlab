@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.abspath("./src"))
 
 @pytest.mark.asyncio
 async def test_async_model_invocation():
-    """Test async model invocation""" 
+    """Test async model invocation"""
     from promptlab.model.model import Model
     from promptlab.types import ModelConfig, InferenceResult
 
@@ -38,7 +38,8 @@ async def test_async_model_invocation():
                 prompt_tokens=10,
                 completion_tokens=20,
                 latency_ms=100,
-            )    # Create a model config
+            )  # Create a model config
+
     model_config = ModelConfig(
         model_deployment="mock-model",
     )
@@ -83,7 +84,7 @@ async def test_experiment_async_execution():
     tracer = MagicMock()
     tracer.db_client.fetch_data.return_value = [
         {"asset_binary": "system: test\nuser: test", "file_path": "test.jsonl"}
-    ]    # Create a mock dataset
+    ]  # Create a mock dataset
     dataset = [{"id": 1, "text": "test"}]
 
     # Mock the Utils.load_dataset method
@@ -93,7 +94,7 @@ async def test_experiment_async_execution():
             "system: test",
             "user: test",
             [],
-        )        # Mock the ExperimentConfig validation
+        )  # Mock the ExperimentConfig validation
         with patch("promptlab._config.ExperimentConfig") as mock_config_class:
             # Make the mock return itself when called with **kwargs
             mock_instance = MagicMock()
@@ -323,7 +324,10 @@ async def test_experiment_concurrency_limit():
             "user: test",
             [],
         )
-        mockUtils.prepare_prompts = lambda item, sys, usr, vars: (sys, usr)        # Create a model with limited concurrency
+        mockUtils.prepare_prompts = lambda item, sys, usr, vars: (
+            sys,
+            usr,
+        )  # Create a model with limited concurrency
         model_config = ModelConfig(
             model_deployment="mock-model",
             max_concurrent_tasks=3,  # Limit to 3 concurrent tasks

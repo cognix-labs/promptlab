@@ -45,7 +45,6 @@ async def test_async_model_invocation():
         model_deployment="mock-model",
     )
 
-
     # Create a model instance
     model = MockModel(model_config)
 
