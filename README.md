@@ -1,5 +1,5 @@
 <div align="center">
-    <img alt="logo" src="img/logo.png" style="height:300px">
+    <img alt="logo" src="https://github.com/imum-ai/promptlab/blob/main/img/logo.png" style="height:300px">
     <h1>PromptLab</h1>
     <p>A free, lightweight, open-source experimentation tool for Gen AI applications</p>
     <a href="https://pypi.org/project/promptlab/"><img src="https://img.shields.io/pypi/v/promptlab.svg" alt="PyPI Version"></a>
@@ -14,9 +14,9 @@
 - [Installation](#installation-)
 - [Quick Start](#quick-start-)
 - [Core Concepts](#core-concepts-)
+- [Documentation](#documentation-)
 - [Supported Models](#supported-models-)
 - [Examples](#examples-)
-- [Documentation](#documentation-)
 - [Articles & Tutorials](#articles--tutorials-)
 - [Contributing](#contributing-)
 - [License](#license-)
@@ -30,7 +30,7 @@ With PromptLab, you can:
 - Create and manage prompt templates with versioning
 - Build and maintain evaluation datasets
 - Run experiments with different models and prompts
-- Evaluate model performance using built-in and custom metrics
+- Evaluate model and prompt performance using built-in and custom metrics
 - Compare experiment results side-by-side
 - Deploy optimized prompts to production
 
@@ -45,8 +45,8 @@ With PromptLab, you can:
 - **Self-contained**: No need for additional cloud services for tracking or collaboration
 - **Seamless Integration**: Works within your existing web, mobile, or backend project
 - **Flexible Evaluation**: Use built-in metrics or bring your own custom evaluators
-- **Visual Studio**: Compare experiments and track assets through a local web interface
-- **Multiple Model Support**: Works with Azure OpenAI, Ollama, DeepSeek and more
+- **Web Interface**: Compare experiments and track assets through a web interface
+- **Multiple Model Support**: Works with Azure OpenAI, Ollama, DeepSeek and more. You can also bring your ownd model.
 - **Version Control**: Automatic versioning of all assets for reproducibility
 - **Async Support**: Run experiments and invoke models asynchronously for improved performance
 
@@ -66,96 +66,13 @@ pip install promptlab
 
 ## Quick Start 🚀
 
-```python
-from promptlab import PromptLab
-from promptlab.types import PromptTemplate, Dataset
-
-# Initialize PromptLab with SQLite storage
-tracer_config = {
-    "type": "sqlite",
-    "db_file": "./promptlab.db"
-}
-pl = PromptLab(tracer_config)
-
-# Create a prompt template
-prompt_template = PromptTemplate(
-    name="essay_feedback",
-    description="A prompt for generating feedback on essays",
-    system_prompt="You are a helpful assistant who can provide feedback on essays.",
-    user_prompt="The essay topic is - <essay_topic>.\n\nThe submitted essay is - <essay>\nNow write feedback on this essay."
-)
-pt = pl.asset.create(prompt_template)
-
-# Create a dataset
-dataset = Dataset(
-    name="essay_samples",
-    description="Sample essays for evaluation",
-    file_path="./essays.jsonl"
-)
-ds = pl.asset.create(dataset)
-
-# Run an experiment
-experiment_config = {
-    "model": {
-        "type": "ollama",
-        "inference_model_deployment": "llama2",
-        "embedding_model_deployment": "llama2"
-    },
-    "prompt_template": {
-        "name": pt.name,
-        "version": pt.version
-    },
-    "dataset": {
-        "name": ds.name,
-        "version": ds.version
-    },
-    "evaluation": [
-        {
-            "type": "custom",
-            "metric": "length",
-            "column_mapping": {
-                "response": "$inference"
-            }
-        }
-    ]
-}
-pl.experiment.run(experiment_config)
-
-# Start the PromptLab Studio to view results
-pl.studio.start(8000)
-```
-
-### Async Support
-
-PromptLab also supports asynchronous operations:
-
-```python
-import asyncio
-from promptlab import PromptLab
-
-async def main():
-    # Initialize PromptLab
-    tracer_config = {
-        "type": "sqlite",
-        "db_file": "./promptlab.db"
-    }
-    pl = PromptLab(tracer_config)
-
-    # Run experiment asynchronously
-    await pl.experiment.run_async(experiment_config)
-
-    # Start the PromptLab Studio asynchronously
-    await pl.studio.start_async(8000)
-
-# Run the async main function
-asyncio.run(main())
-```
+Check the quick start example here - [samples/quickstart](https://github.com/imum-ai/promptlab/blob/main/samples/quickstart/README.md)
 
 ## Core Concepts 🧩
 
 ### Tracer
 
-Storage that maintains assets and experiments. Currently uses SQLite for simplicity and portability.
+Tracer is responsible for persisting and updating assets and experiments in the storage layer. At present, only SQLite is supported.
 
 ### Assets
 
@@ -170,7 +87,11 @@ Evaluate prompts against datasets using specified models and metrics.
 
 ### PromptLab Studio
 
-A local web interface for visualizing experiments and comparing results.
+A web interface for visualizing experiments and comparing results.
+
+## Documentation 📖
+
+For comprehensive documentation, visit our [Documentation Page](https://github.com/imum-ai/promptlab/blob/main/docs/README.md).
 
 ## Supported Models 🤖
 
@@ -184,13 +105,8 @@ A local web interface for visualizing experiments and comparing results.
 - [Quickstart](https://github.com/imum-ai/promptlab/tree/main/samples/quickstart): Getting started with PromptLab
 - [Asset versioning](https://github.com/imum-ai/promptlab/tree/main/samples/asset_versioning): Versioning Prompts and Datasets
 - [Custom Metric](https://github.com/imum-ai/promptlab/tree/main/samples/custom_metric): Creating custom evaluation metrics
-
 - [Async Example](https://github.com/imum-ai/promptlab/tree/main/samples/async_example): Using async functionality with Ollama and OpenRouter models for improved performance
 - [Custom Model](https://github.com/imum-ai/promptlab/tree/main/samples/custom_model): Bring your own model for evaluation
-
-## Documentation 📖
-
-For comprehensive documentation, visit our [Documentation Page](https://github.com/imum-ai/promptlab/blob/main/docs/README.md).
 
 ## Articles & Tutorials 📝
 
