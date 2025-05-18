@@ -5,15 +5,12 @@ from nltk.tokenize import word_tokenize
 
 
 class BleuScore(Evaluator):
-    def __init__(self):    
-        Utils.ensure_nltk_data_downloaded()
+    def __init__(self):
+        Utils.download_required_nltk_resources()
     
     def evaluate(self, data: dict):
         inference = data["response"]
         reference = data["reference"]
-
-        # ground_truth = eval_input["ground_truth"]
-        # response = eval_input["response"]
 
         reference_tokens = word_tokenize(reference)
         hypothesis_tokens = word_tokenize(inference)

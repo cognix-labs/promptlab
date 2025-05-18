@@ -49,18 +49,26 @@ class Utils:
         prompt_template_variables = list(set(prompt_template_variables))
 
         return system_prompt, user_prompt, prompt_template_variables    
-    
+      
     @staticmethod
-    def ensure_nltk_data_downloaded():
-        """Download NLTK data packages if not already downloaded."""
-        nltk_data = [
+    def download_required_nltk_resources():
+        """
+        Ensure all required NLTK language processing resources are available locally.
+        
+        This method checks for the presence of necessary NLTK packages and
+        downloads them if they're not already installed. Thread-safe implementation
+        prevents multiple concurrent downloads of the same resources.
+        """
+        required_resources = [
             ("punkt", "tokenizers/punkt.zip"),
             ("punkt_tab", "tokenizers/punkt_tab.zip"),
         ]
 
         with Utils._nltk_data_download_lock:
-            for _id, resource_name in nltk_data:
+            for package_name, resource_path in required_resources:
                 try:
-                    nltk.find(resource_name)
+                    nltk.data.find(resource_path)
                 except LookupError:
-                    nltk.download(_id)
+                    nltk.download(package_name)
+                except Exception as e:
+                    print(f"Error checking/downloading NLTK resource {package_name}: {str(e)}")
