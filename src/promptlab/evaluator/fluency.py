@@ -4,66 +4,66 @@ from promptlab.evaluator.evaluator import Evaluator
 class Fluency(Evaluator):
     def evaluate(self, data: dict):
         system_prompt = """
-                        # Instruction
-                        ## Goal
-                        ### You are an expert in evaluating the quality of a FEEDBACK from an intelligent system based on provided definition and data. Your goal will involve answering the questions below using the information provided.
-                        - **Definition**: You are given a definition of the communication trait that is being evaluated to help guide your Score.
-                        - **Data**: Your input data include a FEEDBACK.
-                        - **Tasks**: To complete your evaluation you will be asked to evaluate the Data in different ways.
+                        # Evaluation Guidelines
+                        ## Primary Objective
+                        ### You are a linguistic expert specializing in assessing the language quality of AI-generated RESPONSES. Your assessment will follow the framework provided below.
+                        - **Evaluation Framework**: You will use the detailed linguistic criteria provided to guide your scoring.
+                        - **Input Material**: You will analyze a RESPONSE text passage.
+                        - **Evaluation Process**: Your assessment must result in a precise numerical rating based strictly on the provided criteria.
                     """
 
         user_prompt = """
-                    # Definition
-                    **Fluency** refers to the effectiveness and clarity of written communication, focusing on grammatical accuracy, vocabulary range, sentence complexity, coherence, and overall readability. It assesses how smoothly ideas are conveyed and how easily the text can be understood by the reader.
+                    # Conceptual Framework
+                    **Linguistic Articulacy** measures how effectively and elegantly ideas are communicated in writing. It encompasses syntactic precision, lexical diversity, structural sophistication, textual flow, and overall comprehensibility. This metric quantifies how seamlessly thoughts are articulated and how readily the content can be processed by readers.
 
-                    # Ratings
-                    ## [Fluency: 1] (Emergent Fluency)
-                    **Definition:** The feedback shows minimal command of the language. It contains pervasive grammatical errors, extremely limited vocabulary, and fragmented or incoherent sentences. The message is largely incomprehensible, making understanding very difficult.
-
-                    **Examples:**
-                    **FEEDBACK:** Free time I. Go park. Not fun. Alone.
-
-                    **FEEDBACK:** Like food pizza. Good cheese eat.
-
-                    ## [Fluency: 2] (Basic Fluency)
-                    **Definition:** The feedback communicates simple ideas but has frequent grammatical errors and limited vocabulary. Sentences are short and may be improperly constructed, leading to partial understanding. Repetition and awkward phrasing are common.
+                    # Assessment Scale
+                    ## [Linguistic Articulacy: 1] (Rudimentary Expression)
+                    **Definition:** The response exhibits elementary language control with prevalent syntactical errors, severely restricted vocabulary, and disconnected or incomplete sentence structures. The content is predominantly unclear, creating significant comprehension barriers.
 
                     **Examples:**
-                    **FEEDBACK:** I like play soccer. I watch movie. It fun.
+                    **RESPONSE:** Yesterday go concert. Sound bad. People many. Leave early.
 
-                    **FEEDBACK:** My town small. Many people. We have market.
+                    **RESPONSE:** Computer problem have. Screen black. Try button many time.
 
-                    ## [Fluency: 3] (Competent Fluency)
-                    **Definition:** The feedback clearly conveys ideas with occasional grammatical errors. Vocabulary is adequate but not extensive. Sentences are generally correct but may lack complexity and variety. The text is coherent, and the message is easily understood with minimal effort.
-
-                    **Examples:**
-                    **FEEDBACK:** I'm planning to visit friends and maybe see a movie together.
-
-                    **FEEDBACK:** I try to eat healthy food and exercise regularly by jogging.
-
-                    ## [Fluency: 4] (Proficient Fluency)
-                    **Definition:** The feedback is well-articulated with good control of grammar and a varied vocabulary. Sentences are complex and well-structured, demonstrating coherence and cohesion. Minor errors may occur but do not affect overall understanding. The text flows smoothly, and ideas are connected logically.
+                    ## [Linguistic Articulacy: 2] (Developing Expression)
+                    **Definition:** The response conveys basic concepts but contains numerous grammatical inconsistencies and limited word choices. Sentences tend to be simplistic and occasionally malformed, resulting in partial message clarity. Redundancy and awkward constructions predominate.
 
                     **Examples:**
-                    **FEEDBACK:** My interest in mathematics and problem-solving inspired me to become an engineer, as I enjoy designing solutions that improve people's lives.
+                    **RESPONSE:** I read book yesterday. Story was good. Main character have problem.
 
-                    **FEEDBACK:** Environmental conservation is crucial because it protects ecosystems, preserves biodiversity, and ensures natural resources are available for future generations.
+                    **RESPONSE:** Weather today very cold. Need wear jacket. Sky have clouds.
 
-                    ## [Fluency: 5] (Exceptional Fluency)
-                    **Definition:** The feedback demonstrates an exceptional command of language with sophisticated vocabulary and complex, varied sentence structures. It is coherent, cohesive, and engaging, with precise and nuanced expression. Grammar is flawless, and the text reflects a high level of eloquence and style.
+                    ## [Linguistic Articulacy: 3] (Functional Expression)
+                    **Definition:** The response effectively communicates ideas with periodic grammatical lapses. Vocabulary is sufficient though not particularly rich. Sentence construction is generally accurate but lacks variation and complexity. The text maintains coherence and the message is readily comprehensible.
 
                     **Examples:**
-                    **FEEDBACK:** Globalization exerts a profound influence on cultural diversity by facilitating unprecedented cultural exchange while simultaneously risking the homogenization of distinct cultural identities, which can diminish the richness of global heritage.
+                    **RESPONSE:** The conference offered several interesting workshops about digital marketing strategies.
 
-                    **FEEDBACK:** Technology revolutionizes modern education by providing interactive learning platforms, enabling personalized learning experiences, and connecting students worldwide, thereby transforming how knowledge is acquired and shared.
+                    **RESPONSE:** I found the historical documentary informative, although some parts were overly simplified.
+
+                    ## [Linguistic Articulacy: 4] (Refined Expression)
+                    **Definition:** The response is skillfully crafted with strong grammatical control and diverse vocabulary. Sentences exhibit complexity and structural variety, demonstrating clear logical progression. Occasional minor language imperfections do not hinder comprehension. The narrative flows naturally with effective transitional elements.
+
+                    **Examples:**
+                    **RESPONSE:** The integration of artificial intelligence into healthcare systems presents both promising opportunities for improved diagnostics and significant challenges regarding patient privacy.
+
+                    **RESPONSE:** Throughout history, artistic movements have often emerged as responses to societal changes, reflecting the cultural values and political tensions of their respective eras.
+
+                    ## [Linguistic Articulacy: 5] (Masterful Expression)
+                    **Definition:** The response showcases exemplary language mastery with sophisticated lexical choices and intricate, varied syntactic patterns. It demonstrates impeccable coherence, compelling rhetorical flow, and precise expression of nuanced concepts. Grammatical execution is flawless, and the text exhibits remarkable eloquence and stylistic refinement.
+
+                    **Examples:**
+                    **RESPONSE:** The inexorable advancement of quantum computing portends a paradigmatic shift in cryptographic security protocols, necessitating the development of post-quantum algorithms capable of withstanding computational approaches that exploit fundamental quantum mechanical principles.
+
+                    **RESPONSE:** Contemporary literary criticism increasingly acknowledges the intricate interplay between authorial intent and reader interpretation, recognizing how cultural contexts and individual experiences inevitably influence the construction of textual meaning in ways that transcend traditional hermeneutic frameworks.
 
 
-                    # Data
-                    FEEDBACK: {{feedback}}
+                    # Evaluation Material
+                    RESPONSE: {{feedback}}
 
 
-                    # Tasks
-                    ## Please provide your assessment Score for the previous FEEDBACK based on the Definitions above. The Score you give MUST be a integer score (i.e., "1", "2"...) based on the levels of the definitions. Only reply with the numeric score. Do not add any other text or explanation score.
+                    # Assessment Task
+                    ## Determine the appropriate Linguistic Articulacy score for the RESPONSE above based on the provided scale. Your evaluation MUST yield a single integer rating (e.g., "1", "2", etc.) corresponding to the defined levels. Provide ONLY the numerical score without any accompanying explanation or commentary.
                         """
 
         inference = data["response"]
