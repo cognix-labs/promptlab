@@ -1,10 +1,15 @@
 import json
 import os
 import re
+import threading
 from typing import Dict, List, Tuple
+
+import nltk
 
 
 class Utils:
+    _nltk_data_download_lock = threading.Lock()
+
     @staticmethod
     def sanitize_path(value: str) -> str:
         if any(char in value for char in '<>"|?*'):
@@ -43,4 +48,19 @@ class Utils:
         prompt_template_variables = system_prompt_variables + user_prompt_variables
         prompt_template_variables = list(set(prompt_template_variables))
 
-        return system_prompt, user_prompt, prompt_template_variables
+        return system_prompt, user_prompt, prompt_template_variables    
+    
+    @staticmethod
+    def ensure_nltk_data_downloaded():
+        """Download NLTK data packages if not already downloaded."""
+        nltk_data = [
+            ("punkt", "tokenizers/punkt.zip"),
+            ("punkt_tab", "tokenizers/punkt_tab.zip"),
+        ]
+
+        with Utils._nltk_data_download_lock:
+            for _id, resource_name in nltk_data:
+                try:
+                    nltk.find(resource_name)
+                except LookupError:
+                    nltk.download(_id)
