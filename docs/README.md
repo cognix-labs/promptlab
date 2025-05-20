@@ -132,4 +132,4 @@ Fields definition:
 
 ### Metric
 
-jjjjjjj
+For detailed information about available metrics and evaluators in PromptLab, please refer to the [Evaluators Documentation](./evaluators.md).

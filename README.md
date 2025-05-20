@@ -93,6 +93,10 @@ A web interface for visualizing experiments and comparing results.
 
 For comprehensive documentation, visit our [Documentation Page](https://github.com/imum-ai/promptlab/blob/main/docs/README.md).
 
+Key documentation:
+- [Core Concepts](docs/README.md#core-concepts)
+- [Evaluators](docs/evaluators.md) - Detailed information about built-in and custom evaluators
+
 ## Supported Models 🤖
 
 - **Azure OpenAI**: Connect to Azure-hosted OpenAI models
