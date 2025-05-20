@@ -6,7 +6,7 @@ Evaluators are a crucial component of PromptLab that help measure the quality of
     - [BLEU Score](#bleu-score-bleuscore)
     - [Exact Match](#exact-match-exactmatch)
     - [Fluency](#fluency-fluency)
-    - Coherence
+    - [Coherence](#coherence-coherence)
     - F1 Score
     - ROUGE
 - RAG (Retrieval Augmented Generation)
@@ -62,6 +62,23 @@ The [Fluency](../src/promptlab/evaluator/fluency.py) is a LLM-as-a-Judge evaluat
 - **Usage**: Useful for evaluating the linguistic quality and readability of generated content
 
 This evaluator uses another inference model to rate the text's fluency based on a detailed linguistic assessment rubric.
+
+#### Coherence (`Coherence`)
+
+The [Coherence](../src/promptlab/evaluator/coherence.py) is a LLM-as-a-Judge evaluator which assesses how logically organized and connected the ideas in a response are, evaluating the flow and structure of the text.
+
+- **Input**: 
+  - `query`: The original query that prompted the response
+  - `response`: The model's generated text to evaluate
+- **Output**: An integer score from 1 to 5, where:
+  - 1: Incoherent Response
+  - 2: Poorly Coherent Response
+  - 3: Partially Coherent Response
+  - 4: Coherent Response
+  - 5: Highly Coherent Response
+- **Usage**: Useful for evaluating how well a response presents information in a logical, connected manner that directly addresses the query
+
+This evaluator uses another inference model to rate the text's coherence based on a detailed assessment framework that examines logical flow, transitions between ideas, and overall organization.
 
 ### RAG (Retrieval Augmented Generation)
 
