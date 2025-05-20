@@ -17,6 +17,7 @@ The SDK/CLI can also launch the PromptLab Studio, a web interface that runs loca
 <img alt="architecture" src="../img/architecture.png" style="">
 
 ## Core Concepts
+PromptLab offers a minimal set of primitives, making it easy to learn and quick to get started with.
 
 ### Tracer
 
