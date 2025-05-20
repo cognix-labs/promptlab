@@ -42,7 +42,7 @@ embedding_model = Ollama_Embedding(
 
 # Run an experiment
 experiment_config = {
-    "name": "inference_model2",
+    "name": "demo_experiment",
     "inference_model": inference_model,
     "embedding_model": embedding_model,
     "prompt_template": pt,
