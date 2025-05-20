@@ -2,6 +2,24 @@
 
 Evaluators are a crucial component of PromptLab that help measure the quality of model responses. They allow you to quantitatively compare different prompt templates, models, or parameters based on objective metrics. PromptLab offers several built-in evaluators, and you can also create custom evaluators to fit your specific needs.
 
+- General Purpose
+    - [BLEU Score](#bleu-score-bleuscore)
+    - [Exact Match](#exact-match-exactmatch)
+    - [Fluency](#fluency-fluency)
+    - Coherence
+    - F1 Score
+    - ROUGE
+- RAG (Retrieval Augmented Generation)
+    - [Semantic Similarity](#semantic-similarity-semanticsimilarity)
+    - Groundedness
+    - Relevance
+    - Context Precision
+    - Context Recall
+- Agents
+    - Intent Resolution
+    - Task Adherence
+    - Tool Call Accuracy
+
 ## Built-in Evaluators
 
 PromptLab comes with the following built-in evaluators, grouped according tor their primary use case:
