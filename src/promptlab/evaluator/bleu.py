@@ -7,7 +7,7 @@ from nltk.tokenize import word_tokenize
 class BleuScore(Evaluator):
     def __init__(self):
         Utils.download_required_nltk_resources()
-    
+
     def evaluate(self, data: dict):
         inference = data["response"]
         reference = data["reference"]
@@ -17,8 +17,11 @@ class BleuScore(Evaluator):
 
         # NIST Smoothing
         smoothing_function = SmoothingFunction().method4
-        score = sentence_bleu([reference_tokens], hypothesis_tokens, smoothing_function=smoothing_function)
+        score = sentence_bleu(
+            [reference_tokens], hypothesis_tokens, smoothing_function=smoothing_function
+        )
 
         return score
+
 
 bleu_score = BleuScore

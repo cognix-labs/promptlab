@@ -48,13 +48,13 @@ class Utils:
         prompt_template_variables = system_prompt_variables + user_prompt_variables
         prompt_template_variables = list(set(prompt_template_variables))
 
-        return system_prompt, user_prompt, prompt_template_variables    
-      
+        return system_prompt, user_prompt, prompt_template_variables
+
     @staticmethod
     def download_required_nltk_resources():
         """
         Ensure all required NLTK language processing resources are available locally.
-        
+
         This method checks for the presence of necessary NLTK packages and
         downloads them if they're not already installed. Thread-safe implementation
         prevents multiple concurrent downloads of the same resources.
@@ -71,4 +71,6 @@ class Utils:
                 except LookupError:
                     nltk.download(package_name)
                 except Exception as e:
-                    print(f"Error checking/downloading NLTK resource {package_name}: {str(e)}")
+                    print(
+                        f"Error checking/downloading NLTK resource {package_name}: {str(e)}"
+                    )
