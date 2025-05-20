@@ -76,7 +76,7 @@ class Coherence(Evaluator):
         ## Output Requirements
         Provide your evaluation using an integer score (1-5) based on the coherence rating scale. Reply with only the score without any additional text or explanation.
         """
-        
+
         query = data["query"]
         inference = data["response"]
 
@@ -86,5 +86,6 @@ class Coherence(Evaluator):
         inference_result = self.inference(system_prompt, user_prompt)
 
         return inference_result.inference
+
 
 coherence = Coherence
