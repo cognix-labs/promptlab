@@ -74,13 +74,9 @@ class Groundedness(Evaluator):
         RESPONSE: {{response}}
         CONTEXT: {{context}}
         
-        ## Output Requirements
-        Provide your evaluation as a JSON object with two fields:
-        1. "score": An integer rating from 1-5 based on the groundedness scale above
-        2. "reasoning": A brief explanation of your rating that analyzes specific claims from the response and their relationship to the context
-        
-        Format: 
-        {{"score": <integer>, "reasoning": "<explanation>"}}
+        ## Output
+        Determine the appropriate groundedness score for the RESPONSE above based on the provided scale. Your evaluation MUST yield a single integer rating (e.g., "1", "2", etc.) corresponding to the defined levels. Provide ONLY the numerical score without any accompanying explanation or commentary.
+
         """
 
         # Check if query is provided and create the query section accordingly

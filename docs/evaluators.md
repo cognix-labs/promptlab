@@ -11,7 +11,7 @@ Evaluators are a crucial component of PromptLab that help measure the quality of
     - ROUGE
 - RAG (Retrieval Augmented Generation)
     - [Semantic Similarity](#semantic-similarity-semanticsimilarity)
-    - Groundedness
+    - [Groundedness](#groundedness)
     - Relevance
     - Context Precision
     - Context Recall
