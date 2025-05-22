@@ -94,6 +94,26 @@ This evaluator computes the semantic similarity between the model response and a
 
 The evaluator uses embeddings to represent both texts and calculates their cosine similarity.
 
+#### Groundedness (`Groundedness`)
+
+The [Groundedness](../src/promptlab/evaluator/groundedness.py) is a LLM-as-a-Judge evaluator which assesses how well the claims in an AI-generated response are supported by the provided context.
+
+- **Input**: 
+  - `query`: (Optional) The original query that prompted the response
+  - `response`: The model's generated text to evaluate
+  - `context`: The reference context that should support the response
+- **Output**: A JSON object containing:
+  - A score from 1 to 5, where:
+    - 1: Ungrounded Response
+    - 2: Minimally Grounded Response
+    - 3: Partially Grounded Response
+    - 4: Mostly Grounded Response
+    - 5: Fully Grounded Response
+  - Reasoning that explains the score
+- **Usage**: Useful for evaluating how well RAG systems ensure that responses are factually supported by the provided context
+
+This evaluator uses another inference model to assess groundedness based on how well each claim in the response can be verified from the given context.
+
 ## Evaluator Architecture
 
 All evaluators in PromptLab:
