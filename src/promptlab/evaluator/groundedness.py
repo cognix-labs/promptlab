@@ -87,22 +87,18 @@ class Groundedness(Evaluator):
         else:
             # Remove the query section placeholder if no query is provided
             user_prompt = user_prompt.replace("{query_section}", "")
-        
-        # Handle required parameters
+
         inference = data["response"]
         context = data["context"]
-        
-        # Replace placeholders
+
         user_prompt = user_prompt.replace("{{response}}", inference)
         user_prompt = user_prompt.replace("{{context}}", context)
-        
-        # If query section was used, make sure it's properly replaced
+
         if query_section:
             user_prompt = user_prompt.replace("{query_section}", query_section)
-        
-        # Get the evaluation from the inference model
+
         inference_result = self.inference(system_prompt, user_prompt)
-        
+
         return inference_result.inference
 
 

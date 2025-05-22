@@ -54,7 +54,11 @@ experiment_config = {
         },
         {
             "metric": "groundedness",
-            "column_mapping": {"response": "$inference", "query": "essay_topic", "context": "essay"},
+            "column_mapping": {
+                "response": "$inference",
+                "query": "essay_topic",
+                "context": "essay",
+            },
         },
     ],
 }
