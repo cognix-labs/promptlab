@@ -7,8 +7,7 @@ Evaluators are a crucial component of PromptLab that help measure the quality of
     - [Exact Match](#exact-match-exactmatch)
     - [Fluency](#fluency-fluency)
     - [Coherence](#coherence-coherence)
-    - F1 Score
-    - ROUGE
+    - [ROUGE Score](#rouge-score-rougescore)
 - RAG (Retrieval Augmented Generation)
     - [Semantic Similarity](#semantic-similarity-semanticsimilarity)
     - Groundedness
@@ -79,6 +78,26 @@ The [Coherence](../src/promptlab/evaluator/coherence.py) is a LLM-as-a-Judge eva
 - **Usage**: Useful for evaluating how well a response presents information in a logical, connected manner that directly addresses the query
 
 This evaluator uses another inference model to rate the text's coherence based on a detailed assessment framework that examines logical flow, transitions between ideas, and overall organization.
+
+#### ROUGE Score (`RougeScore`)
+
+[ROUGE (Recall-Oriented Understudy for Gisting Evaluation)](../src/promptlab/evaluator/rouge.py) measures the similarity between generated text and reference text based on n-gram overlaps and sequence matching.
+
+- **Input**: 
+  - `response`: The model's generated text
+  - `reference`: The reference text to compare against
+- **Output**: A float value between 0 and 1, where higher scores indicate better matches
+- **Parameters**:
+  - `rouge_type`: Type of ROUGE score to calculate (default: "rouge1")
+  - `precision_threshold`: Minimum acceptable precision (default: 0.5)
+  - `recall_threshold`: Minimum acceptable recall (default: 0.5)
+  - `f1_score_threshold`: Minimum acceptable F1 score (default: 0.5)
+- **Usage**: Useful for evaluating text summarization, machine translation, or any scenario where capturing relevant content from a reference is critical—especially with a focus on recall
+
+The implementation supports several ROUGE variants:
+  - rouge1: Unigram overlap
+  - rouge2: Bigram overlap
+  - rougeL: Longest common subsequence matching
 
 ### RAG (Retrieval Augmented Generation)
 
