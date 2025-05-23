@@ -35,16 +35,10 @@ class RougeScore(Evaluator):
         inference = data["response"]
         reference = data["reference"]
 
-        # Initialize a ROUGE scorer with the specified rouge_type
         scorer = rouge_scorer.RougeScorer([self.rouge_type], use_stemmer=True)
-        
-        # Calculate ROUGE scores
         scores = scorer.score(reference, inference)
-        
-        # Extract the scores for the specified rouge_type
         rouge_scores = scores[self.rouge_type]
         
-        # Return the F1 score as the primary score
         return rouge_scores.fmeasure
 
 
