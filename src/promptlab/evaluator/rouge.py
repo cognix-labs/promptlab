@@ -4,7 +4,13 @@ from rouge_score import rouge_scorer
 
 
 class RougeScore(Evaluator):
-    def __init__(self, rouge_type="rouge1", precision_threshold=0.5, recall_threshold=0.5, f1_score_threshold=0.5):
+    def __init__(
+        self,
+        rouge_type="rouge1",
+        precision_threshold=0.5,
+        recall_threshold=0.5,
+        f1_score_threshold=0.5,
+    ):
         """
         Initialize the RougeScore evaluator.
 
@@ -38,7 +44,7 @@ class RougeScore(Evaluator):
         scorer = rouge_scorer.RougeScorer([self.rouge_type], use_stemmer=True)
         scores = scorer.score(reference, inference)
         rouge_scores = scores[self.rouge_type]
-        
+
         return rouge_scores.fmeasure
 
 
