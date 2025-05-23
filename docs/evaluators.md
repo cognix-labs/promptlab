@@ -7,7 +7,8 @@ Evaluators are a crucial component of PromptLab that help measure the quality of
     - [Exact Match](#exact-match-exactmatch)
     - [Fluency](#fluency-fluency)
     - [Coherence](#coherence-coherence)
-    - [ROUGE Score](#rouge-score-rougescore)
+    - [F1 Score](#f1-score-f1score)
+    - [ROUGE](#rouge-score-rougescore)
 - RAG (Retrieval Augmented Generation)
     - [Semantic Similarity](#semantic-similarity-semanticsimilarity)
     - [Groundedness](#groundedness-groundedness)
@@ -78,6 +79,30 @@ The [Coherence](../src/promptlab/evaluator/coherence.py) is a LLM-as-a-Judge eva
 - **Usage**: Useful for evaluating how well a response presents information in a logical, connected manner that directly addresses the query
 
 This evaluator uses another inference model to rate the text's coherence based on a detailed assessment framework that examines logical flow, transitions between ideas, and overall organization.
+
+#### F1 Score (`F1Score`)
+
+The [F1 Score](../src/promptlab/evaluator/f1_score.py) evaluator calculates the F1 score for a given response and ground truth, which measures the overlap between the generated response and the ground truth by combining precision and recall into a single metric.
+
+- **Input**: 
+  - `response`: The model's generated text
+  - `reference`: The reference text to compare against
+- **Output**: A float between 0 and 1, where 0 indicates no overlap and 1 indicates a perfect match
+- **Usage**: Useful for evaluating how well a response captures the correct information, balancing both completeness (recall) and accuracy (precision)
+
+This evaluator calculates precision (proportion of shared words relative to the total words in the response) and recall (proportion of shared words relative to the total words in the ground truth), then computes the F1 score as the harmonic mean of these two values.
+
+#### F1 Score (`F1Score`)
+
+The [F1 Score](../src/promptlab/evaluator/f1_score.py) evaluator calculates the F1 score for a given response and ground truth, which measures the overlap between the generated response and the ground truth by combining precision and recall into a single metric.
+
+- **Input**: 
+  - `response`: The model's generated text
+  - `reference`: The reference text to compare against
+- **Output**: A float between 0 and 1, where 0 indicates no overlap and 1 indicates a perfect match
+- **Usage**: Useful for evaluating how well a response captures the correct information, balancing both completeness (recall) and accuracy (precision)
+
+This evaluator calculates precision (proportion of shared words relative to the total words in the response) and recall (proportion of shared words relative to the total words in the ground truth), then computes the F1 score as the harmonic mean of these two values.
 
 #### ROUGE Score (`RougeScore`)
 
