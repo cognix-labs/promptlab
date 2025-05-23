@@ -42,7 +42,7 @@ embedding_model = Ollama_Embedding(
 
 # Run an experiment
 experiment_config = {
-    "name": "demo_experiment5",
+    "name": "demo_experiment",
     "inference_model": inference_model,
     "embedding_model": embedding_model,
     "prompt_template": pt,
@@ -53,11 +53,10 @@ experiment_config = {
             "column_mapping": {"response": "$inference", "reference": "feedback"},
         },
         {
-            "metric": "groundedness",
+            "metric": "relevance",
             "column_mapping": {
                 "response": "$inference",
                 "query": "essay_topic",
-                "context": "essay",
             },
         },
     ],

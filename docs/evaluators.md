@@ -12,7 +12,7 @@ Evaluators are a crucial component of PromptLab that help measure the quality of
 - RAG (Retrieval Augmented Generation)
     - [Semantic Similarity](#semantic-similarity-semanticsimilarity)
     - [Groundedness](#groundedness-groundedness)
-    - Relevance
+    - [Relevance](#relevance-relevance)
     - Context Precision
     - Context Recall
 - Agents
@@ -125,6 +125,23 @@ The [Groundedness](../src/promptlab/evaluator/groundedness.py) is a LLM-as-a-Jud
 - **Usage**: Useful for evaluating how well RAG systems ensure that responses are factually supported by the provided context
 
 This evaluator uses another inference model to assess groundedness based on how well each claim in the response can be verified from the given context.
+
+#### Relevance (`Relevance`)
+
+The [Relevance](../src/promptlab/evaluator/relevance.py) evaluator assesses how well a response addresses the key points of the input query, along with reasoning.
+
+- **Input**: 
+  - `query`: The original query that prompted the response
+  - `response`: The model's generated text to evaluate
+- **Output**: An integer score from 1 to 5, where:
+  - 1: Completely Irrelevant Response
+  - 2: Mostly Irrelevant Response
+  - 3: Partially Relevant Response
+  - 4: Mostly Relevant Response
+  - 5: Highly Relevant Response
+- **Usage**: Useful for evaluating how effectively an AI system interprets inputs and generates meaningful, context-aware responses that meet the user's intent
+
+This evaluator uses an inference model to rate the relevance of the response based on how well it addresses the query content and intent.
 
 ## Evaluator Architecture
 
