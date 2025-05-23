@@ -24,7 +24,6 @@ class F1Score(Evaluator):
         response = data["response"]
         reference = data["reference"]
 
-        # Tokenize both texts
         response_tokens = set(word_tokenize(response.lower()))
         reference_tokens = set(word_tokenize(reference.lower()))
         
@@ -32,10 +31,8 @@ class F1Score(Evaluator):
         if not response_tokens or not reference_tokens:
             return 0.0
 
-        # Calculate common tokens
         common_tokens = response_tokens.intersection(reference_tokens)
         
-        # Calculate precision and recall
         precision = len(common_tokens) / len(response_tokens) if response_tokens else 0
         recall = len(common_tokens) / len(reference_tokens) if reference_tokens else 0
         
