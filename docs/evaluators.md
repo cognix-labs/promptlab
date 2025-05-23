@@ -10,8 +10,8 @@ Evaluators are a crucial component of PromptLab that help measure the quality of
     - [ROUGE Score](#rouge-score-rougescore)
 - RAG (Retrieval Augmented Generation)
     - [Semantic Similarity](#semantic-similarity-semanticsimilarity)
-    - Groundedness
-    - Relevance
+    - [Groundedness](#groundedness-groundedness)
+    - [Relevance](#relevance-relevance)
     - Context Precision
     - Context Recall
 - Agents
@@ -112,6 +112,43 @@ This evaluator computes the semantic similarity between the model response and a
 - **Usage**: Useful when the meaning matters more than the exact wording
 
 The evaluator uses embeddings to represent both texts and calculates their cosine similarity.
+
+#### Groundedness (`Groundedness`)
+
+The [Groundedness](../src/promptlab/evaluator/groundedness.py) is a LLM-as-a-Judge evaluator which assesses how well the claims in an AI-generated response are supported by the provided context.
+
+- **Input**: 
+  - `query`: (Optional) The original query that prompted the response
+  - `response`: The model's generated text to evaluate
+  - `context`: The reference context that should support the response
+- **Output**: A JSON object containing:
+  - A score from 1 to 5, where:
+    - 1: Ungrounded Response
+    - 2: Minimally Grounded Response
+    - 3: Partially Grounded Response
+    - 4: Mostly Grounded Response
+    - 5: Fully Grounded Response
+  - Reasoning that explains the score
+- **Usage**: Useful for evaluating how well RAG systems ensure that responses are factually supported by the provided context
+
+This evaluator uses another inference model to assess groundedness based on how well each claim in the response can be verified from the given context.
+
+#### Relevance (`Relevance`)
+
+The [Relevance](../src/promptlab/evaluator/relevance.py) evaluator assesses how well a response addresses the key points of the input query, along with reasoning.
+
+- **Input**: 
+  - `query`: The original query that prompted the response
+  - `response`: The model's generated text to evaluate
+- **Output**: An integer score from 1 to 5, where:
+  - 1: Completely Irrelevant Response
+  - 2: Mostly Irrelevant Response
+  - 3: Partially Relevant Response
+  - 4: Mostly Relevant Response
+  - 5: Highly Relevant Response
+- **Usage**: Useful for evaluating how effectively an AI system interprets inputs and generates meaningful, context-aware responses that meet the user's intent
+
+This evaluator uses an inference model to rate the relevance of the response based on how well it addresses the query content and intent.
 
 ## Evaluator Architecture
 
