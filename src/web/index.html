@@ -266,6 +266,52 @@
         #backBtn {
             margin: 0; /* Remove margins */
             display: none; /* Initially hidden */
+
+        }
+
+        #popupOverlay {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0; top: 0; right: 0; bottom: 0;
+            background: rgba(44, 62, 80, 0.7);
+            align-items: center;
+            justify-content: center;
+        }
+        #popupOverlay .popup-content {
+            background: #fff;
+            border-radius: 8px;
+            padding: 32px 24px 24px 24px;
+            max-width: 700px;
+            width: 90vw;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 4px 32px rgba(44,62,80,0.2);
+        }
+        #popupOverlay .close-popup {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #34495e;
+            cursor: pointer;
+        }
+        #popupOverlay .popup-text {
+            white-space: pre-wrap;
+            font-family: inherit;
+            font-size: 1rem;
+            color: #2c3e50;
+            margin-top: 16px;
+        }
+        .see-more-link {
+            color: #2980b9;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 0.95em;
+
         }
     </style>
 </head>
@@ -614,17 +660,46 @@
                 
                 data.sort((a, b) => parseInt(a.dataset_record_id) - parseInt(b.dataset_record_id));
                 
-                data.forEach(exp => {
+                // Helper to truncate text to 3 lines and add 'see more...'
+                function getTruncatedCellContent(text) {
+                    if (!text) return '-';
+                    const safeText = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    if (safeText.length <= 170) return safeText;
+                    const preview = safeText.slice(0, 170);
+                    return `<span class="truncated-text">${preview}</span> <a href="#" class="see-more-link">see more...</a>`;
+                }
+
+                // Pop-up overlay logic
+                function showOverlay(fullText) {
+                    let overlay = document.getElementById('popupOverlay');
+                    if (!overlay) {
+                        overlay = document.createElement('div');
+                        overlay.id = 'popupOverlay';
+                        overlay.innerHTML = `
+                            <div class="popup-content">
+                                <button class="close-popup">&times;</button>
+                                <pre class="popup-text"></pre>
+                            </div>
+                        `;
+                        document.body.appendChild(overlay);
+                        overlay.querySelector('.close-popup').onclick = () => overlay.style.display = 'none';
+                        overlay.onclick = (e) => { if (e.target === overlay) overlay.style.display = 'none'; };
+                    }
+                    overlay.querySelector('.popup-text').textContent = fullText;
+                    overlay.style.display = 'flex';
+                }
+
+                data.forEach((exp, rowIdx) => {
                     const row = document.createElement('tr');
                     const evaluationData = JSON.parse(exp.evaluation);
-                    console.log('Evaluation data:', evaluationData);
+                    // console.log('Evaluation data:', evaluationData);
                     if (currentRecordId !== exp.dataset_record_id) {
                         isAlternate = !isAlternate;
                         currentRecordId = exp.dataset_record_id;
                     }
-                    
+
                     row.dataset.alternate = isAlternate;
-                    
+
                     // Create metrics map
                     const metricResults = {};
                     evaluationData.forEach(e => {
@@ -641,15 +716,31 @@
                         'Latency (ms)': exp.latency_ms.toFixed(2),
                         ...metricResults
                     };
-                    
+
                     // Add only selected columns in the same order as headers
-                    selectedColumns.forEach(colName => {
+                    selectedColumns.forEach((colName, colIdx) => {
                         const td = document.createElement('td');
-                        td.textContent = allValues[colName] || '-';
+                        if (colName === 'Inference' && allValues[colName]) {
+                            td.innerHTML = getTruncatedCellContent(allValues[colName]);
+                        } else {
+                            td.textContent = allValues[colName] || '-';
+                        }
                         row.appendChild(td);
                     });
-                    
+
                     comparisonTableBody.appendChild(row);
+                });
+                // Add event listeners for see more links
+                comparisonTableBody.querySelectorAll('.see-more-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        // Find the row and column
+                        const tr = this.closest('tr');
+                        const rowIdx = tr.rowIndex - 1; // skip header
+                        // Find the data object
+                        const exp = data[rowIdx];
+                        showOverlay(exp.inference);
+                    });
                 });
             }
             
