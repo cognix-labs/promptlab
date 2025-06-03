@@ -24,10 +24,21 @@ class SQLiteClient:
         """Execute a query such as CREATE TABLE or INSERT."""
         conn = self.create_connection()
         cursor = conn.cursor()
-        cursor.execute(query, params)
-        conn.commit()
-        cursor.close()
-        conn.close()
+        try:
+            cursor.execute(query, params)
+            conn.commit()
+        except sqlite3.IntegrityError as e:
+            if "UNIQUE constraint failed: assets.asset_name, assets.asset_version" in str(e):
+                raise ValueError(
+                    "An asset with this name and version already exists. "
+                    "Please use a different name or version number."
+                ) from e
+            raise
+        except sqlite3.Error as e:
+            print(f"Error executing query: {e}")
+        finally:
+            cursor.close()
+            conn.close()
 
     def execute_query_many(self, query: str, params: List[Tuple]):
         """Execute a query such as CREATE TABLE or INSERT."""

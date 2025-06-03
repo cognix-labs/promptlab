@@ -120,7 +120,7 @@ class OpenRouter_Embedding(EmbeddingModel):
         try:
             # Try to use the embedding API
             response = self.client.embeddings.create(
-                model=self.model_config.embedding_model_deployment,
+                model=self.model_config.model_deployment,
                 input=text,
                 extra_headers=extra_headers,
             )
