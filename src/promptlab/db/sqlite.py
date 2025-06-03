@@ -28,10 +28,10 @@ class SQLiteClient:
             cursor.execute(query, params)
             conn.commit()
         except sqlite3.IntegrityError as e:
-            if "UNIQUE constraint failed: assets.asset_name, assets.asset_version" in str(e):
+            if "UNIQUE constraint failed" in str(e):
                 raise ValueError(
-                    "An asset with this name and version already exists. "
-                    "Please use a different name or version number."
+                    "An asset (dataset/prompt) or an experiment with this name/ID already exists"
+                    "Please use unique names/IDs for each asset/experiment."
                 ) from e
             raise
         except sqlite3.Error as e:
