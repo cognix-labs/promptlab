@@ -21,7 +21,7 @@ class OpenRouter(Model):
         self.async_client = AsyncOpenAI(
             api_key=model_config.api_key, base_url=str(model_config.endpoint)
         )
-        self.deployment = model_config.inference_model_deployment
+        self.deployment = model_config.model_deployment
 
     def invoke(self, system_prompt: str, user_prompt: str):
         """
