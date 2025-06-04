@@ -177,3 +177,5 @@ ide_docs/*
 
 # SQLite file
 *.db
+.cursor/
+.trunk/

@@ -7,6 +7,7 @@ from promptlab._config import TracerConfig
 from promptlab.studio.api import StudioApi
 from promptlab.studio.async_api import AsyncStudioApi
 from promptlab.studio.web import StudioWebHandler
+from art import tprint
 
 
 class Studio:
@@ -27,6 +28,17 @@ class Studio:
         )
 
         self.api_thread.start()
+
+    @staticmethod
+    def print_welcome_text(port: int) -> None:
+        """Print the welcome text and port number.
+
+        Args:
+            port (int): The port number to display
+        """
+
+        tprint("PromptLab")
+        print(f"\n🚀 PromptLab Studio running on: http://localhost:{port} 🚀")
 
     async def start_api_server_async(self, api_port: int):
         """Start the API server asynchronously"""
@@ -60,6 +72,9 @@ class Studio:
     def start(self, port: int = 8000):
         """Start the studio synchronously"""
         try:
+            # Print welcome text
+            Studio.print_welcome_text(port)
+
             # Start API server first in a separate thread
             self.start_api_server(port + 1)
 
@@ -85,6 +100,9 @@ class Studio:
     async def start_async(self, port: int = 8000):
         """Start the studio asynchronously"""
         try:
+            # Print welcome text
+            Studio.print_welcome_text(port)
+
             # Start web server in a separate thread
             self.start_web_server(port)
 
