@@ -103,6 +103,7 @@ class Experiment:
         Synchronous version of batch evaluation with concurrency limit
         """
         inference_model = experiment_config.inference_model
+        agent_proxy = experiment_config.agent_proxy
         experiment_id = (
             experiment_config.name if experiment_config.name else str(uuid.uuid4())
         )
@@ -115,7 +116,7 @@ class Experiment:
                 eval_record, system_prompt, user_prompt, prompt_template_variables
             )
 
-            inference_result = inference_model(sys_prompt, usr_prompt)
+            inference_result = agent_proxy( eval_record ) if agent_proxy else inference_model(sys_prompt, usr_prompt)
             evaluation = self._evaluate(
                 inference_result.inference, eval_record, experiment_config
             )

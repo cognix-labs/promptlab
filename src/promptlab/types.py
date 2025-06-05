@@ -67,6 +67,7 @@ class ExperimentConfig(BaseModel):
     inference_model: Model
     embedding_model: EmbeddingModel
     prompt_template: PromptTemplate
+    agent_proxy: Optional[callable] = None
     dataset: Dataset
     evaluation: List[EvaluationConfig]
     model_config = {"arbitrary_types_allowed": True}
