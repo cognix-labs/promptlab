@@ -2,9 +2,12 @@ from promptlab import PromptLab
 from promptlab.model.ollama import Ollama, Ollama_Embedding
 from promptlab.types import ModelResponse, ModelConfig, PromptTemplate, Dataset
 
-def dummy_target(inputs: dict) -> ModelResponse:
+# Replace the implementation of the target function with coe that calls your agent/API and returns a ModelResponse.
+def target(inputs: dict) -> ModelResponse:
+    topic = inputs["essay_topic"]
+    essay = inputs["essay"]
 
-    return ModelResponse(response = "This is a dummy target function that returns a static response.", prompt_tokens=0, completion_tokens=0, latency_ms=0)
+    return ModelResponse(response = "This is a dummy response function that returns a static response.", prompt_tokens=0, completion_tokens=0, latency_ms=0)
 
 # Initialize PromptLab with SQLite storage
 tracer_config = {"type": "sqlite", "db_file": "./promptlab.db"}
@@ -46,11 +49,11 @@ embedding_model = Ollama_Embedding(
 
 # Run an experiment
 experiment_config = {
-    "name": "demo_experimen441",
+    "name": "demo_experiment",
     "inference_model": inference_model,
     "embedding_model": embedding_model,
     "prompt_template": pt,
-    # "agent_proxy": dummy_target,
+    "agent_proxy": target,
     "dataset": ds,
     "evaluation": [
         {
@@ -73,6 +76,6 @@ pl.studio.start(8000)
 
 
 ## TODO
-# Rename ModelResponse to Response
+# Testing
 # Make embedding_model optional in ExperimentConfig
 # Make PromptTemplate optional in ExperimentConfig
