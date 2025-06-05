@@ -4,7 +4,7 @@ from openai import OpenAI
 from openai import AsyncOpenAI
 
 from promptlab.model.model import Model, EmbeddingModel
-from promptlab.types import InferenceResult, ModelConfig
+from promptlab.types import ModelResponse, ModelConfig
 
 
 class DeepSeek(Model):
@@ -50,14 +50,14 @@ class DeepSeek(Model):
         # Calculate latency
         latency_ms = (end_time - start_time) * 1000
 
-        return InferenceResult(
+        return ModelResponse(
             inference=inference,
             prompt_tokens=prompt_token,
             completion_tokens=completion_token,
             latency_ms=latency_ms,
         )
 
-    async def ainvoke(self, system_prompt: str, user_prompt: str) -> InferenceResult:
+    async def ainvoke(self, system_prompt: str, user_prompt: str) -> ModelResponse:
         """
         Asynchronous invocation of the DeepSeek model
         """
@@ -91,7 +91,7 @@ class DeepSeek(Model):
         prompt_token = getattr(chat_completion.usage, "prompt_tokens", 0)
         completion_token = getattr(chat_completion.usage, "completion_tokens", 0)
 
-        return InferenceResult(
+        return ModelResponse(
             inference=inference,
             prompt_tokens=prompt_token,
             completion_tokens=completion_token,

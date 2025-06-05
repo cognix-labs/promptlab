@@ -3,7 +3,7 @@ from typing import List
 from openai import AzureOpenAI
 from openai import AsyncAzureOpenAI
 
-from promptlab.model.model import EmbeddingModel, Model, InferenceResult, ModelConfig
+from promptlab.model.model import EmbeddingModel, Model, ModelResponse, ModelConfig
 
 
 class AzOpenAI(Model):
@@ -41,14 +41,14 @@ class AzOpenAI(Model):
         prompt_token = chat_completion.usage.prompt_tokens
         completion_token = chat_completion.usage.completion_tokens
 
-        return InferenceResult(
+        return ModelResponse(
             inference=inference,
             prompt_tokens=prompt_token,
             completion_tokens=completion_token,
             latency_ms=latency_ms,
         )
 
-    async def ainvoke(self, system_prompt: str, user_prompt: str) -> InferenceResult:
+    async def ainvoke(self, system_prompt: str, user_prompt: str) -> ModelResponse:
         """
         Asynchronous invocation of the Azure OpenAI model
         """
@@ -70,7 +70,7 @@ class AzOpenAI(Model):
         prompt_token = chat_completion.usage.prompt_tokens
         completion_token = chat_completion.usage.completion_tokens
 
-        return InferenceResult(
+        return ModelResponse(
             inference=inference,
             prompt_tokens=prompt_token,
             completion_tokens=completion_token,

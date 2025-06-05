@@ -2,7 +2,7 @@ import asyncio
 import time
 from unittest.mock import MagicMock
 from promptlab.model.model import Model
-from promptlab.types import InferenceResult, ModelConfig
+from promptlab.types import ModelResponse, ModelConfig
 
 
 class MockModel(Model):
@@ -18,20 +18,20 @@ class MockModel(Model):
         self.delay_seconds = delay_seconds
         self.latency_ms = int(delay_seconds * 1000)
 
-    async def ainvoke(self, system_prompt, user_prompt) -> InferenceResult:
+    async def ainvoke(self, system_prompt, user_prompt) -> ModelResponse:
         """Async invocation that simulates a delay"""
         await asyncio.sleep(self.delay_seconds)  # Simulate network delay
-        return InferenceResult(
+        return ModelResponse(
             inference=f"Async response to: {user_prompt}",
             prompt_tokens=10,
             completion_tokens=20,
             latency_ms=self.latency_ms,
         )
 
-    def invoke(self, system_prompt, user_prompt) -> InferenceResult:
+    def invoke(self, system_prompt, user_prompt) -> ModelResponse:
         """Synchronous invocation"""
         time.sleep(self.delay_seconds)  # Simulate network delay
-        return InferenceResult(
+        return ModelResponse(
             inference=f"Sync response to: {user_prompt}",
             prompt_tokens=10,
             completion_tokens=20,

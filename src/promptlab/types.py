@@ -9,7 +9,7 @@ from promptlab._utils import Utils
 
 
 @dataclass
-class InferenceResult:
+class ModelResponse:
     inference: str
     prompt_tokens: int
     completion_tokens: int
@@ -27,10 +27,10 @@ class ModelConfig:
 
 @runtime_checkable
 class Model(Protocol):
-    def invoke(self, system_prompt: str, user_prompt: str) -> InferenceResult: ...
+    def invoke(self, system_prompt: str, user_prompt: str) -> ModelResponse: ...
     async def ainvoke(
         self, system_prompt: str, user_prompt: str
-    ) -> InferenceResult: ...
+    ) -> ModelResponse: ...
 
 
 @runtime_checkable

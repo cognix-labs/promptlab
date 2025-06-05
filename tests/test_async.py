@@ -74,7 +74,7 @@ class TestAsyncSupport(unittest.TestCase):
     def test_azure_openai_async(self):
         """Test that AzOpenAI model supports async invocation"""
         from promptlab.model.azure_openai import AzOpenAI
-        from promptlab.types import ModelConfig, InferenceResult
+        from promptlab.types import ModelConfig, ModelResponse
 
         # Create a mock model config
         model_config = ModelConfig(
@@ -102,7 +102,7 @@ class TestAsyncSupport(unittest.TestCase):
 
         # Mock the invoke method
         model.invoke = MagicMock(
-            return_value=InferenceResult(
+            return_value=ModelResponse(
                 inference="Test response",
                 prompt_tokens=10,
                 completion_tokens=20,
