@@ -97,9 +97,9 @@ class Groundedness(Evaluator):
         if query_section:
             user_prompt = user_prompt.replace("{query_section}", query_section)
 
-        inference_result = self.inference(system_prompt, user_prompt)
+        model_response = self.inference(system_prompt, user_prompt)
 
-        return inference_result.inference
+        return model_response.response
 
 
 groundedness = Groundedness

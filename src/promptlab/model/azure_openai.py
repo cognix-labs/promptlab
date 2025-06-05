@@ -37,12 +37,12 @@ class AzOpenAI(Model):
         end_time = time.time()
         latency_ms = (end_time - start_time) * 1000
 
-        inference = chat_completion.choices[0].message.content
+        response = chat_completion.choices[0].message.content
         prompt_token = chat_completion.usage.prompt_tokens
         completion_token = chat_completion.usage.completion_tokens
 
         return ModelResponse(
-            inference=inference,
+            response=response,
             prompt_tokens=prompt_token,
             completion_tokens=completion_token,
             latency_ms=latency_ms,
@@ -66,12 +66,12 @@ class AzOpenAI(Model):
         end_time = time.time()
         latency_ms = (end_time - start_time) * 1000
 
-        inference = chat_completion.choices[0].message.content
+        response = chat_completion.choices[0].message.content
         prompt_token = chat_completion.usage.prompt_tokens
         completion_token = chat_completion.usage.completion_tokens
 
         return ModelResponse(
-            inference=inference,
+            response=response,
             prompt_tokens=prompt_token,
             completion_tokens=completion_token,
             latency_ms=latency_ms,

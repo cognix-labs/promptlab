@@ -10,7 +10,7 @@ from promptlab._utils import Utils
 
 @dataclass
 class ModelResponse:
-    inference: str
+    response: str
     prompt_tokens: int
     completion_tokens: int
     latency_ms: int

@@ -70,9 +70,9 @@ class Fluency(Evaluator):
 
         user_prompt = user_prompt.replace("{{feedback}}", inference)
 
-        inference_result = self.inference(system_prompt, user_prompt)
+        model_response = self.inference(system_prompt, user_prompt)
 
-        return inference_result.inference
+        return model_response.response
 
 
 fluency = Fluency

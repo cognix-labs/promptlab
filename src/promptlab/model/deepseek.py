@@ -41,7 +41,7 @@ class DeepSeek(Model):
             extra_headers=extra_headers if extra_headers else None,
         )
         end_time = time.time()
-        inference = chat_completion.choices[0].message.content
+        response = chat_completion.choices[0].message.content
 
         # Some providers might not return usage info
         prompt_token = getattr(chat_completion.usage, "prompt_tokens", 0)
@@ -51,7 +51,7 @@ class DeepSeek(Model):
         latency_ms = (end_time - start_time) * 1000
 
         return ModelResponse(
-            inference=inference,
+            response=response,
             prompt_tokens=prompt_token,
             completion_tokens=completion_token,
             latency_ms=latency_ms,
@@ -85,14 +85,14 @@ class DeepSeek(Model):
         end_time = time.time()
         latency_ms = (end_time - start_time) * 1000
 
-        inference = chat_completion.choices[0].message.content
+        response = chat_completion.choices[0].message.content
 
         # Some providers might not return usage info
         prompt_token = getattr(chat_completion.usage, "prompt_tokens", 0)
         completion_token = getattr(chat_completion.usage, "completion_tokens", 0)
 
         return ModelResponse(
-            inference=inference,
+            response=response,
             prompt_tokens=prompt_token,
             completion_tokens=completion_token,
             latency_ms=latency_ms,

@@ -24,7 +24,7 @@ async def test_async_model_invocation():
             """Synchronous invocation"""
             time.sleep(0.1)
             return ModelResponse(
-                inference=f"Response to: {user_prompt}",
+                response=f"Response to: {user_prompt}",
                 prompt_tokens=10,
                 completion_tokens=20,
                 latency_ms=100,
@@ -34,7 +34,7 @@ async def test_async_model_invocation():
             """Asynchronous invocation"""
             await asyncio.sleep(0.1)
             return ModelResponse(
-                inference=f"Async response to: {user_prompt}",
+                response=f"Async response to: {user_prompt}",
                 prompt_tokens=10,
                 completion_tokens=20,
                 latency_ms=100,
@@ -70,7 +70,7 @@ async def test_async_model_invocation():
 
     # Check that the results are correct
     for i, result in enumerate(async_results):
-        assert result.inference == f"Async response to: Test prompt {i}"
+        assert result.response == f"Async response to: Test prompt {i}"
         assert result.prompt_tokens == 10
         assert result.completion_tokens == 20
         assert result.latency_ms == 100

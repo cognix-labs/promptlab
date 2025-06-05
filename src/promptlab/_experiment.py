@@ -116,18 +116,18 @@ class Experiment:
                 eval_record, system_prompt, user_prompt, prompt_template_variables
             )
 
-            inference_result = agent_proxy( eval_record ) if agent_proxy else inference_model(sys_prompt, usr_prompt)
+            model_response = agent_proxy( eval_record ) if agent_proxy else inference_model(sys_prompt, usr_prompt)
             evaluation = self._evaluate(
-                inference_result.inference, eval_record, experiment_config
+                model_response.response, eval_record, experiment_config
             )
 
             eval = dict()
             eval["experiment_id"] = experiment_id
             eval["dataset_record_id"] = eval_record["id"]
-            eval["inference"] = inference_result.inference
-            eval["prompt_tokens"] = inference_result.prompt_tokens
-            eval["completion_tokens"] = inference_result.completion_tokens
-            eval["latency_ms"] = inference_result.latency_ms
+            eval["inference"] = model_response.response
+            eval["prompt_tokens"] = model_response.prompt_tokens
+            eval["completion_tokens"] = model_response.completion_tokens
+            eval["latency_ms"] = model_response.latency_ms
             eval["evaluation"] = evaluation
             eval["created_at"] = timestamp
 
@@ -227,20 +227,20 @@ class Experiment:
         """
         Process a single record asynchronously
         """
-        inference_result = await inference_model(system_prompt, user_prompt)
+        model_response = await inference_model(system_prompt, user_prompt)
 
         # Run potentially blocking evaluation in a separate thread
         evaluation = await asyncio.to_thread(
-            self._evaluate, inference_result.inference, eval_record, experiment_config
+            self._evaluate, model_response.response, eval_record, experiment_config
         )
 
         eval_result = dict()
         eval_result["experiment_id"] = experiment_id
         eval_result["dataset_record_id"] = eval_record["id"]
-        eval_result["inference"] = inference_result.inference
-        eval_result["prompt_tokens"] = inference_result.prompt_tokens
-        eval_result["completion_tokens"] = inference_result.completion_tokens
-        eval_result["latency_ms"] = inference_result.latency_ms
+        eval_result["inference"] = model_response.response
+        eval_result["prompt_tokens"] = model_response.prompt_tokens
+        eval_result["completion_tokens"] = model_response.completion_tokens
+        eval_result["latency_ms"] = model_response.latency_ms
         eval_result["evaluation"] = evaluation
         eval_result["created_at"] = timestamp
 

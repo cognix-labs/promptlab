@@ -22,12 +22,12 @@ class Ollama(Model):
         )
 
         latency_ms = chat_completion.total_duration / 1000000
-        inference = chat_completion.message.content
+        response = chat_completion.message.content
         prompt_token = chat_completion.eval_count
         completion_token = chat_completion.prompt_eval_count
 
         return ModelResponse(
-            inference=inference,
+            response=response,
             prompt_tokens=prompt_token,
             completion_tokens=completion_token,
             latency_ms=latency_ms,
@@ -53,12 +53,12 @@ class Ollama(Model):
         )
 
         latency_ms = chat_completion.total_duration / 1000000
-        inference = chat_completion.message.content
+        response = chat_completion.message.content
         prompt_token = chat_completion.eval_count
         completion_token = chat_completion.prompt_eval_count
 
         return ModelResponse(
-            inference=inference,
+            response=response,
             prompt_tokens=prompt_token,
             completion_tokens=completion_token,
             latency_ms=latency_ms,

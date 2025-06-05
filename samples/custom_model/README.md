@@ -24,12 +24,12 @@ The following code snippet implements a LMStudio based model.
             )
 
             latency_ms = 0
-            inference = completion.choices[0].message.content
+            response = completion.choices[0].message.content
             prompt_token = 0
             completion_token = 0
 
             return ModelResponse(
-                inference=inference,
+                response=response,
                 prompt_tokens=prompt_token,
                 completion_tokens=completion_token,
                 latency_ms=latency_ms,

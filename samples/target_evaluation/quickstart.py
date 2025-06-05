@@ -1,6 +1,10 @@
 from promptlab import PromptLab
 from promptlab.model.ollama import Ollama, Ollama_Embedding
-from promptlab.types import ModelConfig, PromptTemplate, Dataset
+from promptlab.types import ModelResponse, ModelConfig, PromptTemplate, Dataset
+
+def dummy_target(inputs: dict) -> ModelResponse:
+
+    return ModelResponse(response = "This is a dummy target function that returns a static response.", prompt_tokens=0, completion_tokens=0, latency_ms=0)
 
 # Initialize PromptLab with SQLite storage
 tracer_config = {"type": "sqlite", "db_file": "./promptlab.db"}
@@ -19,7 +23,7 @@ prompt_template = PromptTemplate(
     system_prompt=system_prompt,
     user_prompt=user_prompt,
 )
-pt = pl.asset.create(prompt_template)
+# pt = pl.asset.create(prompt_template)
 
 # Create a dataset
 dataset_name = "essay_samples"
@@ -28,7 +32,7 @@ dataset_file_path = "./samples/data/essay_feedback.jsonl"
 dataset = Dataset(
     name=dataset_name, description=dataset_description, file_path=dataset_file_path
 )
-ds = pl.asset.create(dataset)
+# ds = pl.asset.create(dataset)
 
 # Retrieve assets
 pt = pl.asset.get(asset_name=prompt_name, version=0)
@@ -46,6 +50,7 @@ experiment_config = {
     "inference_model": inference_model,
     "embedding_model": embedding_model,
     "prompt_template": pt,
+    # "agent_proxy": dummy_target,
     "dataset": ds,
     "evaluation": [
         {
@@ -65,3 +70,9 @@ pl.experiment.run(experiment_config)
 
 # Start the PromptLab Studio to view results
 pl.studio.start(8000)
+
+
+## TODO
+# Rename ModelResponse to Response
+# Make embedding_model optional in ExperimentConfig
+# Make PromptTemplate optional in ExperimentConfig

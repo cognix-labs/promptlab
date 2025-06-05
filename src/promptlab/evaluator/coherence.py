@@ -83,9 +83,9 @@ class Coherence(Evaluator):
         user_prompt = user_prompt.replace("{{response}}", inference)
         user_prompt = user_prompt.replace("{{query}}", query)
 
-        inference_result = self.inference(system_prompt, user_prompt)
+        model_response = self.inference(system_prompt, user_prompt)
 
-        return inference_result.inference
+        return model_response.response
 
 
 coherence = Coherence
