@@ -210,6 +210,7 @@ class Experiment:
             # check if the evaluator requires additonal models for evaluation
             # Auxilary LLM can be used for claim preparation for LLM as judge framework
             # LLM as judge can be used for evluating the experiment
+            print(eval)
             if "judge_llm" in eval:
                 if "auxilary_llm" in eval:
                     evaluation_result = evaluator.evaluate(data,
