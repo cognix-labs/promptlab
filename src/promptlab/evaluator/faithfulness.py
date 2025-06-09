@@ -67,9 +67,7 @@ class Faithfulness(Evaluator):
     {claim}
     """
 
-    def __init__(self,
-                 judge_llm: Model = None,
-                 claimify_llm: Model = None):
+    def __init__(self, judge_llm: Model = None, claimify_llm: Model = None):
         """
         Initialize the Faithfulness evaluator.
 
@@ -80,10 +78,12 @@ class Faithfulness(Evaluator):
         # Validate judge_llm
         if judge_llm is None:
             raise ValueError("Faithfulness evaluation requires a judge_llm model")
-        
+
         # If claimify_llm is not provided, use judge_llm as fallback
         if claimify_llm is None:
-            print("Warning: No claim generation model is provided. Using judge_llm for claim generation.")
+            print(
+                "Warning: No claim generation model is provided. Using judge_llm for claim generation."
+            )
             claimify_llm = judge_llm
 
         self.judge_llm = judge_llm
@@ -105,7 +105,9 @@ class Faithfulness(Evaluator):
         # Validate input data
         required_keys = ["query", "context", "response"]
         if not all(key in data for key in required_keys):
-            raise ValueError(f"data dictionary must contain {', '.join(required_keys)} keys")
+            raise ValueError(
+                f"data dictionary must contain {', '.join(required_keys)} keys"
+            )
 
         try:
             claims = self._claim_generation(data["response"])
@@ -123,11 +125,13 @@ class Faithfulness(Evaluator):
         Returns:
             List of claims extracted from the response
         """
-        formatted_prompt = self.CLAIM_GENERATOR_USER_PROMPT.format(query_passage=response)
+        formatted_prompt = self.CLAIM_GENERATOR_USER_PROMPT.format(
+            query_passage=response
+        )
 
         claim_generator_response = self.claimify_llm.invoke(
             system_prompt=self.CLAIM_GENERATOR_SYSTEM_PROMPT,
-            user_prompt=formatted_prompt
+            user_prompt=formatted_prompt,
         )
 
         return claim_generator_response.inference.split("\n")
@@ -153,19 +157,24 @@ class Faithfulness(Evaluator):
 
         for claim in claims:
             try:
-                formatted_prompt = self.JUDGE_USER_PROMPT.format(context=context, claim=claim)
+                formatted_prompt = self.JUDGE_USER_PROMPT.format(
+                    context=context, claim=claim
+                )
 
                 judgement = self.judge_llm.invoke(
-                    system_prompt=self.JUDGE_SYSTEM_PROMPT,
-                    user_prompt=formatted_prompt
+                    system_prompt=self.JUDGE_SYSTEM_PROMPT, user_prompt=formatted_prompt
                 ).inference
 
                 try:
                     verdict = json.loads(judgement)["verdict"]
                 except json.JSONDecodeError as e:
-                    raise ValueError(f"Invalid JSON response from judge_llm: {judgement}") from e
+                    raise ValueError(
+                        f"Invalid JSON response from judge_llm: {judgement}"
+                    ) from e
                 except KeyError as e:
-                    raise ValueError(f"Missing 'verdict' key in judge_llm response: {judgement}") from e
+                    raise ValueError(
+                        f"Missing 'verdict' key in judge_llm response: {judgement}"
+                    ) from e
 
                 if verdict == 1:
                     num_supported_claims += 1
