@@ -5,10 +5,12 @@ import json
 
 
 class Faithfulness(Evaluator):
-    def evaluate(self,
-                data: dict,
-                auxilary_llm: Optional[Dict] = None,
-                judge_llm: Optional[Dict] = None) -> float:
+    def evaluate(
+        self,
+        data: dict,
+        auxilary_llm: Optional[Dict] = None,
+        judge_llm: Optional[Dict] = None,
+    ) -> float:
         """
         Evaluate the faithfulness of a response against its context.
 
@@ -31,39 +33,43 @@ class Faithfulness(Evaluator):
         1. Identify all the claims in the response via LLM call using the auxilary_llm model
         2. Check each claim to see if it can be inferred from the retrieved context using the judge_llm model
         3. Compute the faithfulness score using the formula:
-        
+
         Let, A = # of claims identified by claim_generator
         B = # of claims supported by the retrieved context as found by the llm_as_judge
-        
+
         faithfulness = B/A
         """
         # Validate input data
         required_keys = ["query", "context", "response"]
         if not all(key in data for key in required_keys):
-            raise ValueError(f"data dictionary must contain {', '.join(required_keys)} keys")
-        
+            raise ValueError(
+                f"data dictionary must contain {', '.join(required_keys)} keys"
+            )
+
         # Validate judge_llm
         if judge_llm is None:
             raise ValueError("Faithfulness evaluation requires a judge_llm model")
         if "model" not in judge_llm:
             raise ValueError("judge_llm dictionary must contain a 'model' key")
-        
+
         # If auxilary_llm is not provided, use judge_llm as fallback
         if auxilary_llm is None:
-            print("Warning: No claim generation model is provided. Using judge_llm for claim generation.")
+            print(
+                "Warning: No claim generation model is provided. Using judge_llm for claim generation."
+            )
             auxilary_llm = judge_llm
         elif "model" not in auxilary_llm:
             raise ValueError("auxilary_llm dictionary must contain a 'model' key")
-        
+
         try:
             claims = self.claim_generation(data["response"], auxilary_llm["model"])
-            return self.faithfulness_evaluation(data["context"], claims, judge_llm["model"])
+            return self.faithfulness_evaluation(
+                data["context"], claims, judge_llm["model"]
+            )
         except Exception as e:
             raise RuntimeError(f"Error during faithfulness evaluation: {str(e)}") from e
 
-    def claim_generation(self,
-                        response: str,
-                        claim_generator_llm: Model) -> List[str]:
+    def claim_generation(self, response: str, claim_generator_llm: Model) -> List[str]:
         """
         Generate claims from the response using the provided LLM.
 
@@ -107,19 +113,20 @@ class Faithfulness(Evaluator):
         Determine the claims in the query passage and output them in a numbered list.
         """
 
-        claim_generator_user_prompt = claim_generator_user_prompt.format(query_passage=response)
+        claim_generator_user_prompt = claim_generator_user_prompt.format(
+            query_passage=response
+        )
 
         claim_generator_response = claim_generator_llm.invoke(
             system_prompt=claim_generator_system_prompt,
-            user_prompt=claim_generator_user_prompt
+            user_prompt=claim_generator_user_prompt,
         )
 
         return claim_generator_response.inference.split("\n")
 
-    def faithfulness_evaluation(self,
-                              context: str,
-                              claims: List[str],
-                              judge_llm: Model) -> float:
+    def faithfulness_evaluation(
+        self, context: str, claims: List[str], judge_llm: Model
+    ) -> float:
         """
         Evaluate the faithfulness of claims against the provided context.
 
@@ -169,19 +176,24 @@ class Faithfulness(Evaluator):
 
         for claim in claims:
             try:
-                formatted_prompt = judge_user_prompt.format(context=context, claim=claim)
+                formatted_prompt = judge_user_prompt.format(
+                    context=context, claim=claim
+                )
 
                 judgement = judge_llm.invoke(
-                    system_prompt=judge_system_prompt,
-                    user_prompt=formatted_prompt
+                    system_prompt=judge_system_prompt, user_prompt=formatted_prompt
                 ).inference
 
                 try:
                     verdict = json.loads(judgement)["verdict"]
                 except json.JSONDecodeError as e:
-                    raise ValueError(f"Invalid JSON response from judge_llm: {judgement}") from e
+                    raise ValueError(
+                        f"Invalid JSON response from judge_llm: {judgement}"
+                    ) from e
                 except KeyError as e:
-                    raise ValueError(f"Missing 'verdict' key in judge_llm response: {judgement}") from e
+                    raise ValueError(
+                        f"Missing 'verdict' key in judge_llm response: {judgement}"
+                    ) from e
 
                 if verdict == 1:
                     num_supported_claims += 1
@@ -194,8 +206,5 @@ class Faithfulness(Evaluator):
 
         return num_supported_claims / len(claims)
 
+
 faithfulness = Faithfulness
-            
-        
-        
-        
