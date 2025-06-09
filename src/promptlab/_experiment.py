@@ -206,8 +206,21 @@ class Experiment:
                     data[key] = inference
                 else:
                     data[key] = row[value]
+                    
+            # check if the evaluator requires additonal models for evaluation
+            # Auxilary LLM can be used for claim preparation for LLM as judge framework
+            # LLM as judge can be used for evluating the experiment
+            if "judge_llm" in eval:
+                if "auxilary_llm" in eval:
+                    evaluation_result = evaluator.evaluate(data,
+                                                           experiment_config.auxilary_llm,
+                                                           experiment_config.judge_llm)
+                else:
+                    evaluation_result = evaluator.evaluate(data,
+                                                           experiment_config.judge_llm)
+            else:
+                evaluation_result = evaluator.evaluate(data)
 
-            evaluation_result = evaluator.evaluate(data)
             evaluations.append(
                 {"metric": f"{eval.metric}", "result": evaluation_result}
             )
