@@ -1,6 +1,6 @@
 from promptlab.evaluator.evaluator import Evaluator
 from promptlab.model.model import Model
-from typing import Dict, List, Optional
+from typing import List
 import json
 
 
