@@ -80,8 +80,6 @@ class Faithfulness(Evaluator):
         # Validate judge_llm
         if judge_llm is None:
             raise ValueError("Faithfulness evaluation requires a judge_llm model")
-        if "model" not in judge_llm:
-            raise ValueError("judge_llm dictionary must contain a 'model' key")
         
         # If claimify_llm is not provided, use judge_llm as fallback
         if claimify_llm is None:
