@@ -68,14 +68,14 @@ class Faithfulness(Evaluator):
     """
 
     def __init__(self,
-                 judge_llm: Optional[Dict] = None,
-                 auxilary_llm: Optional[Dict] = None):
+                 judge_llm: Model = None,
+                 claimify_llm: Model = None):
         """
         Initialize the Faithfulness evaluator.
 
         Args:
             judge_llm: Dictionary containing the model for claim verification
-            auxilary_llm: Dictionary containing the model for claim generation
+            claimify_llm: Dictionary containing the model for claim generation
         """
         # Validate judge_llm
         if judge_llm is None:
@@ -83,15 +83,13 @@ class Faithfulness(Evaluator):
         if "model" not in judge_llm:
             raise ValueError("judge_llm dictionary must contain a 'model' key")
         
-        # If auxilary_llm is not provided, use judge_llm as fallback
-        if auxilary_llm is None:
+        # If claimify_llm is not provided, use judge_llm as fallback
+        if claimify_llm is None:
             print("Warning: No claim generation model is provided. Using judge_llm for claim generation.")
-            auxilary_llm = judge_llm
-        elif "model" not in auxilary_llm:
-            raise ValueError("auxilary_llm dictionary must contain a 'model' key")
+            claimify_llm = judge_llm
 
-        self.judge_llm = judge_llm["model"]
-        self.auxilary_llm = auxilary_llm["model"]
+        self.judge_llm = judge_llm
+        self.claimify_llm = claimify_llm
 
     def evaluate(self, data: dict) -> float:
         """
@@ -129,7 +127,7 @@ class Faithfulness(Evaluator):
         """
         formatted_prompt = self.CLAIM_GENERATOR_USER_PROMPT.format(query_passage=response)
 
-        claim_generator_response = self.auxilary_llm.invoke(
+        claim_generator_response = self.claimify_llm.invoke(
             system_prompt=self.CLAIM_GENERATOR_SYSTEM_PROMPT,
             user_prompt=formatted_prompt
         )
