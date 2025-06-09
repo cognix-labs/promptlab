@@ -179,3 +179,5 @@ ide_docs/*
 *.db
 .cursor/
 .trunk/
+AGENTS.md
+.env
