@@ -193,7 +193,8 @@ class Faithfulness(Evaluator):
             raise ValueError("No claims were evaluated")
 
         return num_supported_claims / len(claims)
-            
+
+faithfulness = Faithfulness
             
         
         
