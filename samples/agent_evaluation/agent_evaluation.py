@@ -2,10 +2,10 @@ from promptlab import PromptLab
 from promptlab.types import ModelResponse, Dataset
 
 
-# Replace the implementation of the target function with coe that calls your agent/API and returns a ModelResponse.
-def target(inputs: dict) -> ModelResponse:
-    topic = inputs["essay_topic"]
-    essay = inputs["essay"]
+# Replace the implementation of the target function with code that calls your agent/API and returns a ModelResponse.
+def agent_proxy(inputs: dict) -> ModelResponse:
+    # topic = inputs["essay_topic"]
+    # essay = inputs["essay"]
 
     return ModelResponse(
         response="This is a dummy response function that returns a static response.",
@@ -33,8 +33,8 @@ ds = pl.asset.get(asset_name=dataset_name, version=0)
 
 # Run an experiment
 experiment_config = {
-    "name": "demo_target_evaluation",
-    "agent_proxy": target,
+    "name": "demo_agent_evaluation",
+    "agent_proxy": agent_proxy,
     "dataset": ds,
     "evaluation": [
         {
