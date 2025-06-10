@@ -1,12 +1,19 @@
 from promptlab import PromptLab
 from promptlab.types import ModelResponse, Dataset
 
+
 # Replace the implementation of the target function with coe that calls your agent/API and returns a ModelResponse.
 def target(inputs: dict) -> ModelResponse:
     topic = inputs["essay_topic"]
     essay = inputs["essay"]
 
-    return ModelResponse(response = "This is a dummy response function that returns a static response.", prompt_tokens=0, completion_tokens=0, latency_ms=0)
+    return ModelResponse(
+        response="This is a dummy response function that returns a static response.",
+        prompt_tokens=0,
+        completion_tokens=0,
+        latency_ms=0,
+    )
+
 
 # Initialize PromptLab with SQLite storage
 tracer_config = {"type": "sqlite", "db_file": "./promptlab.db"}

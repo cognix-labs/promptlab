@@ -68,7 +68,7 @@ class Experiment:
 
         # if experiment_config.prompt_template is None:
         pt_asset_binary = None
-        if experiment_config.prompt_template:                
+        if experiment_config.prompt_template:
             prompt_template = self.tracer.db_client.fetch_data(
                 SQLQuery.SELECT_ASSET_QUERY,
                 (
@@ -121,7 +121,11 @@ class Experiment:
                 eval_record, system_prompt, user_prompt, prompt_template_variables
             )
 
-            model_response = agent_proxy(eval_record) if agent_proxy else inference_model(sys_prompt, usr_prompt)
+            model_response = (
+                agent_proxy(eval_record)
+                if agent_proxy
+                else inference_model(sys_prompt, usr_prompt)
+            )
             evaluation = self._evaluate(
                 model_response.response, eval_record, experiment_config
             )
