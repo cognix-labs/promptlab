@@ -208,6 +208,7 @@ class Experiment:
                     data[key] = row[value]
 
             evaluation_result = evaluator.evaluate(data)
+
             evaluations.append(
                 {"metric": f"{eval.metric}", "result": evaluation_result}
             )
