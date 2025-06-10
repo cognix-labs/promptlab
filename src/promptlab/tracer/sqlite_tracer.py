@@ -24,8 +24,16 @@ class SQLiteTracer(Tracer):
         experiment_id = experiment_summary[0]["experiment_id"]
 
         # Convert model_config objects to dict for JSON serialization
-        inference_model_config = vars(experiment_config.inference_model.model_config)
-        embedding_model_config = vars(experiment_config.embedding_model.model_config)
+        inference_model_config = (
+            vars(experiment_config.inference_model.model_config)
+            if experiment_config.inference_model
+            else None
+        )
+        embedding_model_config = (
+            vars(experiment_config.embedding_model.model_config)
+            if experiment_config.embedding_model
+            else None
+        )
 
         model = {
             "inference_model_config": inference_model_config,
@@ -33,8 +41,12 @@ class SQLiteTracer(Tracer):
         }
 
         asset = {
-            "prompt_template_name": experiment_config.prompt_template.name,
-            "prompt_template_version": experiment_config.prompt_template.version,
+            "prompt_template_name": experiment_config.prompt_template.name
+            if experiment_config.prompt_template
+            else None,
+            "prompt_template_version": experiment_config.prompt_template.version
+            if experiment_config.prompt_template
+            else None,
             "dataset_name": experiment_config.dataset.name,
             "dataset_version": experiment_config.dataset.version,
         }

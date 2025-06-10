@@ -34,6 +34,9 @@ class Utils:
 
     @staticmethod
     def split_prompt_template(asset: str) -> Tuple[str, str, List[str]]:
+        if asset is None:
+            return ("", "", [])
+
         pattern = r"<<system>>\s*(.*?)\s*<<user>>\s*(.*?)\s*(?=<<|$)"
         matches = re.findall(pattern, asset, re.DOTALL)
 

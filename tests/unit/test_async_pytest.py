@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.abspath("./src"))
 async def test_async_model_invocation():
     """Test async model invocation"""
     from promptlab.model.model import Model
-    from promptlab.types import ModelConfig, InferenceResult
+    from promptlab.types import ModelConfig, ModelResponse
 
     # Create a mock model
     class MockModel(Model):
@@ -23,7 +23,7 @@ async def test_async_model_invocation():
         def invoke(self, system_prompt, user_prompt):
             """Synchronous invocation"""
             time.sleep(0.1)
-            return InferenceResult(
+            return ModelResponse(
                 inference=f"Response to: {user_prompt}",
                 prompt_tokens=10,
                 completion_tokens=20,
@@ -33,7 +33,7 @@ async def test_async_model_invocation():
         async def ainvoke(self, system_prompt, user_prompt):
             """Asynchronous invocation"""
             await asyncio.sleep(0.1)
-            return InferenceResult(
+            return ModelResponse(
                 inference=f"Async response to: {user_prompt}",
                 prompt_tokens=10,
                 completion_tokens=20,
@@ -210,7 +210,7 @@ async def test_promptlab_async_methods():
 async def test_model_max_concurrent_tasks():
     """Test the max_concurrent_tasks parameter in Model class"""
     from promptlab.model.model import Model
-    from promptlab.types import ModelConfig, InferenceResult
+    from promptlab.types import ModelConfig, ModelResponse
     import time
 
     # Create a mock model with a delay
@@ -222,7 +222,7 @@ async def test_model_max_concurrent_tasks():
         def invoke(self, system_prompt, user_prompt):
             """Synchronous invocation"""
             time.sleep(0.1)
-            return InferenceResult(
+            return ModelResponse(
                 inference=f"Response to: {user_prompt}",
                 prompt_tokens=10,
                 completion_tokens=20,
@@ -233,7 +233,7 @@ async def test_model_max_concurrent_tasks():
             """Asynchronous invocation with recording start time"""
             self.invocation_times.append(time.time())
             await asyncio.sleep(0.5)  # Simulate a slow API call
-            return InferenceResult(
+            return ModelResponse(
                 inference=f"Async response to: {user_prompt}",
                 prompt_tokens=10,
                 completion_tokens=20,
@@ -265,7 +265,7 @@ async def test_experiment_concurrency_limit():
     """Test the concurrency limit in experiment async execution"""
     from promptlab._experiment import Experiment
     from promptlab.model.model import Model
-    from promptlab.types import ModelConfig, InferenceResult
+    from promptlab.types import ModelConfig, ModelResponse
     import time
 
     # Create a mock model with a delay and tracking
@@ -277,7 +277,7 @@ async def test_experiment_concurrency_limit():
             self.max_observed_concurrency = 0
 
         def invoke(self, system_prompt, user_prompt):
-            return InferenceResult(
+            return ModelResponse(
                 inference="Test response",
                 prompt_tokens=10,
                 completion_tokens=20,
@@ -298,7 +298,7 @@ async def test_experiment_concurrency_limit():
             # Reduce active count
             self.active_count -= 1
 
-            return InferenceResult(
+            return ModelResponse(
                 inference="Test async response",
                 prompt_tokens=10,
                 completion_tokens=20,

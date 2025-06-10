@@ -2,7 +2,7 @@ from typing import List
 import ollama
 import asyncio
 
-from promptlab.model.model import EmbeddingModel, Model, InferenceResult, ModelConfig
+from promptlab.model.model import EmbeddingModel, Model, ModelResponse, ModelConfig
 
 
 class Ollama(Model):
@@ -22,18 +22,18 @@ class Ollama(Model):
         )
 
         latency_ms = chat_completion.total_duration / 1000000
-        inference = chat_completion.message.content
+        response = chat_completion.message.content
         prompt_token = chat_completion.eval_count
         completion_token = chat_completion.prompt_eval_count
 
-        return InferenceResult(
-            inference=inference,
+        return ModelResponse(
+            response=response,
             prompt_tokens=prompt_token,
             completion_tokens=completion_token,
             latency_ms=latency_ms,
         )
 
-    async def ainvoke(self, system_prompt: str, user_prompt: str) -> InferenceResult:
+    async def ainvoke(self, system_prompt: str, user_prompt: str) -> ModelResponse:
         """
         Asynchronous invocation of the Ollama model
         Note: Ollama doesn't have a native async API, so we run it in a thread pool
@@ -53,12 +53,12 @@ class Ollama(Model):
         )
 
         latency_ms = chat_completion.total_duration / 1000000
-        inference = chat_completion.message.content
+        response = chat_completion.message.content
         prompt_token = chat_completion.eval_count
         completion_token = chat_completion.prompt_eval_count
 
-        return InferenceResult(
-            inference=inference,
+        return ModelResponse(
+            response=response,
             prompt_tokens=prompt_token,
             completion_tokens=completion_token,
             latency_ms=latency_ms,

@@ -12,7 +12,7 @@ The following code snippet implements a LMStudio based model.
 
             self.client = OpenAI(base_url=str(self.model_config.endpoint), api_key=self.model_config.api_key)
 
-        def invoke(self, system_prompt: str, user_prompt: str) -> InferenceResult:
+        def invoke(self, system_prompt: str, user_prompt: str) -> ModelResponse:
             """Synchronous invocation of the model"""
             payload = [
                 {"role": "system", "content": system_prompt},
@@ -24,18 +24,18 @@ The following code snippet implements a LMStudio based model.
             )
 
             latency_ms = 0
-            inference = completion.choices[0].message.content
+            response = completion.choices[0].message.content
             prompt_token = 0
             completion_token = 0
 
-            return InferenceResult(
-                inference=inference,
+            return ModelResponse(
+                response=response,
                 prompt_tokens=prompt_token,
                 completion_tokens=completion_token,
                 latency_ms=latency_ms,
             )
         
-        async def ainvoke(self, system_prompt: str, user_prompt: str) -> InferenceResult:
+        async def ainvoke(self, system_prompt: str, user_prompt: str) -> ModelResponse:
             """Asynchronous invocation of the model"""
             # Since OpenAI's Python client doesn't have native async support in this version,
             # we'll run the synchronous method in an executor

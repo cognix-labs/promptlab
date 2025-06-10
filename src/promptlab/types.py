@@ -9,8 +9,8 @@ from promptlab._utils import Utils
 
 
 @dataclass
-class InferenceResult:
-    inference: str
+class ModelResponse:
+    response: str
     prompt_tokens: int
     completion_tokens: int
     latency_ms: int
@@ -27,10 +27,8 @@ class ModelConfig:
 
 @runtime_checkable
 class Model(Protocol):
-    def invoke(self, system_prompt: str, user_prompt: str) -> InferenceResult: ...
-    async def ainvoke(
-        self, system_prompt: str, user_prompt: str
-    ) -> InferenceResult: ...
+    def invoke(self, system_prompt: str, user_prompt: str) -> ModelResponse: ...
+    async def ainvoke(self, system_prompt: str, user_prompt: str) -> ModelResponse: ...
 
 
 @runtime_checkable
@@ -64,9 +62,10 @@ class EvaluationConfig(BaseModel):
 
 class ExperimentConfig(BaseModel):
     name: str = None
-    inference_model: Model
-    embedding_model: EmbeddingModel
-    prompt_template: PromptTemplate
+    inference_model: Optional[Model] = None
+    embedding_model: Optional[EmbeddingModel] = None
+    prompt_template: Optional[PromptTemplate] = None
+    agent_proxy: Optional[callable] = None
     dataset: Dataset
     evaluation: List[EvaluationConfig]
     model_config = {"arbitrary_types_allowed": True}

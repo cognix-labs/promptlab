@@ -4,7 +4,7 @@ from openai import OpenAI
 from openai import AsyncOpenAI
 
 from promptlab.model.model import Model, EmbeddingModel
-from promptlab.types import InferenceResult, ModelConfig
+from promptlab.types import ModelResponse, ModelConfig
 
 
 class OpenRouter(Model):
@@ -43,7 +43,7 @@ class OpenRouter(Model):
             model=self.deployment, messages=payload, extra_headers=extra_headers
         )
         end_time = time.time()
-        inference = chat_completion.choices[0].message.content
+        response = chat_completion.choices[0].message.content
 
         # Some providers might not return usage info
         prompt_token = getattr(chat_completion.usage, "prompt_tokens", 0)
@@ -52,14 +52,14 @@ class OpenRouter(Model):
         # Calculate latency
         latency_ms = (end_time - start_time) * 1000
 
-        return InferenceResult(
-            inference=inference,
+        return ModelResponse(
+            response=response,
             prompt_tokens=prompt_token,
             completion_tokens=completion_token,
             latency_ms=latency_ms,
         )
 
-    async def ainvoke(self, system_prompt: str, user_prompt: str) -> InferenceResult:
+    async def ainvoke(self, system_prompt: str, user_prompt: str) -> ModelResponse:
         """
         Asynchronous invocation of the OpenRouter model
         """
@@ -83,14 +83,14 @@ class OpenRouter(Model):
         end_time = time.time()
         latency_ms = (end_time - start_time) * 1000
 
-        inference = chat_completion.choices[0].message.content
+        response = chat_completion.choices[0].message.content
 
         # Some providers might not return usage info
         prompt_token = getattr(chat_completion.usage, "prompt_tokens", 0)
         completion_token = getattr(chat_completion.usage, "completion_tokens", 0)
 
-        return InferenceResult(
-            inference=inference,
+        return ModelResponse(
+            response=response,
             prompt_tokens=prompt_token,
             completion_tokens=completion_token,
             latency_ms=latency_ms,

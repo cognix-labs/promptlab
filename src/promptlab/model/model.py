@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Union, Awaitable
 import asyncio
 
-from promptlab.types import InferenceResult, ModelConfig
+from promptlab.types import ModelResponse, ModelConfig
 
 
 class Model(ABC):
@@ -11,22 +11,22 @@ class Model(ABC):
         self.max_concurrent_tasks = getattr(model_config, "max_concurrent_tasks", 5)
 
     @abstractmethod
-    def invoke(self, system_prompt: str, user_prompt: str) -> InferenceResult:
+    def invoke(self, system_prompt: str, user_prompt: str) -> ModelResponse:
         """Synchronous invocation of the model"""
         pass
 
     @abstractmethod
-    async def ainvoke(self, system_prompt: str, user_prompt: str) -> InferenceResult:
+    async def ainvoke(self, system_prompt: str, user_prompt: str) -> ModelResponse:
         """Asynchronous invocation of the model"""
         pass
 
-    def invoke_async(self, system_prompt: str, user_prompt: str) -> InferenceResult:
+    def invoke_async(self, system_prompt: str, user_prompt: str) -> ModelResponse:
         """Helper method to run async method in sync context"""
         return asyncio.run(self.ainvoke(system_prompt, user_prompt))
 
     def __call__(
         self, system_prompt: str, user_prompt: str
-    ) -> Union[InferenceResult, Awaitable[InferenceResult]]:
+    ) -> Union[ModelResponse, Awaitable[ModelResponse]]:
         """Make the model callable for both sync and async contexts"""
         # Check if we're in an async context by inspecting the caller's frame
         try:
