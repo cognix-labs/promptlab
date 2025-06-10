@@ -13,7 +13,7 @@ class ConfigValidator:
 
     @staticmethod
     def validate_experiment_config(experiment_config: ExperimentConfig):
-        ConfigValidator.validate_prompt_template(experiment_config.prompt_template.name)
+        # ConfigValidator.validate_prompt_template(experiment_config.prompt_template.name)
         ConfigValidator.validate_dataset(experiment_config.dataset.name)
 
     @staticmethod

@@ -66,15 +66,20 @@ class Experiment:
         experiment_config = ExperimentConfig(**experiment_config)
         ConfigValidator.validate_experiment_config(experiment_config)
 
-        prompt_template = self.tracer.db_client.fetch_data(
-            SQLQuery.SELECT_ASSET_QUERY,
-            (
-                experiment_config.prompt_template.name,
-                experiment_config.prompt_template.version,
-            ),
-        )[0]
+        # if experiment_config.prompt_template is None:
+        pt_asset_binary = None
+        if experiment_config.prompt_template:                
+            prompt_template = self.tracer.db_client.fetch_data(
+                SQLQuery.SELECT_ASSET_QUERY,
+                (
+                    experiment_config.prompt_template.name,
+                    experiment_config.prompt_template.version,
+                ),
+            )[0]
+            pt_asset_binary = prompt_template["asset_binary"]
+
         system_prompt, user_prompt, prompt_template_variables = (
-            Utils.split_prompt_template(prompt_template["asset_binary"])
+            Utils.split_prompt_template(pt_asset_binary)
         )
 
         eval_dataset_path = self.tracer.db_client.fetch_data(
@@ -116,7 +121,7 @@ class Experiment:
                 eval_record, system_prompt, user_prompt, prompt_template_variables
             )
 
-            model_response = agent_proxy( eval_record ) if agent_proxy else inference_model(sys_prompt, usr_prompt)
+            model_response = agent_proxy(eval_record) if agent_proxy else inference_model(sys_prompt, usr_prompt)
             evaluation = self._evaluate(
                 model_response.response, eval_record, experiment_config
             )

@@ -64,9 +64,9 @@ class EvaluationConfig(BaseModel):
 
 class ExperimentConfig(BaseModel):
     name: str = None
-    inference_model: Model
-    embedding_model: EmbeddingModel
-    prompt_template: PromptTemplate
+    inference_model: Optional[Model] = None
+    embedding_model: Optional[EmbeddingModel] = None
+    prompt_template: Optional[PromptTemplate] = None
     agent_proxy: Optional[callable] = None
     dataset: Dataset
     evaluation: List[EvaluationConfig]

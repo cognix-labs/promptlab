@@ -128,8 +128,9 @@ class SQLQuery:
                                 FROM experiments e
                                 JOIN experiment_result er on
                                     e.experiment_id = er.experiment_id
-                                JOIN assets a ON
+                                LEFT JOIN assets a ON
                                     a.asset_name = prompt_template_name AND a.asset_version = prompt_template_version
+                                ORDER BY e.created_at DESC
                                 """
 
     DEPLOY_ASSET_QUERY = """UPDATE assets SET is_deployed = 1, deployment_time = CURRENT_TIMESTAMP WHERE asset_name = ? and asset_version = ?"""
