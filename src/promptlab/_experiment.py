@@ -156,7 +156,11 @@ class Experiment:
         Asynchronous version of batch evaluation with concurrency limit
         """
         inference_model = experiment_config.inference_model
-        experiment_id = str(uuid.uuid4())
+        agent_proxy = experiment_config.agent_proxy
+
+        experiment_id = (
+            experiment_config.name if experiment_config.name else str(uuid.uuid4())
+        )
         timestamp = datetime.now().isoformat()
         max_concurrent_tasks = getattr(inference_model, "max_concurrent_tasks", 5)
 
@@ -176,6 +180,7 @@ class Experiment:
             async with semaphore:
                 return await self._process_record_async(
                     inference_model,
+                    agent_proxy,
                     s_prompt,
                     u_prompt,
                     record,
@@ -227,6 +232,7 @@ class Experiment:
     async def _process_record_async(
         self,
         inference_model,
+        agent_proxy,
         system_prompt,
         user_prompt,
         eval_record,
@@ -237,8 +243,12 @@ class Experiment:
         """
         Process a single record asynchronously
         """
-        model_response = await inference_model(system_prompt, user_prompt)
-
+        # model_response = await inference_model(system_prompt, user_prompt)
+        model_response = (
+            await agent_proxy(eval_record)
+            if agent_proxy
+            else await inference_model(system_prompt, user_prompt)
+        )
         # Run potentially blocking evaluation in a separate thread
         evaluation = await asyncio.to_thread(
             self._evaluate, model_response.response, eval_record, experiment_config
