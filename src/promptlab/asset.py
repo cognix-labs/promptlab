@@ -222,7 +222,9 @@ class Asset:
             )
 
     def deploy(self, asset: T, target_dir: str) -> T:
-        logger.info(f"Deploying asset: {getattr(asset, 'name', str(asset))} to {target_dir}")
+        logger.info(
+            f"Deploying asset: {getattr(asset, 'name', str(asset))} to {target_dir}"
+        )
 
         if isinstance(asset, PromptTemplate):
             return self._handle_prompt_template_deploy(asset, target_dir)
@@ -230,7 +232,9 @@ class Asset:
             raise TypeError(f"Unsupported asset type: {type(asset)}")
 
     def _handle_prompt_template_deploy(self, template: PromptTemplate, target_dir: str):
-        logger.debug(f"Handling prompt template deploy: {template.name} to {target_dir}")
+        logger.debug(
+            f"Handling prompt template deploy: {template.name} to {target_dir}"
+        )
         prompt_template = self.tracer.db_client.fetch_data(
             SQLQuery.SELECT_ASSET_QUERY, (template.name, template.version)
         )[0]

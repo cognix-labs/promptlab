@@ -10,7 +10,9 @@ LOG_LEVEL = os.environ.get("PROMPTLAB_LOG_LEVEL", "INFO").upper()
 if os.environ.get("PROMPTLAB_LOG_DIR"):
     LOG_DIR = os.environ["PROMPTLAB_LOG_DIR"]
 elif platform.system() == "Windows":
-    LOG_DIR = os.path.join(os.environ.get("LOCALAPPDATA", os.path.expanduser("~")), APP_NAME, "Logs")
+    LOG_DIR = os.path.join(
+        os.environ.get("LOCALAPPDATA", os.path.expanduser("~")), APP_NAME, "Logs"
+    )
 elif platform.system() == "Darwin":
     LOG_DIR = os.path.expanduser(f"~/Library/Logs/{APP_NAME}/")
 else:  # Linux and other
@@ -27,7 +29,7 @@ formatter = logging.Formatter(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 
-file_handler = RotatingFileHandler(LOG_FILE, maxBytes=5*1024*1024, backupCount=10)
+file_handler = RotatingFileHandler(LOG_FILE, maxBytes=5 * 1024 * 1024, backupCount=10)
 file_handler.setLevel(LEVEL)
 file_handler.setFormatter(formatter)
 

@@ -21,7 +21,10 @@ class Experiment:
         """
         Synchronous version of experiment execution
         """
-        logger.info("Running experiment synchronously. Experiment Name: %s", experiment_config.name)
+        logger.info(
+            "Running experiment synchronously. Experiment Name: %s",
+            experiment_config.name,
+        )
         (
             experiment_config,
             eval_dataset,
@@ -39,10 +42,16 @@ class Experiment:
         )
 
         self.tracer.trace(experiment_config, exp_summary)
-        logger.info("Experiment run complete and traced. Experiment Name: %s", experiment_config.name)
+        logger.info(
+            "Experiment run complete and traced. Experiment Name: %s",
+            experiment_config.name,
+        )
 
     async def run_async(self, experiment_config: ExperimentConfig):
-        logger.info("Running experiment asynchronously. Experiment Name: %s", experiment_config.name)
+        logger.info(
+            "Running experiment asynchronously. Experiment Name: %s",
+            experiment_config.name,
+        )
         (
             experiment_config,
             eval_dataset,
@@ -60,7 +69,10 @@ class Experiment:
         )
 
         self.tracer.trace(experiment_config, exp_summary)
-        logger.info("Async experiment run complete and traced. Experiment Name: %s", experiment_config.name)
+        logger.info(
+            "Async experiment run complete and traced. Experiment Name: %s",
+            experiment_config.name,
+        )
 
     def _prepare_experiment_data(self, experiment_config: ExperimentConfig):
         logger.debug("Preparing experiment data.")
