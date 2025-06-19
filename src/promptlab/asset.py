@@ -9,6 +9,7 @@ from promptlab.db.sql import SQLQuery
 from promptlab.tracer.tracer import Tracer
 from promptlab.types import Dataset, PromptTemplate
 from promptlab._utils import Utils
+from promptlab._logging import logger
 
 T = TypeVar("T", Dataset, PromptTemplate)
 
@@ -16,6 +17,7 @@ T = TypeVar("T", Dataset, PromptTemplate)
 class Asset:
     def __init__(self, tracer: Tracer):
         self.tracer = tracer
+        logger.debug("Asset manager initialized.")
 
     @overload
     def create(self, asset: PromptTemplate) -> PromptTemplate: ...
@@ -40,10 +42,9 @@ class Asset:
         return bool(re.match(r"^[a-zA-Z][a-zA-Z0-9_-]*$", name))
 
     def create(self, asset: T) -> T:
-        """
-        Create a new asset with a given name.
-        """
+        logger.info(f"Creating asset: {getattr(asset, 'name', str(asset))}")
         if not Asset.is_valid_name(asset.name):
+            logger.warning(f"Invalid asset name: {asset.name}")
             raise ValueError(
                 "Name must begin with a letter and use only alphanumeric, underscore, or hyphen."
             )
@@ -58,9 +59,8 @@ class Asset:
             raise TypeError(f"Unsupported asset type: {type(asset)}")
 
     def update(self, asset: T) -> T:
-        """
-        Create a new version of an existing asset.
-        """
+        logger.info(f"Updating asset: {getattr(asset, 'name', str(asset))}")
+
         if isinstance(asset, Dataset):
             return self._update_dataset(asset)
 
@@ -71,6 +71,7 @@ class Asset:
             raise TypeError(f"Unsupported asset type: {type(asset)}")
 
     def _create_dataset(self, dataset: Dataset) -> Dataset:
+        logger.debug(f"Creating dataset asset: {dataset.name}")
         dataset.version = 0
         binary = {"file_path": dataset.file_path}
         timestamp = datetime.now().isoformat()
@@ -90,6 +91,7 @@ class Asset:
         return dataset
 
     def _update_dataset(self, dataset: Dataset) -> Dataset:
+        logger.debug(f"Updating dataset asset: {dataset.name}")
         dataset_record = self.tracer.db_client.fetch_data(
             SQLQuery.SELECT_ASSET_BY_NAME_QUERY, (dataset.name, dataset.name)
         )[0]
@@ -122,6 +124,7 @@ class Asset:
         return dataset
 
     def _create_prompt_template(self, template: PromptTemplate) -> PromptTemplate:
+        logger.debug(f"Creating prompt template asset: {template.name}")
         template.version = 0
         binary = f"""
             <<system>>
@@ -146,6 +149,7 @@ class Asset:
         return template
 
     def _update_prompt_template(self, template: PromptTemplate) -> PromptTemplate:
+        logger.debug(f"Updating prompt template asset: {template.name}")
         timestamp = datetime.now().isoformat()
 
         prompt_template = self.tracer.db_client.fetch_data(
@@ -189,6 +193,7 @@ class Asset:
         return template
 
     def get(self, asset_name: str, version: int) -> Any:
+        logger.info(f"Fetching asset: {asset_name}, version: {version}")
         asset = self.tracer.db_client.fetch_data(
             SQLQuery.SELECT_ASSET_QUERY, (asset_name, version)
         )[0]
@@ -217,12 +222,19 @@ class Asset:
             )
 
     def deploy(self, asset: T, target_dir: str) -> T:
+        logger.info(
+            f"Deploying asset: {getattr(asset, 'name', str(asset))} to {target_dir}"
+        )
+
         if isinstance(asset, PromptTemplate):
             return self._handle_prompt_template_deploy(asset, target_dir)
         else:
             raise TypeError(f"Unsupported asset type: {type(asset)}")
 
     def _handle_prompt_template_deploy(self, template: PromptTemplate, target_dir: str):
+        logger.debug(
+            f"Handling prompt template deploy: {template.name} to {target_dir}"
+        )
         prompt_template = self.tracer.db_client.fetch_data(
             SQLQuery.SELECT_ASSET_QUERY, (template.name, template.version)
         )[0]

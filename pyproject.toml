@@ -21,15 +21,14 @@ dependencies = [
     "flask[async]>=3.0.0",
     "flask-cors>=5.0.0",
     "click>=8.0.0",
-    "langchain-ollama",
     "ollama>=0.4.7",
     "aiohttp>=3.8.0",
     "fastapi>=0.100.0",
-    "uvicorn>=0.22.0",
     "numpy",
     "python-dotenv>=1.0.0",
     "rouge-score>=0.1.2",
-    "art>=6.5"
+    "art>=6.5",
+    "setuptools"
 ]
 requires-python = ">=3.8"
 
