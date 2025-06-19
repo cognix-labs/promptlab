@@ -5,6 +5,7 @@ import threading
 from typing import Dict, List, Tuple
 
 import nltk
+from promptlab._logging import logger
 
 
 class Utils:
@@ -12,36 +13,46 @@ class Utils:
 
     @staticmethod
     def sanitize_path(value: str) -> str:
+        logger.debug(f"Sanitizing path: {value}")
         if any(char in value for char in '<>"|?*'):
+            logger.warning(f"Invalid characters in file path: {value}")
             raise ValueError("Invalid characters in file path")
-
         if not value:
+            logger.error("File path cannot be empty")
             raise ValueError("File path cannot be empty")
-
         value = os.path.normpath(value.replace("\t", "\\t"))
 
         return value
 
     @staticmethod
     def load_dataset(dataset_path: str) -> List[Dict]:
+        logger.info(f"Loading dataset from: {dataset_path}")
         dataset_path = Utils.sanitize_path(dataset_path)
 
         dataset = []
-        with open(dataset_path, "r") as file:
-            for line in file:
-                dataset.append(json.loads(line.strip()))
+        try:
+            with open(dataset_path, "r") as file:
+                for line in file:
+                    dataset.append(json.loads(line.strip()))
+            logger.debug(f"Loaded {len(dataset)} records from dataset.")
+        except Exception as e:
+            logger.error(f"Failed to load dataset: {e}", exc_info=True)
+            raise
         return dataset
 
     @staticmethod
     def split_prompt_template(asset: str) -> Tuple[str, str, List[str]]:
+        logger.debug("Splitting prompt template.")
         if asset is None:
+            logger.warning("Prompt template asset is None.")
             return ("", "", [])
 
         pattern = r"<<system>>\s*(.*?)\s*<<user>>\s*(.*?)\s*(?=<<|$)"
         matches = re.findall(pattern, asset, re.DOTALL)
 
         if not matches:
-            raise ValueError("No valid prompt format found in template")
+            logger.error("No valid prompt format found in template.")
+            raise ValueError("No valid prompt format found in template.")
 
         system_prompt = matches[0][0].strip()
         user_prompt = matches[0][1].strip()
@@ -55,6 +66,7 @@ class Utils:
 
     @staticmethod
     def download_required_nltk_resources():
+        logger.info("Ensuring required NLTK resources are available.")
         """
         Ensure all required NLTK language processing resources are available locally.
 
@@ -74,6 +86,6 @@ class Utils:
                 except LookupError:
                     nltk.download(package_name)
                 except Exception as e:
-                    print(
+                    logger.error(
                         f"Error checking/downloading NLTK resource {package_name}: {str(e)}"
                     )

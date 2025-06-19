@@ -9,16 +9,19 @@ from promptlab.db.sql import SQLQuery
 from promptlab.evaluator.evaluator_factory import EvaluatorFactory
 from promptlab.tracer.tracer import Tracer
 from promptlab._utils import Utils
+from promptlab._logging import logger
 
 
 class Experiment:
     def __init__(self, tracer: Tracer):
         self.tracer = tracer
+        logger.debug("Experiment instance initialized.")
 
     def run(self, experiment_config: ExperimentConfig):
         """
         Synchronous version of experiment execution
         """
+        logger.info("Running experiment synchronously. Experiment Name: %s", experiment_config.name)
         (
             experiment_config,
             eval_dataset,
@@ -36,11 +39,10 @@ class Experiment:
         )
 
         self.tracer.trace(experiment_config, exp_summary)
+        logger.info("Experiment run complete and traced. Experiment Name: %s", experiment_config.name)
 
     async def run_async(self, experiment_config: ExperimentConfig):
-        """
-        Asynchronous version of experiment execution
-        """
+        logger.info("Running experiment asynchronously. Experiment Name: %s", experiment_config.name)
         (
             experiment_config,
             eval_dataset,
@@ -58,13 +60,17 @@ class Experiment:
         )
 
         self.tracer.trace(experiment_config, exp_summary)
+        logger.info("Async experiment run complete and traced. Experiment Name: %s", experiment_config.name)
 
     def _prepare_experiment_data(self, experiment_config: ExperimentConfig):
-        """
-        Prepare common experiment data used by both sync and async versions
-        """
+        logger.debug("Preparing experiment data.")
         experiment_config = ExperimentConfig(**experiment_config)
-        ConfigValidator.validate_experiment_config(experiment_config)
+        try:
+            ConfigValidator.validate_experiment_config(experiment_config)
+            logger.debug("Experiment config validated.")
+        except Exception as e:
+            logger.error(f"Experiment config validation failed: {e}", exc_info=True)
+            raise
 
         # if experiment_config.prompt_template is None:
         pt_asset_binary = None
