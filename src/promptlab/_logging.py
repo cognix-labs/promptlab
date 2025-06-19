@@ -2,9 +2,9 @@ import logging
 import os
 import platform
 from logging.handlers import RotatingFileHandler
-from promptlab._config import LOG_LEVEL
 
 APP_NAME = "PromptLab"
+LOG_LEVEL = os.environ.get("PROMPTLAB_LOG_LEVEL", "INFO").upper()
 
 # Determine platform-specific log directory
 if os.environ.get("PROMPTLAB_LOG_DIR"):
