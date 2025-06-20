@@ -28,7 +28,9 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "rouge-score>=0.1.2",
     "art>=6.5",
-    "setuptools"
+    "setuptools",
+    "fastapi",
+    "uvicorn"
 ]
 requires-python = ">=3.8"
 

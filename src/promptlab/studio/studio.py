@@ -5,9 +5,10 @@ import threading
 
 from promptlab._config import TracerConfig
 from promptlab.studio.api import StudioApi
-from promptlab.studio.async_api import AsyncStudioApi
+from promptlab.studio.fastapi_studio import FastAPIStudio
 from promptlab.studio.web import StudioWebHandler
 from art import tprint
+import uvicorn
 
 
 class Studio:
@@ -41,9 +42,13 @@ class Studio:
         print(f"\n🚀 PromptLab Studio running on: http://localhost:{port} 🚀")
 
     async def start_api_server_async(self, api_port: int):
-        """Start the API server asynchronously"""
-        self.api_server = AsyncStudioApi(self.tracer_config)
-        await self.api_server.run("localhost", api_port)
+        """Start the API server asynchronously using FastAPI"""
+        self.api_server = FastAPIStudio(self.tracer_config)
+        config = uvicorn.Config(
+            self.api_server.get_app(), host="localhost", port=api_port, log_level="info"
+        )
+        server = uvicorn.Server(config)
+        await server.serve()
 
     def start_web_server(self, web_port: int):
         """Start the web server in a separate thread"""

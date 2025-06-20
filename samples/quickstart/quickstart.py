@@ -1,3 +1,4 @@
+import asyncio
 from promptlab import PromptLab
 from promptlab.model.ollama import Ollama, Ollama_Embedding
 from promptlab.types import ModelConfig, PromptTemplate, Dataset
@@ -42,7 +43,7 @@ embedding_model = Ollama_Embedding(
 
 # Run an experiment
 experiment_config = {
-    "name": "demo_experimet",
+    "name": "demo_experimet123098",
     "inference_model": inference_model,
     "embedding_model": embedding_model,
     "prompt_template": pt,
@@ -64,4 +65,5 @@ experiment_config = {
 # pl.experiment.run(experiment_config)
 
 # Start the PromptLab Studio to view results
-pl.studio.start(8000)
+# pl.studio.start(8000)
+asyncio.run(pl.studio.start_async(8000))

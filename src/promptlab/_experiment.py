@@ -17,13 +17,13 @@ class Experiment:
         self.tracer = tracer
         logger.debug("Experiment instance initialized.")
 
-    def run(self, experiment_config: ExperimentConfig):
+    def run(self, config: dict):
         """
         Synchronous version of experiment execution
         """
         logger.info(
             "Running experiment synchronously. Experiment Name: %s",
-            experiment_config.name,
+            config['name'],
         )
         (
             experiment_config,
@@ -31,7 +31,7 @@ class Experiment:
             system_prompt,
             user_prompt,
             prompt_template_variables,
-        ) = self._prepare_experiment_data(experiment_config)
+        ) = self._prepare_experiment_data(config)
 
         exp_summary = self._init_batch_eval(
             eval_dataset,
@@ -47,10 +47,10 @@ class Experiment:
             experiment_config.name,
         )
 
-    async def run_async(self, experiment_config: ExperimentConfig):
+    async def run_async(self, config: dict):
         logger.info(
             "Running experiment asynchronously. Experiment Name: %s",
-            experiment_config.name,
+            config['name'],
         )
         (
             experiment_config,
@@ -58,7 +58,7 @@ class Experiment:
             system_prompt,
             user_prompt,
             prompt_template_variables,
-        ) = self._prepare_experiment_data(experiment_config)
+        ) = self._prepare_experiment_data(config)
 
         exp_summary = await self._init_batch_eval_async(
             eval_dataset,
