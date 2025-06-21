@@ -4,9 +4,8 @@ from typing import Optional
 import threading
 
 from promptlab._config import TracerConfig
-from promptlab.studio.api import StudioApi
-from promptlab.studio.fastapi_studio import FastAPIStudio
-from promptlab.studio.web import StudioWebHandler
+from promptlab.studio.studio_api import StudioApi
+from promptlab.studio.studio_web import StudioWebHandler
 from art import tprint
 import uvicorn
 
@@ -43,7 +42,7 @@ class Studio:
 
     async def start_api_server_async(self, api_port: int):
         """Start the API server asynchronously using FastAPI"""
-        self.api_server = FastAPIStudio(self.tracer_config)
+        self.api_server = StudioApi(self.tracer_config)
         config = uvicorn.Config(
             self.api_server.get_app(), host="localhost", port=api_port, log_level="info"
         )

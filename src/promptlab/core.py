@@ -13,7 +13,7 @@ class PromptLab:
         logger.info("Tracer config validated successfully.")
 
         self.tracer = TracerFactory.get_tracer(tracer_config)
-        self.tracer.init_db()
+        # self.tracer.init_db()
 
         self.asset = Asset(self.tracer)
         self.experiment = Experiment(self.tracer)

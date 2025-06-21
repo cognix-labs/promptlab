@@ -1,0 +1,38 @@
+from sqlalchemy import Column, Integer, String, Text, Boolean, Float, LargeBinary, ForeignKey, DateTime
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
+from datetime import datetime
+
+Base = declarative_base()
+
+class Asset(Base):
+    __tablename__ = 'assets'
+    asset_name = Column(String, primary_key=True)
+    asset_version = Column(Integer, primary_key=True)
+    asset_description = Column(Text)
+    asset_type = Column(String)
+    asset_binary = Column(Text)  # Store as JSON/text
+    is_deployed = Column(Boolean, default=False)
+    deployment_time = Column(DateTime)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class Experiment(Base):
+    __tablename__ = 'experiments'
+    experiment_id = Column(String, primary_key=True)
+    model = Column(Text)  # Store as JSON/text
+    asset = Column(Text)  # Store as JSON/text
+    created_at = Column(DateTime, default=datetime.utcnow)
+    results = relationship('ExperimentResult', back_populates='experiment')
+
+class ExperimentResult(Base):
+    __tablename__ = 'experiment_result'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    experiment_id = Column(String, ForeignKey('experiments.experiment_id'))
+    dataset_record_id = Column(String)
+    inference = Column(Text)
+    prompt_tokens = Column(Integer)
+    completion_tokens = Column(Integer)
+    latency_ms = Column(Float)
+    evaluation = Column(Text)  # Store as JSON/text
+    created_at = Column(DateTime, default=datetime.utcnow)
+    experiment = relationship('Experiment', back_populates='results')

@@ -3,19 +3,18 @@ from typing import Dict, List
 import json
 
 from promptlab._config import ExperimentConfig, TracerConfig
-from promptlab.db.sqlite import SQLiteClient
+from promptlab.db.sqlite import SQLAlchemyClient
 from promptlab.tracer.tracer import Tracer
-from promptlab.db.sql import SQLQuery
+from promptlab.db.models import Experiment as ExperimentModel, ExperimentResult as ExperimentResultModel
 
 
 class SQLiteTracer(Tracer):
     def __init__(self, tracer_config: TracerConfig):
-        self.db_client = SQLiteClient(tracer_config.db_file)
+        self.db_client = SQLAlchemyClient(tracer_config.db_file)
 
     def init_db(self):
-        self.db_client.execute_query(SQLQuery.CREATE_ASSETS_TABLE_QUERY)
-        self.db_client.execute_query(SQLQuery.CREATE_EXPERIMENTS_TABLE_QUERY)
-        self.db_client.execute_query(SQLQuery.CREATE_EXPERIMENT_RESULT_TABLE_QUERY)
+        # Tables are created by SQLAlchemyClient/init_engine
+        pass
 
     def trace(
         self, experiment_config: ExperimentConfig, experiment_summary: List[Dict]
@@ -51,10 +50,26 @@ class SQLiteTracer(Tracer):
             "dataset_version": experiment_config.dataset.version,
         }
 
-        self.db_client.execute_query(
-            SQLQuery.INSERT_EXPERIMENT_QUERY,
-            (experiment_id, json.dumps(model), json.dumps(asset), timestamp),
+        exp = ExperimentModel(
+            experiment_id=experiment_id,
+            model=json.dumps(model),
+            asset=json.dumps(asset),
+            created_at=datetime.utcnow(),
         )
-        self.db_client.execute_query_many(
-            SQLQuery.INSERT_BATCH_EXPERIMENT_RESULT_QUERY, experiment_summary
-        )
+        self.db_client.add_experiment(exp)
+        results = [
+            ExperimentResultModel(
+                experiment_id=record["experiment_id"],
+                dataset_record_id=record["dataset_record_id"],
+                inference=record["inference"],
+                prompt_tokens=record["prompt_tokens"],
+                completion_tokens=record["completion_tokens"],
+                latency_ms=record["latency_ms"],
+                evaluation=json.dumps(record["evaluation"])
+                if isinstance(record["evaluation"], (dict, list))
+                else record["evaluation"],
+                created_at=datetime.utcnow(),
+            )
+            for record in experiment_summary
+        ]
+        self.db_client.add_experiment_results(results)
