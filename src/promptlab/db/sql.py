@@ -125,12 +125,14 @@ class SQLQuery:
                                     er.latency_ms as latency_ms,
                                     er.evaluation as evaluation,
                                     a.asset_binary,
-                                    e.user_id
+                                    u.username
                                 FROM experiments e
                                 JOIN experiment_result er on
                                     e.experiment_id = er.experiment_id
                                 LEFT JOIN assets a ON
                                     a.asset_name = prompt_template_name AND a.asset_version = prompt_template_version
+                                LEFT JOIN users u ON
+                                    e.user_id = u.id
                                 ORDER BY e.created_at DESC
                                 """
 

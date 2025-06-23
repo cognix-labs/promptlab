@@ -48,7 +48,17 @@ class SQLAlchemyClient:
     def get_assets_by_type(self, asset_type: str):
         session = get_session()
         try:
-            return session.query(Asset).filter_by(asset_type=asset_type).all()
+            # Join Asset with User on user_id, return asset fields and username
+            results = (
+                session.query(Asset, User.username)
+                .join(User, Asset.user_id == User.id)
+                .filter(Asset.asset_type == asset_type)
+                .all()
+            )
+            # Return as list of dicts for easier use
+            return [
+                {**asset.__dict__, 'username': username} for asset, username in results
+            ]
         finally:
             session.close()
 

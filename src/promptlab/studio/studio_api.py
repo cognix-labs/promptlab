@@ -45,7 +45,7 @@ class StudioApi:
                     }
                     experiment_data["system_prompt_template"] = system_prompt
                     experiment_data["user_prompt_template"] = user_prompt
-                    experiment_data["user_id"] = experiment.get("user_id", None)
+                    experiment_data["user_id"] = experiment.get("username", None)
 
                     processed_experiments.append(experiment_data)
                 return {"experiments": processed_experiments}
@@ -58,18 +58,18 @@ class StudioApi:
                 prompt_templates = await asyncio.to_thread(self.tracer.db_client.get_assets_by_type, AssetType.PROMPT_TEMPLATE.value)
                 processed_templates = []
                 for template in prompt_templates:
-                    system_prompt, user_prompt, _ = Utils.split_prompt_template(template.asset_binary)
+                    system_prompt, user_prompt, _ = Utils.split_prompt_template(template['asset_binary'])
                     experiment_data = {
-                        "asset_name": template.asset_name,
-                        "asset_description": template.asset_description,
-                        "asset_version": template.asset_version,
-                        "asset_type": template.asset_type,
-                        "created_at": template.created_at,
+                        "asset_name": template['asset_name'],
+                        "asset_description": template['asset_description'],
+                        "asset_version": template['asset_version'],
+                        "asset_type": template['asset_type'],
+                        "created_at": template['created_at'],
                         "system_prompt_template": system_prompt,
                         "user_prompt_template": user_prompt,
-                        "is_deployed": template.is_deployed,
-                        "deployment_time": template.deployment_time,
-                        "user_id": template.user_id,
+                        "is_deployed": template['is_deployed'],
+                        "deployment_time": template['deployment_time'],
+                        "user_id": template['username'],
                     }
                     processed_templates.append(experiment_data)
                 return {"prompt_templates": processed_templates}
@@ -82,15 +82,15 @@ class StudioApi:
                 datasets = await asyncio.to_thread(self.tracer.db_client.get_assets_by_type, AssetType.DATASET.value)
                 processed_datasets = []
                 for dataset in datasets:
-                    file_path = json.loads(dataset.asset_binary)["file_path"]
+                    file_path = json.loads(dataset['asset_binary'])["file_path"]
                     data = {
-                        "asset_name": dataset.asset_name,
-                        "asset_description": dataset.asset_description,
-                        "asset_version": dataset.asset_version,
-                        "asset_type": dataset.asset_type,
-                        "created_at": dataset.created_at,
+                        "asset_name": dataset['asset_name'],
+                        "asset_description": dataset['asset_description'],
+                        "asset_version": dataset['asset_version'],
+                        "asset_type": dataset['asset_type'],
+                        "created_at": dataset['created_at'],
                         "file_path": file_path,
-                        "user_id": dataset.user_id,
+                        "user_id": dataset['username'],
                     }
                     processed_datasets.append(data)
                 return {"datasets": processed_datasets}
