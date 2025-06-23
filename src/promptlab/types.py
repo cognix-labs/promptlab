@@ -42,6 +42,7 @@ class Dataset:
     description: str
     file_path: str
     version: int = 0
+    user_id: int = None
 
 
 @dataclass
@@ -51,6 +52,7 @@ class PromptTemplate:
     system_prompt: str = None
     user_prompt: str = None
     version: int = 0
+    user_id: int = None
 
 
 class EvaluationConfig(BaseModel):

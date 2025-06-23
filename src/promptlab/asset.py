@@ -84,6 +84,7 @@ class Asset:
             asset_type=AssetType.DATASET.value,
             asset_binary=json.dumps(binary),
             created_at=datetime.utcnow(),
+            user_id=dataset.user_id
         )
         self.tracer.db_client.add_asset(asset)
         return dataset
@@ -107,6 +108,7 @@ class Asset:
             asset_type=AssetType.DATASET.value,
             asset_binary=binary,
             created_at=datetime.utcnow(),
+            user_id=dataset.user_id
         )
         self.tracer.db_client.add_asset(asset)
         return dataset
@@ -127,6 +129,7 @@ class Asset:
             asset_type=AssetType.PROMPT_TEMPLATE.value,
             asset_binary=binary,
             created_at=datetime.utcnow(),
+            user_id=template.user_id
         )
         self.tracer.db_client.add_asset(asset)
         return template
@@ -158,6 +161,7 @@ class Asset:
             asset_type=AssetType.PROMPT_TEMPLATE.value,
             asset_binary=binary,
             created_at=datetime.utcnow(),
+            user_id=template.user_id
         )
         self.tracer.db_client.add_asset(asset)
         return template

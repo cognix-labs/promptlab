@@ -15,6 +15,8 @@ class Asset(Base):
     is_deployed = Column(Boolean, default=False)
     deployment_time = Column(DateTime)
     created_at = Column(DateTime, default=datetime.utcnow)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    user = relationship('User', back_populates='assets')
 
 class Experiment(Base):
     __tablename__ = 'experiments'
@@ -22,6 +24,8 @@ class Experiment(Base):
     model = Column(Text)  # Store as JSON/text
     asset = Column(Text)  # Store as JSON/text
     created_at = Column(DateTime, default=datetime.utcnow)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    user = relationship('User', back_populates='experiments')
     results = relationship('ExperimentResult', back_populates='experiment')
 
 class ExperimentResult(Base):
@@ -44,3 +48,5 @@ class User(Base):
     password_hash = Column(String, nullable=False)
     role = Column(String, nullable=False)  # 'admin' or 'engineer'
     created_at = Column(DateTime, default=datetime.utcnow)
+    assets = relationship('Asset', back_populates='user')
+    experiments = relationship('Experiment', back_populates='user')
