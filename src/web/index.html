@@ -7,9 +7,13 @@
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            padding: 0;
             background-color: #f5f7fa;
             color: #2c3e50;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
         }
 
         h1 {
@@ -313,10 +317,62 @@
             font-size: 0.95em;
 
         }
+
+        /* Add login form styles */
+        #loginContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #f5f7fa;
+        }
+        #loginBox {
+            background: #fff;
+            padding: 32px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 32px rgba(44,62,80,0.12);
+            min-width: 320px;
+        }
+        #loginBox h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        #loginBox input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        #loginBox button {
+            width: 100%;
+            padding: 10px;
+            background: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #loginError {
+            color: #e74c3c;
+            margin-bottom: 10px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div id="loginContainer" style="display:none;">
+        <div id="loginBox">
+            <h2>Login to PromptLab</h2>
+            <div id="loginError"></div>
+            <input type="text" id="loginUsername" placeholder="Username" autocomplete="username">
+            <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password">
+            <button id="loginBtn">Login</button>
+        </div>
+    </div>
+    <div class="container" style="display:none;">
         <nav class="left-menu">
             <button class="nav-toggle" title="Toggle menu">☰</button>
             <ul>
@@ -439,7 +495,78 @@
     </div>
 
     <script>
-        // Add this at the beginning of your script section
+        // --- AUTH LOGIC ---
+        function getApiBaseUrl() {
+            const currentPort = window.location.port || '8000';
+            const apiPort = parseInt(currentPort) + 1;
+            return `http://${window.location.hostname}:${apiPort}`;
+        }
+        function isAuthenticated() {
+            return !!localStorage.getItem('access_token');
+        }
+        function setAuthHeader(options = {}) {
+            const token = localStorage.getItem('access_token');
+            if (!options.headers) options.headers = {};
+            if (token) options.headers['Authorization'] = 'Bearer ' + token;
+            return options;
+        }
+        function showLogin() {
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.querySelector('.container').style.display = 'none';
+        }
+        function showApp() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.querySelector('.container').style.display = 'flex';
+        }
+        async function tryLogin(username, password) {
+            const url = getApiBaseUrl() + '/login';
+            const form = new URLSearchParams();
+            form.append('username', username);
+            form.append('password', password);
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: form
+                });
+                if (!res.ok) throw new Error('Invalid credentials');
+                const data = await res.json();
+                localStorage.setItem('access_token', data.access_token);
+                localStorage.setItem('user_role', data.role);
+                showApp();
+                location.reload();
+            } catch (e) {
+                document.getElementById('loginError').textContent = 'Invalid username or password.';
+            }
+        }
+        document.getElementById('loginBtn').onclick = function() {
+            const u = document.getElementById('loginUsername').value;
+            const p = document.getElementById('loginPassword').value;
+            tryLogin(u, p);
+        };
+        // On load, check auth
+        if (!isAuthenticated()) {
+            showLogin();
+        } else {
+            showApp();
+        }
+        // --- PATCH FETCH TO ADD AUTH HEADER ---
+        const origFetch = window.fetch;
+        window.fetch = function(url, options = {}) {
+            if (url.includes('/login')) return origFetch(url, options);
+            options = setAuthHeader(options);
+            return origFetch(url, options).then(res => {
+                if (res.status === 401) {
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('user_role');
+                    showLogin();
+                    throw new Error('Unauthorized');
+                }
+                return res;
+            });
+        };
+    </script>
+    <script>
         document.querySelector('.nav-toggle').addEventListener('click', () => {
             document.querySelector('.container').classList.toggle('nav-collapsed');
         });

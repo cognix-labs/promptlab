@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from .session import get_session, init_engine
-from .models import Asset, Experiment, ExperimentResult
+from .models import Asset, Experiment, ExperimentResult, User
 from promptlab.db.sql import SQLQuery
 from datetime import datetime
 from sqlalchemy import text
@@ -106,5 +106,38 @@ class SQLAlchemyClient:
                 .filter_by(experiment_id=experiment_id)
                 .all()
             )
+        finally:
+            session.close()
+
+    def add_user(self, user: User):
+        session = get_session()
+        try:
+            session.add(user)
+            session.commit()
+        except Exception as e:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+    def get_user_by_username(self, username: str):
+        session = get_session()
+        try:
+            return session.query(User).filter_by(username=username).first()
+        finally:
+            session.close()
+
+    def get_users(self):
+        session = get_session()
+        try:
+            return session.query(User).all()
+        finally:
+            session.close()
+
+    def check_user_role(self, username: str, role: str):
+        session = get_session()
+        try:
+            user = session.query(User).filter_by(username=username, role=role).first()
+            return user is not None
         finally:
             session.close()

@@ -31,7 +31,10 @@ dependencies = [
     "setuptools",
     "fastapi",
     "uvicorn",
-    "sqlalchemy"
+    "sqlalchemy",
+    "passlib",
+    "python-jose",
+    "python-multipart"
 ]
 requires-python = ">=3.8"
 
