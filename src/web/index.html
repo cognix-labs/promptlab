@@ -874,6 +874,46 @@
             updateTable();
         }
 
+        // --- ROUTING LOGIC ---
+        function showTab(tab) {
+            // Remove active from all
+            document.querySelectorAll('.left-menu li').forEach(item => item.classList.remove('active'));
+            // Hide all content
+            document.querySelectorAll('.content-area > div').forEach(content => content.style.display = 'none');
+            // Show selected
+            document.getElementById(tab).style.display = 'block';
+            // Set active nav
+            const navItem = Array.from(document.querySelectorAll('.left-menu li')).find(li => li.dataset.content === tab);
+            if (navItem) navItem.classList.add('active');
+            // Load data if needed
+            if (tab === 'promptTemplateContent') loadPromptTemplates();
+            else if (tab === 'datasetContent') loadDatasets();
+        }
+        function handleRoute() {
+            const path = window.location.pathname;
+            if (path === '/datasets') {
+                showTab('datasetContent');
+            } else if (path === '/prompttemplate') {
+                showTab('promptTemplateContent');
+            } else {
+                showTab('experimentContent');
+            }
+        }
+        window.addEventListener('popstate', handleRoute);
+        // Navigation click handlers
+        document.querySelectorAll('.left-menu li').forEach(menuItem => {
+            menuItem.addEventListener('click', () => {
+                const contentId = menuItem.dataset.content;
+                let url = '/';
+                if (contentId === 'datasetContent') url = '/datasets';
+                else if (contentId === 'promptTemplateContent') url = '/prompttemplate';
+                window.history.pushState({}, '', url);
+                handleRoute();
+            });
+        });
+        // On load, show correct tab
+        handleRoute();
+
         // Add this after the existing event listeners
         document.querySelectorAll('.left-menu li').forEach(menuItem => {
             menuItem.addEventListener('click', () => {
