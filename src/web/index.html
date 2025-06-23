@@ -428,7 +428,6 @@
                         <tr>
                             <th><input type="checkbox" id="selectAll"></th>
                             <th>Experiment ID</th>
-                            <th>User ID</th>
                             <th>Inference Model</th>
                             <th>Embedding Model</th>
                             <th>Prompt Template</th>
@@ -437,6 +436,7 @@
                             <th>Dataset Version</th>
                             <th>System Prompt</th>
                             <th>User Prompt</th>
+                            <th>User ID</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
@@ -468,11 +468,11 @@
                             <th>Description</th>
                             <th>Version</th>
                             <th>Created At</th>
-                            <th>User ID</th>
                             <th>System Prompt</th>
                             <th>User Prompt</th>
                             <th>Deployment Time</th>
                             <th>Is Deployed</th>
+                            <th>User ID</th>
                         </tr>
                     </thead>
                     <tbody id="promptTemplateTableBody"></tbody>
@@ -493,8 +493,8 @@
                             <th>Description</th>
                             <th>Version</th>
                             <th>Created At</th>
-                            <th>User ID</th>
                             <th>File Path</th>
+                            <th>User ID</th>
                         </tr>
                     </thead>
                     <tbody id="datasetTableBody"></tbody>
@@ -590,7 +590,6 @@
                     row.innerHTML = `
                         <td><input type="checkbox" class="experiment-checkbox" data-id="${exp.experiment_id}"></td>
                         <td>${exp.experiment_id}</td>
-                        <td>${exp.user_id ?? '-'}</td>
                         <td>${exp.inference_model}</td>
                         <td>${exp.embedding_model}</td>
                         <td>${exp.prompt_template_name}</td>
@@ -599,6 +598,7 @@
                         <td>${exp.dataset_version}</td>
                         <td>${exp.system_prompt_template.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
                         <td>${exp.user_prompt_template.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
+                        <td>${exp.user_id ?? '-'}</td>
                     `;
                     tableBody.appendChild(row);
                 });
@@ -963,11 +963,11 @@
                         <td>${template.asset_description}</td>
                         <td>${template.asset_version}</td>
                         <td>${createdAt}</td>
-                        <td>${template.user_id ?? '-'}</td>
                         <td class="evaluation-cell">${template.system_prompt_template.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
                         <td class="evaluation-cell">${template.user_prompt_template.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
                         <td>${deploymentTime}</td>
                         <td>${template.is_deployed ? '✓' : '✗'}</td>
+                        <td>${template.user_id ?? '-'}</td>
                     `;
                     tableBody.appendChild(row);
                 });
@@ -996,8 +996,8 @@
                         <td>${dataset.asset_description}</td>
                         <td>${dataset.asset_version}</td>
                         <td>${createdAt}</td>
-                        <td>${dataset.user_id ?? '-'}</td>
                         <td class="evaluation-cell">${dataset.file_path}</td>
+                        <td>${dataset.user_id ?? '-'}</td>
                     `;
                     tableBody.appendChild(row);
                 });
