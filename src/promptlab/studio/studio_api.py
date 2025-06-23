@@ -86,6 +86,11 @@ class StudioApi:
             access_token = create_access_token(data={"sub": user.username, "role": user.role})
             return {"access_token": access_token, "token_type": "bearer", "role": user.role}
 
+        @self.app.post("/logout")
+        async def logout():
+            # For JWT, logout is handled client-side by deleting the token
+            return {"msg": "Logged out"}
+
         @self.app.post("/users")
         async def create_user(
             request: Request,

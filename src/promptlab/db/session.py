@@ -11,6 +11,23 @@ def init_engine(db_url):
     _SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=_engine)
     Base.metadata.create_all(bind=_engine)
 
+    # Insert default admin user if not exists
+    from .models import User
+    from passlib.context import CryptContext
+    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    session = _SessionLocal()
+    try:
+        if not session.query(User).filter_by(username="admin").first():
+            admin_user = User(
+                username="admin",
+                password_hash=pwd_context.hash("admin"),
+                role="admin"
+            )
+            session.add(admin_user)
+            session.commit()
+    finally:
+        session.close()
+
 def get_session():
     if _SessionLocal is None:
         raise RuntimeError("Session not initialized. Call init_engine first.")

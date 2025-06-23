@@ -34,7 +34,8 @@ dependencies = [
     "sqlalchemy",
     "passlib",
     "python-jose",
-    "python-multipart"
+    "python-multipart",
+    "bcrypt"
 ]
 requires-python = ">=3.8"
 

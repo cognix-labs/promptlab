@@ -492,6 +492,7 @@
                 </table>
             </div>
         </main>
+        <button id="logoutBtn" style="position:absolute;top:20px;right:30px;z-index:1000;display:none;background:#e74c3c;color:#fff;border:none;padding:10px 18px;border-radius:5px;cursor:pointer;font-size:15px;">Logout</button>
     </div>
 
     <script>
@@ -513,10 +514,12 @@
         function showLogin() {
             document.getElementById('loginContainer').style.display = 'flex';
             document.querySelector('.container').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'none';
         }
         function showApp() {
             document.getElementById('loginContainer').style.display = 'none';
             document.querySelector('.container').style.display = 'flex';
+            document.getElementById('logoutBtn').style.display = 'block';
         }
         async function tryLogin(username, password) {
             const url = getApiBaseUrl() + '/login';
@@ -543,6 +546,14 @@
             const u = document.getElementById('loginUsername').value;
             const p = document.getElementById('loginPassword').value;
             tryLogin(u, p);
+        };
+        document.getElementById('logoutBtn').onclick = async function() {
+            try {
+                await fetch(getApiBaseUrl() + '/logout', { method: 'POST', ...setAuthHeader() });
+            } catch (e) {}
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('user_role');
+            showLogin();
         };
         // On load, check auth
         if (!isAuthenticated()) {
