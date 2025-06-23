@@ -361,6 +361,22 @@
             margin-top: 12px;
             display: none;
         }
+
+        #logoutBtn {
+            position: fixed;
+            top: 24px;
+            right: 36px;
+            padding: 8px 18px;
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 2000;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -402,8 +418,8 @@
                     </div>
                 </li>
             </ul>
-            <button id="logoutBtn" style="margin:24px 0 0 24px; padding:8px 18px; background:#e74c3c; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:14px; font-weight:500; display:none;">Logout</button>
         </nav>
+        <button id="logoutBtn">Logout</button>
         
         <main class="content-area">
             <div id="experimentContent">
