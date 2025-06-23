@@ -55,6 +55,7 @@ class SQLiteTracer(Tracer):
             model=json.dumps(model),
             asset=json.dumps(asset),
             created_at=datetime.utcnow(),
+            user_id=1,
         )
         self.db_client.add_experiment(exp)
         results = [

@@ -124,7 +124,8 @@ class SQLQuery:
                                     er.completion_tokens as completion_tokens,
                                     er.latency_ms as latency_ms,
                                     er.evaluation as evaluation,
-                                    a.asset_binary
+                                    a.asset_binary,
+                                    e.user_id
                                 FROM experiments e
                                 JOIN experiment_result er on
                                     e.experiment_id = er.experiment_id

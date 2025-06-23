@@ -1,15 +1,16 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from promptlab.db.sql import SQLQuery
+from promptlab.tracer.tracer import Tracer
 from promptlab.types import TracerConfig
 from promptlab._utils import Utils
 from promptlab.enums import AssetType
 import asyncio
 import json
 
-class FastAPIStudio:
-    def __init__(self, tracer_config: TracerConfig):
-        self.tracer_config = tracer_config
+class StudioApi:
+    def __init__(self, tracer: Tracer):
+        self.tracer = tracer
         self.app = FastAPI()
         self.app.add_middleware(
             CORSMiddleware,
@@ -24,20 +25,18 @@ class FastAPIStudio:
         @self.app.get("/experiments")
         async def get_experiments():
             try:
-                experiments = await asyncio.to_thread(
-                    self.tracer_config.db_client.fetch_data,
-                    SQLQuery.SELECT_EXPERIMENTS_QUERY,
-                )
+                experiments = await asyncio.to_thread(self.tracer.db_client.get_experiments)
                 processed_experiments = []
                 for experiment in experiments:
-                    system_prompt, user_prompt, _ = Utils.split_prompt_template(
-                        experiment["asset_binary"]
-                    )
+                    system_prompt, user_prompt, _ = Utils.split_prompt_template(experiment.asset_binary)
+
                     experiment_data = {
                         k: v for k, v in experiment.items() if k != "asset_binary"
                     }
                     experiment_data["system_prompt_template"] = system_prompt
                     experiment_data["user_prompt_template"] = user_prompt
+                    experiment_data["user_id"] = experiment.get("user_id", None)
+
                     processed_experiments.append(experiment_data)
                 return {"experiments": processed_experiments}
             except Exception as e:
@@ -46,21 +45,22 @@ class FastAPIStudio:
         @self.app.get("/prompttemplates")
         async def get_prompt_templates():
             try:
-                prompt_templates = await asyncio.to_thread(
-                    self.tracer_config.db_client.fetch_data,
-                    SQLQuery.SELECT_ASSET_BY_TYPE_QUERY,
-                    (AssetType.PROMPT_TEMPLATE.value,),
-                )
+                prompt_templates = await asyncio.to_thread(self.tracer.db_client.get_assets_by_type, AssetType.PROMPT_TEMPLATE.value)
                 processed_templates = []
                 for template in prompt_templates:
-                    system_prompt, user_prompt, _ = Utils.split_prompt_template(
-                        template["asset_binary"]
-                    )
+                    system_prompt, user_prompt, _ = Utils.split_prompt_template(template.asset_binary)
                     experiment_data = {
-                        k: v for k, v in template.items() if k != "asset_binary"
+                        "asset_name": template.asset_name,
+                        "asset_description": template.asset_description,
+                        "asset_version": template.asset_version,
+                        "asset_type": template.asset_type,
+                        "created_at": template.created_at,
+                        "system_prompt_template": system_prompt,
+                        "user_prompt_template": user_prompt,
+                        "is_deployed": template.is_deployed,
+                        "deployment_time": template.deployment_time,
+                        "user_id": template.user_id,
                     }
-                    experiment_data["system_prompt_template"] = system_prompt
-                    experiment_data["user_prompt_template"] = user_prompt
                     processed_templates.append(experiment_data)
                 return {"prompt_templates": processed_templates}
             except Exception as e:
@@ -69,16 +69,19 @@ class FastAPIStudio:
         @self.app.get("/datasets")
         async def get_datasets():
             try:
-                datasets = await asyncio.to_thread(
-                    self.tracer_config.db_client.fetch_data,
-                    SQLQuery.SELECT_ASSET_BY_TYPE_QUERY,
-                    (AssetType.DATASET.value,),
-                )
+                datasets = await asyncio.to_thread(self.tracer.db_client.get_assets_by_type, AssetType.DATASET.value)
                 processed_datasets = []
                 for dataset in datasets:
-                    file_path = json.loads(dataset["asset_binary"])["file_path"]
-                    data = {k: v for k, v in dataset.items() if k != "asset_binary"}
-                    data["file_path"] = file_path
+                    file_path = json.loads(dataset.asset_binary)["file_path"]
+                    data = {
+                        "asset_name": dataset.asset_name,
+                        "asset_description": dataset.asset_description,
+                        "asset_version": dataset.asset_version,
+                        "asset_type": dataset.asset_type,
+                        "created_at": dataset.created_at,
+                        "file_path": file_path,
+                        "user_id": dataset.user_id,
+                    }
                     processed_datasets.append(data)
                 return {"datasets": processed_datasets}
             except Exception as e:

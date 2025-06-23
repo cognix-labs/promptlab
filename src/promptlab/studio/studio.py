@@ -8,11 +8,12 @@ from promptlab.studio.studio_api import StudioApi
 from promptlab.studio.studio_web import StudioWebHandler
 from art import tprint
 import uvicorn
+from promptlab.tracer.tracer import Tracer
 
 
 class Studio:
-    def __init__(self, tracer_config: TracerConfig):
-        self.tracer_config = tracer_config
+    def __init__(self, tracer: Tracer):
+        self.tracer = tracer
 
         self.web_server: Optional[HTTPServer] = None
         self.api_server = None  # Can be either StudioApi or AsyncStudioApi
@@ -42,7 +43,7 @@ class Studio:
 
     async def start_api_server_async(self, api_port: int):
         """Start the API server asynchronously using FastAPI"""
-        self.api_server = StudioApi(self.tracer_config)
+        self.api_server = StudioApi(self.tracer)
         config = uvicorn.Config(
             self.api_server.get_app(), host="localhost", port=api_port, log_level="info"
         )

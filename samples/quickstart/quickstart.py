@@ -36,34 +36,34 @@ dataset = Dataset(
 pt = pl.asset.get(asset_name=prompt_name, version=0)
 ds = pl.asset.get(asset_name=dataset_name, version=0)
 
-# # model instnace
-# inference_model = Ollama(model_config=ModelConfig(model_deployment="llama3.2"))
-# embedding_model = Ollama_Embedding(
-#     model_config=ModelConfig(model_deployment="nomic-embed-text:latest")
-# )
+# model instnace
+inference_model = Ollama(model_config=ModelConfig(model_deployment="llama3.2"))
+embedding_model = Ollama_Embedding(
+    model_config=ModelConfig(model_deployment="nomic-embed-text:latest")
+)
 
-# # Run an experiment
-# experiment_config = {
-#     "name": "demo_experimet123098",
-#     "inference_model": inference_model,
-#     "embedding_model": embedding_model,
-#     "prompt_template": pt,
-#     "dataset": ds,
-#     "evaluation": [
-#         {
-#             "metric": "semantic_similarity",
-#             "column_mapping": {"response": "$inference", "reference": "feedback"},
-#         },
-#         {
-#             "metric": "relevance",
-#             "column_mapping": {
-#                 "response": "$inference",
-#                 "query": "essay_topic",
-#             },
-#         },
-#     ],
-# }
-# # pl.experiment.run(experiment_config)
+# Run an experiment
+experiment_config = {
+    "name": "demo_experimet1230981",
+    "inference_model": inference_model,
+    "embedding_model": embedding_model,
+    "prompt_template": pt,
+    "dataset": ds,
+    "evaluation": [
+        {
+            "metric": "semantic_similarity",
+            "column_mapping": {"response": "$inference", "reference": "feedback"},
+        },
+        {
+            "metric": "relevance",
+            "column_mapping": {
+                "response": "$inference",
+                "query": "essay_topic",
+            },
+        },
+    ],
+}
+# pl.experiment.run(experiment_config)
 
 # Start the PromptLab Studio to view results
-# asyncio.run(pl.studio.start_async(8000))
+asyncio.run(pl.studio.start_async(8000))

@@ -364,6 +364,7 @@
                         <tr>
                             <th><input type="checkbox" id="selectAll"></th>
                             <th>Experiment ID</th>
+                            <th>User ID</th>
                             <th>Inference Model</th>
                             <th>Embedding Model</th>
                             <th>Prompt Template</th>
@@ -399,11 +400,11 @@
                 <table id="promptTemplateTable">
                     <thead>
                         <tr>
-                            <!-- <th>Id</th> -->
                             <th>Name</th>
                             <th>Description</th>
                             <th>Version</th>
                             <th>Created At</th>
+                            <th>User ID</th>
                             <th>System Prompt</th>
                             <th>User Prompt</th>
                             <th>Deployment Time</th>
@@ -424,11 +425,11 @@
                 <table id="datasetTable">
                     <thead>
                         <tr>
-                            <!-- <th>Id</th> -->
                             <th>Name</th>
                             <th>Description</th>
                             <th>Version</th>
                             <th>Created At</th>
+                            <th>User ID</th>
                             <th>File Path</th>
                         </tr>
                     </thead>
@@ -467,6 +468,7 @@
                     row.innerHTML = `
                         <td><input type="checkbox" class="experiment-checkbox" data-id="${exp.experiment_id}"></td>
                         <td>${exp.experiment_id}</td>
+                        <td>${exp.user_id ?? '-'}</td>
                         <td>${exp.inference_model}</td>
                         <td>${exp.embedding_model}</td>
                         <td>${exp.prompt_template_name}</td>
@@ -548,6 +550,7 @@
             // Define fixed columns
             const fixedColumns = [
                 'Experiment ID',
+                'User ID',
                 'Dataset Record ID',
                 'Inference',
                 'Completion Tokens',
@@ -709,11 +712,12 @@
                     // Map of all possible values
                     const allValues = {
                         'Experiment ID': exp.experiment_id,
+                        'User ID': exp.user_id ?? '-',
                         'Dataset Record ID': exp.dataset_record_id,
                         'Inference': exp.inference,
                         'Completion Tokens': exp.completion_tokens,
                         'Prompt Tokens': exp.prompt_tokens,
-                        'Latency (ms)': exp.latency_ms.toFixed(2),
+                        'Latency (ms)': exp.latency_ms?.toFixed(2) ?? '-',
                         ...metricResults
                     };
 
@@ -788,17 +792,16 @@
                     const row = document.createElement('tr');
                     const createdAt = new Date(template.created_at).toLocaleString();
                     const deploymentTime = template.deployment_time ? new Date(template.deployment_time).toLocaleString() : '-';
-                    
                     // Add deployed-row class if template is deployed
                     if (template.is_deployed) {
                         row.classList.add('deployed-row');
                     }
-                    
                     row.innerHTML = `
                         <td>${template.asset_name}</td>
                         <td>${template.asset_description}</td>
                         <td>${template.asset_version}</td>
                         <td>${createdAt}</td>
+                        <td>${template.user_id ?? '-'}</td>
                         <td class="evaluation-cell">${template.system_prompt_template.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
                         <td class="evaluation-cell">${template.user_prompt_template.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
                         <td>${deploymentTime}</td>
@@ -826,12 +829,12 @@
                 data.datasets.forEach(dataset => {
                     const row = document.createElement('tr');
                     const createdAt = new Date(dataset.created_at).toLocaleString();
-                    
                     row.innerHTML = `
                         <td>${dataset.asset_name}</td>
                         <td>${dataset.asset_description}</td>
                         <td>${dataset.asset_version}</td>
                         <td>${createdAt}</td>
+                        <td>${dataset.user_id ?? '-'}</td>
                         <td class="evaluation-cell">${dataset.file_path}</td>
                     `;
                     tableBody.appendChild(row);
