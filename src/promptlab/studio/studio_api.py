@@ -9,6 +9,7 @@ from promptlab.enums import AssetType
 import asyncio
 import json
 import secrets
+from passlib.context import CryptContext
 
 class StudioApi:
     def __init__(self, tracer: Tracer):
@@ -92,11 +93,13 @@ class StudioApi:
         @self.app.post("/login")
         async def login(request: Request):
             try:
+                pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
                 data = await request.json()
                 username = data.get("username")
                 password = data.get("password")
-                # Demo: static user/pass
-                if username == "admin" and password == "admin":
+                # Fetch user from DB
+                user = await asyncio.to_thread(self.tracer.db_client.get_user_by_username, username)
+                if user and pwd_context.verify(password, user.password_hash):
                     token = secrets.token_hex(16)
                     # In production, store token in DB or memory
                     response = JSONResponse({"success": True, "token": token, "username": username})
