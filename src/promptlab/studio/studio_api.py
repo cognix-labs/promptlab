@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Request, Response, Depends, Cookie
+from fastapi import FastAPI, HTTPException, Request, Response, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from promptlab.db.sql import SQLQuery
@@ -10,11 +10,16 @@ import asyncio
 import json
 import secrets
 from passlib.context import CryptContext
+from jose import JWTError, jwt
+from datetime import datetime, timedelta
 
 class StudioApi:
     def __init__(self, tracer: Tracer):
         self.tracer = tracer
         self.app = FastAPI()
+        self.SECRET_KEY = "your-secret-key"  # Replace with a secure key in production
+        self.ALGORITHM = "HS256"
+        self.ACCESS_TOKEN_EXPIRE_MINUTES = 60
         self.app.add_middleware(
             CORSMiddleware,
             allow_origins=["*"],
@@ -24,12 +29,25 @@ class StudioApi:
         )
         self._setup_routes()
 
-    def _auth_dependency(self, session_token: str = Cookie(default=None)):
-        if not session_token:
+    def _create_access_token(self, data: dict, expires_delta: timedelta = None):
+        to_encode = data.copy()
+        expire = datetime.utcnow() + (expires_delta or timedelta(minutes=self.ACCESS_TOKEN_EXPIRE_MINUTES))
+        to_encode.update({"exp": expire})
+        encoded_jwt = jwt.encode(to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM)
+        return encoded_jwt
+
+    def _auth_dependency(self, authorization: str = Header(None)):
+        if not authorization or not authorization.startswith("Bearer "):
             raise HTTPException(status_code=401, detail="Not authenticated")
-        # In production, validate token from DB or memory
-        # For now, just check presence
-        return True
+        token = authorization.split(" ", 1)[1]
+        try:
+            payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
+            username = payload.get("sub")
+            if username is None:
+                raise HTTPException(status_code=401, detail="Invalid token")
+            return username
+        except JWTError:
+            raise HTTPException(status_code=401, detail="Invalid token")
 
     def _setup_routes(self):
         @self.app.get("/experiments")
@@ -104,24 +122,18 @@ class StudioApi:
                 data = await request.json()
                 username = data.get("username")
                 password = data.get("password")
-                # Fetch user from DB
                 user = await asyncio.to_thread(self.tracer.db_client.get_user_by_username, username)
                 if user and pwd_context.verify(password, user.password_hash):
-                    token = secrets.token_hex(16)
-                    # In production, store token in DB or memory
-                    response = JSONResponse({"success": True, "token": token, "username": username})
-                    response.set_cookie(key="session_token", value=token, httponly=True)
-                    return response
+                    access_token = self._create_access_token(data={"sub": username})
+                    return JSONResponse({"success": True, "access_token": access_token, "token_type": "bearer", "username": username})
                 else:
                     return JSONResponse({"success": False, "message": "Invalid credentials"}, status_code=401)
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
         @self.app.post("/logout")
-        async def logout(response: Response, auth=Depends(self._auth_dependency)):
-            response = JSONResponse({"success": True})
-            response.delete_cookie(key="session_token")
-            return response
+        async def logout(auth=Depends(self._auth_dependency)):
+            return JSONResponse({"success": True})
 
     def get_app(self):
         return self.app

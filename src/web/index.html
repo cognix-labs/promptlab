@@ -522,7 +522,7 @@
     <script>
         // --- AUTH LOGIC ---
         function isLoggedIn() {
-            return !!localStorage.getItem('session_token');
+            return !!localStorage.getItem('access_token');
         }
         function showLogin() {
             document.getElementById('loginContainer').style.display = 'block';
@@ -534,11 +534,8 @@
             document.getElementById('logoutBtn').style.display = 'block';
         }
         function logout() {
-            fetch('/logout', { method: 'POST', credentials: 'include' })
-                .then(() => {
-                    localStorage.removeItem('session_token');
-                    showLogin();
-                });
+            localStorage.removeItem('access_token');
+            showLogin();
         }
         document.getElementById('logoutBtn').addEventListener('click', logout);
 
@@ -555,12 +552,11 @@
                 const resp = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password }),
-                    credentials: 'include'
+                    body: JSON.stringify({ username, password })
                 });
                 const data = await resp.json();
                 if (data.success) {
-                    localStorage.setItem('session_token', data.token);
+                    localStorage.setItem('access_token', data.access_token);
                     showApp();
                     location.reload();
                 } else {
@@ -590,8 +586,10 @@
                 const currentPort = window.location.port || '8000'; // default to 8000 if no port
                 const apiPort = parseInt(currentPort) + 1;
                 const apiUrl = `http://${window.location.hostname}:${apiPort}/experiments`;
-                
-                const response = await fetch(apiUrl, { credentials: 'include' });
+                const token = localStorage.getItem('access_token');
+                const response = await fetch(apiUrl, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
                 experimentsData = await response.json();
                 
                 // Get unique experiments based on experiment_id
@@ -959,8 +957,10 @@
                 const currentPort = window.location.port || '8000'; // default to 8000 if no port
                 const apiPort = parseInt(currentPort) + 1;
                 const apiUrl = `http://${window.location.hostname}:${apiPort}/prompttemplates`;
-
-                const response = await fetch(apiUrl, { credentials: 'include' });
+                const token = localStorage.getItem('access_token');
+                const response = await fetch(apiUrl, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
                 const data = await response.json();
                 
                 const tableBody = document.getElementById('promptTemplateTableBody');
@@ -997,8 +997,10 @@
                 const currentPort = window.location.port || '8000'; // default to 8000 if no port
                 const apiPort = parseInt(currentPort) + 1;
                 const apiUrl = `http://${window.location.hostname}:${apiPort}/datasets`;
-
-                const response = await fetch(apiUrl, { credentials: 'include' });
+                const token = localStorage.getItem('access_token');
+                const response = await fetch(apiUrl, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
                 const data = await response.json();
                 
                 const tableBody = document.getElementById('datasetTableBody');
