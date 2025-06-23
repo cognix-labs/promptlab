@@ -893,7 +893,7 @@
             const path = window.location.pathname;
             if (path === '/datasets') {
                 showTab('datasetContent');
-            } else if (path === '/prompttemplate') {
+            } else if (path === '/prompts') {
                 showTab('promptTemplateContent');
             } else {
                 showTab('experimentContent');
@@ -906,7 +906,7 @@
                 const contentId = menuItem.dataset.content;
                 let url = '/';
                 if (contentId === 'datasetContent') url = '/datasets';
-                else if (contentId === 'promptTemplateContent') url = '/prompttemplate';
+                else if (contentId === 'promptTemplateContent') url = '/prompts';
                 window.history.pushState({}, '', url);
                 handleRoute();
             });

@@ -67,6 +67,3 @@ experiment_config = {
 
 # Start the PromptLab Studio to view results
 asyncio.run(pl.studio.start_async(8000))
-
-## TODO
-# 2. api call only after authentication

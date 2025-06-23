@@ -4,7 +4,7 @@ import pkg_resources
 
 class StudioWebHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
-        if self.path == "/":
+        if self.path == "/" or self.path.startswith("/datasets") or self.path.startswith("/prompts"):
             self.path = pkg_resources.resource_filename("web", "index.html")
             with open(self.path, "rb") as file:
                 self.send_response(200)
