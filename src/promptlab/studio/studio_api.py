@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import FastAPI, HTTPException, Request, Response, Depends, Cookie
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from promptlab.db.sql import SQLQuery
@@ -24,9 +24,16 @@ class StudioApi:
         )
         self._setup_routes()
 
+    def _auth_dependency(self, session_token: str = Cookie(default=None)):
+        if not session_token:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        # In production, validate token from DB or memory
+        # For now, just check presence
+        return True
+
     def _setup_routes(self):
         @self.app.get("/experiments")
-        async def get_experiments():
+        async def get_experiments(auth=Depends(self._auth_dependency)):
             try:
                 experiments = await asyncio.to_thread(self.tracer.db_client.get_experiments)
                 processed_experiments = []
@@ -46,7 +53,7 @@ class StudioApi:
                 raise HTTPException(status_code=500, detail=str(e))
 
         @self.app.get("/prompttemplates")
-        async def get_prompt_templates():
+        async def get_prompt_templates(auth=Depends(self._auth_dependency)):
             try:
                 prompt_templates = await asyncio.to_thread(self.tracer.db_client.get_assets_by_type, AssetType.PROMPT_TEMPLATE.value)
                 processed_templates = []
@@ -70,7 +77,7 @@ class StudioApi:
                 raise HTTPException(status_code=500, detail=str(e))
 
         @self.app.get("/datasets")
-        async def get_datasets():
+        async def get_datasets(auth=Depends(self._auth_dependency)):
             try:
                 datasets = await asyncio.to_thread(self.tracer.db_client.get_assets_by_type, AssetType.DATASET.value)
                 processed_datasets = []
@@ -111,7 +118,7 @@ class StudioApi:
                 raise HTTPException(status_code=500, detail=str(e))
 
         @self.app.post("/logout")
-        async def logout(response: Response):
+        async def logout(response: Response, auth=Depends(self._auth_dependency)):
             response = JSONResponse({"success": True})
             response.delete_cookie(key="session_token")
             return response
