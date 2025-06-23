@@ -313,10 +313,73 @@
             font-size: 0.95em;
 
         }
+
+        /* Login form styles */
+        #loginContainer {
+            display: none;
+            max-width: 400px;
+            margin: 60px auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(44,62,80,0.08);
+            padding: 32px 24px;
+        }
+
+        #loginContainer h2 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        #loginContainer label {
+            display: block;
+            margin-bottom: 6px;
+            color: #34495e;
+        }
+
+        #loginContainer input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 18px;
+        }
+
+        #loginContainer button {
+            width: 100%;
+            padding: 12px;
+            background: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        #loginError {
+            color: #e74c3c;
+            margin-top: 12px;
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div id="loginContainer">
+        <h2>Login to PromptLab</h2>
+        <form id="loginForm">
+            <div>
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Login</button>
+            <div id="loginError"></div>
+        </form>
+    </div>
+    <div class="container" id="mainApp">
         <nav class="left-menu">
             <button class="nav-toggle" title="Toggle menu">☰</button>
             <ul>
@@ -339,6 +402,7 @@
                     </div>
                 </li>
             </ul>
+            <button id="logoutBtn" style="margin:24px 0 0 24px; padding:8px 18px; background:#e74c3c; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:14px; font-weight:500; display:none;">Logout</button>
         </nav>
         
         <main class="content-area">
@@ -440,7 +504,65 @@
     </div>
 
     <script>
-        // Add this at the beginning of your script section
+        // --- AUTH LOGIC ---
+        function isLoggedIn() {
+            return !!localStorage.getItem('session_token');
+        }
+        function showLogin() {
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('mainApp').style.display = 'none';
+        }
+        function showApp() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'flex';
+            document.getElementById('logoutBtn').style.display = 'block';
+        }
+        function logout() {
+            fetch('/logout', { method: 'POST', credentials: 'include' })
+                .then(() => {
+                    localStorage.removeItem('session_token');
+                    showLogin();
+                });
+        }
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.style.display = 'none';
+            try {
+                const currentPort = window.location.port || '8000';
+                const apiPort = parseInt(currentPort) + 1;
+                const apiUrl = `http://${window.location.hostname}:${apiPort}/login`;
+                const resp = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password }),
+                    credentials: 'include'
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    localStorage.setItem('session_token', data.token);
+                    showApp();
+                    location.reload();
+                } else {
+                    errorDiv.textContent = data.message || 'Login failed';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (err) {
+                errorDiv.textContent = 'Login error';
+                errorDiv.style.display = 'block';
+            }
+        });
+        // On load, show login or app
+        if (isLoggedIn()) {
+            showApp();
+        } else {
+            showLogin();
+        }
+
         document.querySelector('.nav-toggle').addEventListener('click', () => {
             document.querySelector('.container').classList.toggle('nav-collapsed');
         });

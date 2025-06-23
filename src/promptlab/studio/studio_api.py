@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from promptlab.db.sql import SQLQuery
 from promptlab.tracer.tracer import Tracer
 from promptlab.types import TracerConfig
@@ -7,6 +8,7 @@ from promptlab._utils import Utils
 from promptlab.enums import AssetType
 import asyncio
 import json
+import secrets
 
 class StudioApi:
     def __init__(self, tracer: Tracer):
@@ -86,6 +88,30 @@ class StudioApi:
                 return {"datasets": processed_datasets}
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.post("/login")
+        async def login(request: Request):
+            try:
+                data = await request.json()
+                username = data.get("username")
+                password = data.get("password")
+                # Demo: static user/pass
+                if username == "admin" and password == "admin":
+                    token = secrets.token_hex(16)
+                    # In production, store token in DB or memory
+                    response = JSONResponse({"success": True, "token": token, "username": username})
+                    response.set_cookie(key="session_token", value=token, httponly=True)
+                    return response
+                else:
+                    return JSONResponse({"success": False, "message": "Invalid credentials"}, status_code=401)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.post("/logout")
+        async def logout(response: Response):
+            response = JSONResponse({"success": True})
+            response.delete_cookie(key="session_token")
+            return response
 
     def get_app(self):
         return self.app
