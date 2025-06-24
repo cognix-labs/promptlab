@@ -151,3 +151,13 @@ class SQLAlchemyClient:
             return user is not None
         finally:
             session.close()
+
+    def delete_user_by_username(self, username: str):
+        session = get_session()
+        try:
+            user = session.query(User).filter_by(username=username).first()
+            if user:
+                session.delete(user)
+                session.commit()
+        finally:
+            session.close()

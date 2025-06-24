@@ -524,6 +524,21 @@
         function isLoggedIn() {
             return !!localStorage.getItem('access_token');
         }
+        function parseJwt(token) {
+            if (!token) return null;
+            const base64Url = token.split('.')[1];
+            if (!base64Url) return null;
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        }
+        function getUserRole() {
+            const token = localStorage.getItem('access_token');
+            const payload = parseJwt(token);
+            return payload && payload.role ? payload.role : null;
+        }
         function showLogin() {
             document.getElementById('loginContainer').style.display = 'block';
             document.getElementById('mainApp').style.display = 'none';
@@ -532,6 +547,27 @@
             document.getElementById('loginContainer').style.display = 'none';
             document.getElementById('mainApp').style.display = 'flex';
             document.getElementById('logoutBtn').style.display = 'block';
+            // Show/hide Admin tab
+            const role = getUserRole();
+            const adminTab = document.getElementById('adminTab');
+            if (role === 'admin') {
+                if (!adminTab) {
+                    const li = document.createElement('li');
+                    li.id = 'adminTab';
+                    li.dataset.content = 'adminContent';
+                    li.innerHTML = `<div class="menu-item"><i class="menu-icon">🔒</i><span>Admin</span></div>`;
+                    document.querySelector('.left-menu ul').appendChild(li);
+                    li.addEventListener('click', () => {
+                        showTab('adminContent');
+                    });
+                } else {
+                    adminTab.style.display = '';
+                }
+                var adminContent = document.getElementById('adminContent');
+                if (adminContent) adminContent.style.display = 'none'; // Hide by default
+            } else if (adminTab) {
+                adminTab.style.display = 'none';
+            }
         }
         function logout() {
             localStorage.removeItem('access_token');
@@ -902,6 +938,7 @@
             // Load data if needed
             if (tab === 'promptTemplateContent') loadPromptTemplates();
             else if (tab === 'datasetContent') loadDatasets();
+            else if (tab === 'adminContent') loadUsers();
         }
         function handleRoute() {
             const path = window.location.pathname;
@@ -1022,6 +1059,109 @@
             } catch (error) {
                 console.error('Error fetching datasets:', error);
             }
+        }
+
+        // --- ADMIN TAB UI ---
+        // Add Admin tab content
+        if (!document.getElementById('adminContent')) {
+            const adminDiv = document.createElement('div');
+            adminDiv.id = 'adminContent';
+            adminDiv.style.display = 'none';
+            adminDiv.innerHTML = `
+                <h1>User Management</h1>
+                <form id="addUserForm" style="margin-bottom:20px;display:flex;gap:10px;align-items:center;">
+                    <input type="text" id="newUsername" placeholder="Username" required style="padding:6px;">
+                    <input type="password" id="newPassword" placeholder="Password" required style="padding:6px;">
+                    <select id="newRole" required style="padding:6px;">
+                        <option value="engineer">Engineer</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <button type="submit">Add User</button>
+                    <span id="addUserError" style="color:#e74c3c;margin-left:10px;"></span>
+                </form>
+                <table id="userTable" style="width:100%;background:#fff;">
+                    <thead><tr><th>Username</th><th>Role</th><th>Created At</th><th>Action</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            `;
+            document.querySelector('.content-area').appendChild(adminDiv);
+        }
+        async function loadUsers() {
+            const currentPort = window.location.port || '8000';
+            const apiPort = parseInt(currentPort) + 1;
+            const apiUrl = `http://${window.location.hostname}:${apiPort}/users`;
+            const token = localStorage.getItem('access_token');
+            const resp = await fetch(apiUrl, { headers: { 'Authorization': 'Bearer ' + token } });
+            const data = await resp.json();
+            const tbody = document.querySelector('#userTable tbody');
+            tbody.innerHTML = '';
+            data.users.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${user.username}</td><td>${user.role}</td><td>${new Date(user.created_at).toLocaleString()}</td><td><button class="removeUserBtn" data-username="${user.username}">Remove</button></td>`;
+                tbody.appendChild(tr);
+            });
+            // Remove user event
+            document.querySelectorAll('.removeUserBtn').forEach(btn => {
+                btn.onclick = async function() {
+                    if (!confirm('Remove user ' + this.dataset.username + '?')) return;
+                    const currentPort = window.location.port || '8000';
+                    const apiPort = parseInt(currentPort) + 1;
+                    const apiUrl = `http://${window.location.hostname}:${apiPort}/users/${this.dataset.username}`;
+                    const token = localStorage.getItem('access_token');
+                    const resp = await fetch(apiUrl, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+                    const result = await resp.json();
+                    if (result.success) loadUsers();
+                    else alert(result.message || 'Failed to remove user');
+                };
+            });
+        }
+        // Add user event
+        document.addEventListener('submit', async function(e) {
+            if (e.target && e.target.id === 'addUserForm') {
+                e.preventDefault();
+                const username = document.getElementById('newUsername').value;
+                const password = document.getElementById('newPassword').value;
+                const role = document.getElementById('newRole').value;
+                const errorSpan = document.getElementById('addUserError');
+                errorSpan.textContent = '';
+                const currentPort = window.location.port || '8000';
+                const apiPort = parseInt(currentPort) + 1;
+                const apiUrl = `http://${window.location.hostname}:${apiPort}/users`;
+                const token = localStorage.getItem('access_token');
+                const resp = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, role })
+                });
+                const result = await resp.json();
+                if (result.success) {
+                    document.getElementById('addUserForm').reset();
+                    loadUsers();
+                } else {
+                    errorSpan.textContent = result.message || 'Failed to add user';
+                }
+            }
+        });
+        // Show admin tab logic in showTab
+        function showTab(tab) {
+            // Remove active from all
+            document.querySelectorAll('.left-menu li').forEach(item => item.classList.remove('active'));
+            // Hide all content
+            document.querySelectorAll('.content-area > div').forEach(content => content.style.display = 'none');
+            // Show selected
+            document.getElementById(tab).style.display = 'block';
+            // Set active nav
+            const navItem = Array.from(document.querySelectorAll('.left-menu li')).find(li => li.dataset.content === tab);
+            if (navItem) navItem.classList.add('active');
+            // Load data if needed
+            if (tab === 'promptTemplateContent') loadPromptTemplates();
+            else if (tab === 'datasetContent') loadDatasets();
+            else if (tab === 'adminContent') loadUsers();
+        }
+        // On load, show correct tab and admin tab if needed
+        handleRoute();
+        if (getUserRole() === 'admin') {
+            showApp();
         }
     </script>
 </body>

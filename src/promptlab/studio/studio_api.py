@@ -36,6 +36,10 @@ class StudioApi:
         encoded_jwt = jwt.encode(to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM)
         return encoded_jwt
 
+    def _get_user_role(self, username):
+        user = self.tracer.db_client.get_user_by_username(username)
+        return user.role if user else None
+
     def _auth_dependency(self, authorization: str = Header(None)):
         if not authorization or not authorization.startswith("Bearer "):
             raise HTTPException(status_code=401, detail="Not authenticated")
@@ -43,11 +47,17 @@ class StudioApi:
         try:
             payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
             username = payload.get("sub")
-            if username is None:
+            role = payload.get("role")
+            if username is None or role is None:
                 raise HTTPException(status_code=401, detail="Invalid token")
-            return username
+            return {"username": username, "role": role}
         except JWTError:
             raise HTTPException(status_code=401, detail="Invalid token")
+
+    def _admin_dependency(self, auth=Depends(_auth_dependency)):
+        if auth["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        return auth
 
     def _setup_routes(self):
         @self.app.get("/experiments")
@@ -124,16 +134,49 @@ class StudioApi:
                 password = data.get("password")
                 user = await asyncio.to_thread(self.tracer.db_client.get_user_by_username, username)
                 if user and pwd_context.verify(password, user.password_hash):
-                    access_token = self._create_access_token(data={"sub": username})
-                    return JSONResponse({"success": True, "access_token": access_token, "token_type": "bearer", "username": username})
+                    access_token = self._create_access_token(data={"sub": username, "role": user.role})
+                    return JSONResponse({"success": True, "access_token": access_token, "token_type": "bearer", "username": username, "role": user.role})
                 else:
                     return JSONResponse({"success": False, "message": "Invalid credentials"}, status_code=401)
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
-        @self.app.post("/logout")
-        async def logout(auth=Depends(self._auth_dependency)):
-            return JSONResponse({"success": True})
+        @self.app.get("/users")
+        async def get_users(auth=Depends(self._admin_dependency)):
+            try:
+                users = await asyncio.to_thread(self.tracer.db_client.get_users)
+                return {"users": [{"id": u.id, "username": u.username, "role": u.role, "created_at": u.created_at.isoformat()} for u in users]}
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.post("/users")
+        async def add_user(request: Request, auth=Depends(self._admin_dependency)):
+            try:
+                data = await request.json()
+                username = data.get("username")
+                password = data.get("password")
+                role = data.get("role")
+                if not username or not password or role not in ("admin", "engineer"):
+                    return JSONResponse({"success": False, "message": "Invalid input"}, status_code=400)
+                pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+                password_hash = pwd_context.hash(password)
+                from promptlab.db.models import User
+                user = User(username=username, password_hash=password_hash, role=role)
+                await asyncio.to_thread(self.tracer.db_client.add_user, user)
+                return JSONResponse({"success": True})
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.delete("/users/{username}")
+        async def delete_user(username: str, auth=Depends(self._admin_dependency)):
+            try:
+                # Don't allow deleting self
+                if username == auth["username"]:
+                    return JSONResponse({"success": False, "message": "Cannot delete yourself"}, status_code=400)
+                await asyncio.to_thread(self.tracer.db_client.delete_user_by_username, username)
+                return JSONResponse({"success": True})
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
 
     def get_app(self):
         return self.app
