@@ -377,6 +377,92 @@
             z-index: 2000;
             display: none;
         }
+
+        /* Profile menu styles */
+        #profileMenu {
+            position: fixed;
+            top: 24px;
+            right: 36px;
+            z-index: 2100;
+        }
+
+        #profileIcon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #2980b9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+        }
+
+        #profileDropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 44px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(44,62,80,0.12);
+            min-width: 180px;
+        }
+
+        .profile-option {
+            padding: 12px 18px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-option:last-child {
+            border-bottom: none;
+        }
+
+        /* Token modal styles */
+        #tokenModal {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(44,62,80,0.7);
+            z-index: 3000;
+        }
+
+        #tokenModal .modal-content {
+            background: #fff;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90vw;
+            margin: 80px auto;
+            padding: 32px 24px;
+            position: relative;
+            box-shadow: 0 4px 32px rgba(44,62,80,0.2);
+        }
+
+        #tokenModal .close-modal {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #34495e;
+            cursor: pointer;
+        }
+
+        #tokenModal pre {
+            white-space: pre-wrap;
+            word-break: break-all;
+            background: #f5f7fa;
+            padding: 16px;
+            border-radius: 6px;
+            font-size: 0.95em;
+            max-height: 300px;
+            overflow: auto;
+        }
     </style>
 </head>
 <body>
@@ -419,7 +505,14 @@
                 </li>
             </ul>
         </nav>
-        <button id="logoutBtn">Logout</button>
+        
+        <div id="profileMenu">
+            <div id="profileIcon" title="Profile"></div>
+            <div id="profileDropdown">
+                <div class="profile-option" id="showTokenOption">Auth Token</div>
+                <div class="profile-option" id="logoutOption">Logout</div>
+            </div>
+        </div>
         
         <main class="content-area">
             <div id="experimentContent">
@@ -519,6 +612,15 @@
         </main>
     </div>
 
+    <!-- JWT Token Modal -->
+    <div id="tokenModal" style="display:none;position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(44,62,80,0.7);z-index:3000;">
+        <div class="modal-content" style="background:#fff;border-radius:8px;max-width:600px;width:90vw;margin:80px auto;padding:32px 24px;position:relative;box-shadow:0 4px 32px rgba(44,62,80,0.2);">
+            <button id="closeTokenModal" class="close-modal" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:2rem;color:#34495e;cursor:pointer;">&times;</button>
+            <h2 style="margin-top:0;">Your Auth Token</h2>
+            <pre id="jwtTokenText" style="white-space:pre-wrap;word-break:break-all;background:#f5f7fa;padding:16px;border-radius:6px;font-size:0.95em;max-height:300px;overflow:auto;"></pre>
+        </div>
+    </div>
+
     <script>
         // --- AUTH LOGIC ---
         function isLoggedIn() {
@@ -546,7 +648,7 @@
         function showApp() {
             document.getElementById('loginContainer').style.display = 'none';
             document.getElementById('mainApp').style.display = 'flex';
-            document.getElementById('logoutBtn').style.display = 'block';
+            // document.getElementById('logoutBtn').style.display = 'block';
             // Show/hide Admin tab
             const role = getUserRole();
             const adminTab = document.getElementById('adminTab');
@@ -573,7 +675,7 @@
             localStorage.removeItem('access_token');
             showLogin();
         }
-        document.getElementById('logoutBtn').addEventListener('click', logout);
+        // document.getElementById('logoutBtn').addEventListener('click', logout);
 
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -1162,6 +1264,66 @@
         handleRoute();
         if (getUserRole() === 'admin') {
             showApp();
+        }
+
+        // --- PROFILE ICON & DROPDOWN ---
+        // Add profile icon and dropdown
+        if (!document.getElementById('profileMenu')) {
+            const profileMenu = document.createElement('div');
+            profileMenu.id = 'profileMenu';
+            profileMenu.style.position = 'fixed';
+            profileMenu.style.top = '24px';
+            profileMenu.style.right = '36px';
+            profileMenu.style.zIndex = '2100';
+            profileMenu.innerHTML = `
+                <div id="profileIcon" style="width:36px;height:36px;border-radius:50%;background:#2980b9;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(44,62,80,0.08);">
+                    <span style="color:#fff;font-size:20px;">👤</span>
+                </div>
+                <div id="profileDropdown" style="display:none;position:absolute;right:0;top:44px;background:#fff;border-radius:8px;box-shadow:0 2px 12px rgba(44,62,80,0.12);min-width:180px;">
+                    <div class="profile-option" id="showTokenOption" style="padding:12px 18px;cursor:pointer;border-bottom:1px solid #eee;">Auth Token</div>
+                    <div class="profile-option" id="logoutOption" style="padding:12px 18px;cursor:pointer;">Logout</div>
+                </div>
+            `;
+            document.body.appendChild(profileMenu);
+        }
+        // Profile icon dropdown logic (safe checks)
+        const profileIcon = document.getElementById('profileIcon');
+        const profileDropdown = document.getElementById('profileDropdown');
+        if (profileIcon && profileDropdown) {
+            profileIcon.onclick = function(e) {
+                e.stopPropagation();
+                profileDropdown.style.display = profileDropdown.style.display === 'block' ? 'none' : 'block';
+            };
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('#profileMenu')) {
+                    profileDropdown.style.display = 'none';
+                }
+            });
+        }
+        // Show JWT token modal (safe checks)
+        const showTokenOption = document.getElementById('showTokenOption');
+        const closeTokenModal = document.getElementById('closeTokenModal');
+        if (showTokenOption && document.getElementById('tokenModal')) {
+            showTokenOption.onclick = function() {
+                const token = localStorage.getItem('access_token') || '';
+                document.getElementById('jwtTokenText').textContent = token;
+                document.getElementById('tokenModal').style.display = 'block';
+                if (profileDropdown) profileDropdown.style.display = 'none';
+            };
+        }
+        if (closeTokenModal) {
+            closeTokenModal.onclick = function() {
+                document.getElementById('tokenModal').style.display = 'none';
+            };
+        }
+        // Logout option (safe check)
+        const logoutOption = document.getElementById('logoutOption');
+        if (logoutOption) {
+            logoutOption.onclick = function() {
+                localStorage.removeItem('access_token');
+                showLogin();
+                if (profileDropdown) profileDropdown.style.display = 'none';
+            };
         }
     </script>
 </body>
