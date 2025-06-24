@@ -54,11 +54,6 @@ class StudioApi:
         except JWTError:
             raise HTTPException(status_code=401, detail="Invalid token")
 
-    def _admin_dependency(self, auth=Depends(_auth_dependency)):
-        if auth["role"] != "admin":
-            raise HTTPException(status_code=403, detail="Admin access required")
-        return auth
-
     def _setup_routes(self):
         @self.app.get("/experiments")
         async def get_experiments(auth=Depends(self._auth_dependency)):
@@ -142,7 +137,9 @@ class StudioApi:
                 raise HTTPException(status_code=500, detail=str(e))
 
         @self.app.get("/users")
-        async def get_users(auth=Depends(self._admin_dependency)):
+        async def get_users(auth=Depends(self._auth_dependency)):
+            if auth["role"] != "admin":
+                raise HTTPException(status_code=403, detail="Admin access required")
             try:
                 users = await asyncio.to_thread(self.tracer.db_client.get_users)
                 return {"users": [{"id": u.id, "username": u.username, "role": u.role, "created_at": u.created_at.isoformat()} for u in users]}
@@ -150,7 +147,10 @@ class StudioApi:
                 raise HTTPException(status_code=500, detail=str(e))
 
         @self.app.post("/users")
-        async def add_user(request: Request, auth=Depends(self._admin_dependency)):
+        async def add_user(request: Request, auth=Depends(self._auth_dependency)):
+            if auth["role"] != "admin":
+                raise HTTPException(status_code=403, detail="Admin access required")
+
             try:
                 data = await request.json()
                 username = data.get("username")
@@ -168,7 +168,9 @@ class StudioApi:
                 raise HTTPException(status_code=500, detail=str(e))
 
         @self.app.delete("/users/{username}")
-        async def delete_user(username: str, auth=Depends(self._admin_dependency)):
+        async def delete_user(username: str, auth=Depends(self._auth_dependency)):
+            if auth["role"] != "admin":
+                raise HTTPException(status_code=403, detail="Admin access required")
             try:
                 # Don't allow deleting self
                 if username == auth["username"]:
