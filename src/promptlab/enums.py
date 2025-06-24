@@ -3,7 +3,7 @@ from enum import Enum
 
 class TracerType(Enum):
     SQLITE = "sqlite"
-    API = "api"  # upcoming
+    API = "api"
 
 
 class AssetType(Enum):
