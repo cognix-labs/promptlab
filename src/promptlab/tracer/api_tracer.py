@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Dict, List
 import json
+import requests
 
 from promptlab._config import ExperimentConfig, TracerConfig
 from promptlab.db.sqlite import SQLAlchemyClient
@@ -50,26 +51,31 @@ class ApiTracer(Tracer):
             "dataset_version": experiment_config.dataset.version,
         }
 
-        exp = ExperimentModel(
-            experiment_id=experiment_id,
-            model=json.dumps(model),
-            asset=json.dumps(asset),
-            created_at=datetime.utcnow(),
-            user_id=1,
-        )
+        experiment_payload = {
+            "experiment_id": experiment_id,
+            "model": json.dumps(model),
+            "asset": json.dumps(asset),
+            "created_at": datetime.utcnow().isoformat(),
+            "user_id": 1,
+        }
 
-        results = [
-            ExperimentResultModel(
-                experiment_id=record["experiment_id"],
-                dataset_record_id=record["dataset_record_id"],
-                inference=record["inference"],
-                prompt_tokens=record["prompt_tokens"],
-                completion_tokens=record["completion_tokens"],
-                latency_ms=record["latency_ms"],
-                evaluation=json.dumps(record["evaluation"])
-                if isinstance(record["evaluation"], (dict, list))
-                else record["evaluation"],
-                created_at=datetime.utcnow(),
-            )
+        results_payload = [
+            {
+                "experiment_id": record["experiment_id"],
+                "dataset_record_id": record["dataset_record_id"],
+                "inference": record["inference"],
+                "prompt_tokens": record["prompt_tokens"],
+                "completion_tokens": record["completion_tokens"],
+                "latency_ms": record["latency_ms"],
+                "evaluation": json.dumps(record["evaluation"]) if isinstance(record["evaluation"], (dict, list)) else record["evaluation"],
+                "created_at": datetime.utcnow().isoformat(),
+            }
             for record in experiment_summary
         ]
+
+        url = f"{self.endpoint.rstrip('/')}/experiments"
+        payload = {"experiment": experiment_payload, "results": results_payload}
+        headers = {"Content-Type": "application/json"}
+        response = requests.post(url, data=json.dumps(payload), headers=headers)
+        if not response.ok:
+            raise Exception(f"Failed to save experiment: {response.status_code} {response.text}")

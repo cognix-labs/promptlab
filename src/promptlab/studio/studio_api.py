@@ -180,5 +180,27 @@ class StudioApi:
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
+        @self.app.post("/experiments")
+        async def post_experiment(request: Request, auth=Depends(self._auth_dependency)):
+            try:
+                data = await request.json()
+                experiment_data = data.get("experiment")
+                results_data = data.get("results")
+                if not experiment_data or not results_data:
+                    return JSONResponse({"success": False, "message": "Missing experiment or results data"}, status_code=400)
+
+                from promptlab.db.models import Experiment, ExperimentResult
+
+                # Set user_id from auth context if not provided
+                experiment_data["user_id"] = experiment_data.get("user_id") or 1
+                experiment = Experiment(**experiment_data)
+                results = [ExperimentResult(**r) for r in results_data]
+
+                await asyncio.to_thread(self.tracer.db_client.add_experiment, experiment)
+                await asyncio.to_thread(self.tracer.db_client.add_experiment_results, results)
+                return JSONResponse({"success": True})
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
     def get_app(self):
         return self.app
