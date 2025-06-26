@@ -1,9 +1,10 @@
 from fastapi import FastAPI, HTTPException, Request, Response, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from promptlab.asset_manager import AssetManager
 from promptlab.sqlite.sql import SQLQuery
 from promptlab.tracer.tracer import Tracer
-from promptlab.types import TracerConfig
+from promptlab.types import Dataset, TracerConfig
 from promptlab._utils import Utils
 from promptlab.enums import AssetType
 import asyncio
@@ -199,6 +200,27 @@ class StudioApi:
                 await asyncio.to_thread(self.tracer.db_client.add_experiment, experiment)
                 await asyncio.to_thread(self.tracer.db_client.add_experiment_results, results)
                 return JSONResponse({"success": True})
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.post("/datasets")
+        async def create_dataset(dataset: Dataset, auth=Depends(self._auth_dependency)):
+            try:             
+                asset_manager = AssetManager(self.tracer)
+                created_dataset = await asyncio.to_thread(asset_manager.create, dataset)
+                
+                return JSONResponse({
+                    "success": True, 
+                    "message": "Dataset created successfully",
+                    "dataset": {
+                        "name": created_dataset.name,
+                        "version": created_dataset.version,
+                        "description": created_dataset.description,
+                        "file_path": created_dataset.file_path
+                    }
+                })
+            except ValueError as e:
+                return JSONResponse({"success": False, "message": str(e)}, status_code=400)
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 

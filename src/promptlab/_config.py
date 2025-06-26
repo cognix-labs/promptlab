@@ -9,7 +9,7 @@ class ConfigValidator:
     @staticmethod
     def validate_tracer_config(tracer_config: TracerConfig):
         ConfigValidator.validate_db_type(tracer_config.type)
-        ConfigValidator.validate_db_file_exists(tracer_config.db_file)
+        # ConfigValidator.validate_db_file_exists(tracer_config.db_file)
 
     @staticmethod
     def validate_experiment_config(experiment_config: ExperimentConfig):

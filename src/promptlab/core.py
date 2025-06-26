@@ -1,4 +1,4 @@
-from promptlab.asset import Asset
+from promptlab.asset_manager import AssetManager
 from promptlab._experiment import Experiment
 from promptlab.studio.studio import Studio
 from promptlab.tracer.tracer_factory import TracerFactory
@@ -13,8 +13,8 @@ class PromptLab:
         logger.info("Tracer config validated successfully.")
 
         self.tracer = TracerFactory.get_tracer(tracer_config)
-        # self.tracer.init_db()
+        logger.info("Tracer initialized successfully.")
 
-        self.asset = Asset(self.tracer)
+        self.asset = AssetManager(self.tracer)
         self.experiment = Experiment(self.tracer)
         self.studio = Studio(self.tracer)

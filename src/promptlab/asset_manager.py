@@ -15,7 +15,7 @@ from promptlab.sqlite.models import Asset as AssetModel
 T = TypeVar("T", Dataset, PromptTemplate)
 
 
-class Asset:
+class AssetManager:
     def __init__(self, tracer: Tracer):
         self.tracer = tracer
         logger.debug("Asset manager initialized.")

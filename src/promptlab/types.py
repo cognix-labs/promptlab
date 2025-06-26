@@ -46,7 +46,7 @@ class Asset:
 
 
 @dataclass
-class Dataset:
+class Dataset(BaseModel):
     name: str
     description: str
     file_path: str
@@ -84,7 +84,9 @@ class ExperimentConfig(BaseModel):
 
 class TracerConfig(BaseModel):
     type: TracerType
-    db_file: str
+    db_file: Optional[str] = None
+    endpoint: Optional[str] = None
+    jwt_token: Optional[str] = None
 
     @field_validator("db_file")
     def validate_db_server(cls, value):
