@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request, Response, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from promptlab.db.sql import SQLQuery
+from promptlab.sqlite.sql import SQLQuery
 from promptlab.tracer.tracer import Tracer
 from promptlab.types import TracerConfig
 from promptlab._utils import Utils
@@ -58,7 +58,7 @@ class StudioApi:
         @self.app.get("/experiments")
         async def get_experiments(auth=Depends(self._auth_dependency)):
             try:
-                experiments = await asyncio.to_thread(self.tracer.db_client.get_experiments)
+                experiments = await asyncio.to_thread(self.tracer.get_experiments)
                 processed_experiments = []
                 for experiment in experiments:
                     system_prompt, user_prompt, _ = Utils.split_prompt_template(experiment.asset_binary)
@@ -78,21 +78,21 @@ class StudioApi:
         @self.app.get("/prompttemplates")
         async def get_prompt_templates(auth=Depends(self._auth_dependency)):
             try:
-                prompt_templates = await asyncio.to_thread(self.tracer.db_client.get_assets_by_type, AssetType.PROMPT_TEMPLATE.value)
+                prompt_templates = await asyncio.to_thread(self.tracer.get_assets_by_type, AssetType.PROMPT_TEMPLATE.value)
                 processed_templates = []
                 for template in prompt_templates:
-                    system_prompt, user_prompt, _ = Utils.split_prompt_template(template['asset_binary'])
+                    system_prompt, user_prompt, _ = Utils.split_prompt_template(template.asset_binary)
                     experiment_data = {
-                        "asset_name": template['asset_name'],
-                        "asset_description": template['asset_description'],
-                        "asset_version": template['asset_version'],
-                        "asset_type": template['asset_type'],
-                        "created_at": template['created_at'],
+                        "asset_name": template.asset_name,
+                        "asset_description": template.asset_description,
+                        "asset_version": template.asset_version,
+                        "asset_type": template.asset_type,
+                        "created_at": template.created_at,
                         "system_prompt_template": system_prompt,
                         "user_prompt_template": user_prompt,
-                        "is_deployed": template['is_deployed'],
-                        "deployment_time": template['deployment_time'],
-                        "user_id": template['username'],
+                        "is_deployed": template.is_deployed,
+                        "deployment_time": template.deployment_time,
+                        "user_id": template.user.username,
                     }
                     processed_templates.append(experiment_data)
                 return {"prompt_templates": processed_templates}
@@ -102,18 +102,18 @@ class StudioApi:
         @self.app.get("/datasets")
         async def get_datasets(auth=Depends(self._auth_dependency)):
             try:
-                datasets = await asyncio.to_thread(self.tracer.db_client.get_assets_by_type, AssetType.DATASET.value)
+                datasets = await asyncio.to_thread(self.tracer.get_assets_by_type, AssetType.DATASET.value)
                 processed_datasets = []
                 for dataset in datasets:
-                    file_path = json.loads(dataset['asset_binary'])["file_path"]
+                    file_path = json.loads(dataset.asset_binary)["file_path"]
                     data = {
-                        "asset_name": dataset['asset_name'],
-                        "asset_description": dataset['asset_description'],
-                        "asset_version": dataset['asset_version'],
-                        "asset_type": dataset['asset_type'],
-                        "created_at": dataset['created_at'],
+                        "asset_name": dataset.asset_name,
+                        "asset_description": dataset.asset_description,
+                        "asset_version": dataset.asset_version,
+                        "asset_type": dataset.asset_type,
+                        "created_at": dataset.created_at,
                         "file_path": file_path,
-                        "user_id": dataset['username'],
+                        "user_id": dataset.user.username,
                     }
                     processed_datasets.append(data)
                 return {"datasets": processed_datasets}
@@ -127,7 +127,7 @@ class StudioApi:
                 data = await request.json()
                 username = data.get("username")
                 password = data.get("password")
-                user = await asyncio.to_thread(self.tracer.db_client.get_user_by_username, username)
+                user = await asyncio.to_thread(self.tracer.get_user_by_username, username)
                 if user and pwd_context.verify(password, user.password_hash):
                     access_token = self._create_access_token(data={"sub": username, "role": user.role})
                     return JSONResponse({"success": True, "access_token": access_token, "token_type": "bearer", "username": username, "role": user.role})
@@ -141,7 +141,7 @@ class StudioApi:
             if auth["role"] != "admin":
                 raise HTTPException(status_code=403, detail="Admin access required")
             try:
-                users = await asyncio.to_thread(self.tracer.db_client.get_users)
+                users = await asyncio.to_thread(self.tracer.get_users)
                 return {"users": [{"id": u.id, "username": u.username, "role": u.role, "created_at": u.created_at.isoformat()} for u in users]}
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
@@ -160,9 +160,9 @@ class StudioApi:
                     return JSONResponse({"success": False, "message": "Invalid input"}, status_code=400)
                 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
                 password_hash = pwd_context.hash(password)
-                from promptlab.db.models import User
+                from promptlab.sqlite.models import User
                 user = User(username=username, password_hash=password_hash, role=role)
-                await asyncio.to_thread(self.tracer.db_client.add_user, user)
+                await asyncio.to_thread(self.tracer.create_user, user)
                 return JSONResponse({"success": True})
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
@@ -175,7 +175,7 @@ class StudioApi:
                 # Don't allow deleting self
                 if username == auth["username"]:
                     return JSONResponse({"success": False, "message": "Cannot delete yourself"}, status_code=400)
-                await asyncio.to_thread(self.tracer.db_client.delete_user_by_username, username)
+                await asyncio.to_thread(self.tracer.deactivate_user_by_username, username)
                 return JSONResponse({"success": True})
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
@@ -189,7 +189,7 @@ class StudioApi:
                 if not experiment_data or not results_data:
                     return JSONResponse({"success": False, "message": "Missing experiment or results data"}, status_code=400)
 
-                from promptlab.db.models import Experiment, ExperimentResult
+                from promptlab.sqlite.models import Experiment, ExperimentResult
 
                 # Set user_id from auth context if not provided
                 experiment_data["user_id"] = experiment_data.get("user_id") or 1

@@ -5,7 +5,7 @@ import uuid
 import asyncio
 
 from promptlab._config import ConfigValidator, ExperimentConfig
-from promptlab.db.sql import SQLQuery
+from promptlab.sqlite.sql import SQLQuery
 from promptlab.evaluator.evaluator_factory import EvaluatorFactory
 from promptlab.tracer.tracer import Tracer
 from promptlab._utils import Utils
@@ -41,7 +41,7 @@ class Experiment:
             experiment_config,
         )
 
-        self.tracer.trace(experiment_config, exp_summary)
+        self.tracer.trace_experiment(experiment_config, exp_summary)
         logger.info(
             "Experiment run complete and traced. Experiment Name: %s",
             experiment_config.name,
@@ -68,7 +68,7 @@ class Experiment:
             experiment_config,
         )
 
-        self.tracer.trace(experiment_config, exp_summary)
+        self.tracer.trace_experiment(experiment_config, exp_summary)
         logger.info(
             "Async experiment run complete and traced. Experiment Name: %s",
             experiment_config.name,
@@ -87,12 +87,9 @@ class Experiment:
         # if experiment_config.prompt_template is None:
         pt_asset_binary = None
         if experiment_config.prompt_template:
-            prompt_template = self.tracer.db_client.get_asset(
-                # SQLQuery.SELECT_ASSET_QUERY,
-                # (
+            prompt_template = self.tracer.get_asset(
                     experiment_config.prompt_template.name,
                     experiment_config.prompt_template.version,
-                # ),
             )
             pt_asset_binary = prompt_template.asset_binary
 
@@ -100,12 +97,9 @@ class Experiment:
             Utils.split_prompt_template(pt_asset_binary)
         )
 
-        eval_dataset_path = self.tracer.db_client.get_asset(
-            # SQLQuery.SELECT_DATASET_FILE_PATH_QUERY,
-            # (
+        eval_dataset_path = self.tracer.get_asset(
                 experiment_config.dataset.name, 
                 experiment_config.dataset.version
-            # ),
         )
         eval_dataset = Utils.load_dataset( json.loads(eval_dataset_path.asset_binary)['file_path'])
 

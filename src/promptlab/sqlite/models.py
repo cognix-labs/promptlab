@@ -14,6 +14,7 @@ class Asset(Base):
     asset_binary = Column(Text)  # Store as JSON/text
     is_deployed = Column(Boolean, default=False)
     deployment_time = Column(DateTime)
+    status = Column(Integer, default=1)  # 1 - 'active', 0 - 'inactive'
     created_at = Column(DateTime, default=datetime.utcnow)
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship('User', back_populates='assets')
@@ -23,6 +24,7 @@ class Experiment(Base):
     experiment_id = Column(String, primary_key=True)
     model = Column(Text)  # Store as JSON/text
     asset = Column(Text)  # Store as JSON/text
+    status = Column(Integer, default=1)  # 1 - 'active', 0 - 'inactive'
     created_at = Column(DateTime, default=datetime.utcnow)
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship('User', back_populates='experiments')
@@ -47,6 +49,7 @@ class User(Base):
     username = Column(String, unique=True, nullable=False)
     password_hash = Column(String, nullable=False)
     role = Column(String, nullable=False)  # 'admin' or 'engineer'
+    status = Column(Integer, default=1)  # 1 - 'active', 0 - 'inactive'
     created_at = Column(DateTime, default=datetime.utcnow)
     assets = relationship('Asset', back_populates='user')
     experiments = relationship('Experiment', back_populates='user')

@@ -5,13 +5,12 @@ import re
 import os
 
 from promptlab.enums import AssetType
-from promptlab.db.sql import SQLQuery
+from promptlab.sqlite.sql import SQLQuery
 from promptlab.tracer.tracer import Tracer
 from promptlab.types import Dataset, PromptTemplate
 from promptlab._utils import Utils
 from promptlab._logging import logger
-from promptlab.db.sqlite import SQLAlchemyClient
-from promptlab.db.models import Asset as AssetModel
+from promptlab.sqlite.models import Asset as AssetModel
 
 T = TypeVar("T", Dataset, PromptTemplate)
 
@@ -19,7 +18,6 @@ T = TypeVar("T", Dataset, PromptTemplate)
 class Asset:
     def __init__(self, tracer: Tracer):
         self.tracer = tracer
-        # self.db_client = SQLAlchemyClient(tracer.db_client)
         logger.debug("Asset manager initialized.")
 
     @overload
@@ -34,8 +32,8 @@ class Asset:
     @overload
     def update(self, asset: Dataset) -> Dataset: ...
 
-    @overload
-    def deploy(self, asset: PromptTemplate, target_dir: str) -> None: ...
+    # @overload
+    # def deploy(self, asset: PromptTemplate, target_dir: str) -> None: ...
 
     @staticmethod
     def is_valid_name(name: str) -> bool:
@@ -76,6 +74,7 @@ class Asset:
     def _create_dataset(self, dataset: Dataset) -> Dataset:
         logger.debug(f"Creating dataset asset: {dataset.name}")
         dataset.version = 0
+        dataset.user_id = 1
         binary = {"file_path": dataset.file_path}
         asset = AssetModel(
             asset_name=dataset.name,
@@ -85,13 +84,16 @@ class Asset:
             asset_binary=json.dumps(binary),
             created_at=datetime.utcnow(),
             user_id=dataset.user_id
-        )
-        self.tracer.db_client.add_asset(asset)
+        )        
+        self.tracer.create_asset(asset)
         return dataset
 
     def _update_dataset(self, dataset: Dataset) -> Dataset:
         logger.debug(f"Updating dataset asset: {dataset.name}")
-        prev = self.tracer.db_client.get_latest_asset(dataset.name)
+
+        dataset.user_id = 1
+
+        prev = self.tracer.get_latest_asset(dataset.name)
         dataset.description = (
             prev.asset_description if dataset.description is None else dataset.description
         )
@@ -110,12 +112,12 @@ class Asset:
             created_at=datetime.utcnow(),
             user_id=dataset.user_id
         )
-        self.tracer.db_client.add_asset(asset)
-        return dataset
+        return self.tracer.create_asset(asset)
 
     def _create_prompt_template(self, template: PromptTemplate) -> PromptTemplate:
         logger.debug(f"Creating prompt template asset: {template.name}")
         template.version = 0
+        template.user_id = 1
         binary = f"""
             <<system>>
                 {template.system_prompt}
@@ -131,12 +133,14 @@ class Asset:
             created_at=datetime.utcnow(),
             user_id=template.user_id
         )
-        self.tracer.db_client.add_asset(asset)
+        self.tracer.create_asset(asset)
         return template
 
     def _update_prompt_template(self, template: PromptTemplate) -> PromptTemplate:
         logger.debug(f"Updating prompt template asset: {template.name}")
-        prev = self.tracer.db_client.get_latest_asset(template.name)
+
+        template.user_id = 1
+        prev = self.tracer.get_latest_asset(template.name)
         system_prompt, user_prompt, _ = Utils.split_prompt_template(prev.asset_binary)
         template.description = (
             prev.asset_description if template.description is None else template.description
@@ -163,12 +167,12 @@ class Asset:
             created_at=datetime.utcnow(),
             user_id=template.user_id
         )
-        self.tracer.db_client.add_asset(asset)
+        self.tracer.create_asset(asset)
         return template
 
     def get(self, asset_name: str, version: int) -> Any:
         logger.info(f"Fetching asset: {asset_name}, version: {version}")
-        asset = self.tracer.db_client.get_asset(asset_name, version)
+        asset = self.tracer.get_asset(asset_name, version)
         asset_type = asset.asset_type
         if asset_type == AssetType.DATASET.value:
             binary = json.loads(asset.asset_binary)
@@ -189,23 +193,23 @@ class Asset:
                 user_prompt=user_prompt,
             )
 
-    def deploy(self, asset: T, target_dir: str) -> T:
-        logger.info(
-            f"Deploying asset: {getattr(asset, 'name', str(asset))} to {target_dir}"
-        )
-        if isinstance(asset, PromptTemplate):
-            return self._handle_prompt_template_deploy(asset, target_dir)
-        else:
-            raise TypeError(f"Unsupported asset type: {type(asset)}")
+    # def deploy(self, asset: T, target_dir: str) -> T:
+    #     logger.info(
+    #         f"Deploying asset: {getattr(asset, 'name', str(asset))} to {target_dir}"
+    #     )
+    #     if isinstance(asset, PromptTemplate):
+    #         return self._handle_prompt_template_deploy(asset, target_dir)
+    #     else:
+    #         raise TypeError(f"Unsupported asset type: {type(asset)}")
 
-    def _handle_prompt_template_deploy(self, template: PromptTemplate, target_dir: str):
-        logger.debug(
-            f"Handling prompt template deploy: {template.name} to {target_dir}"
-        )
-        asset = self.tracer.db_client.get_asset(template.name, template.version)
-        prompt_template_name = asset.asset_name
-        prompt_template_binary = asset.asset_binary
-        prompt_template_path = os.path.join(target_dir, prompt_template_name)
-        with open(prompt_template_path, "w", encoding="utf-8") as file:
-            file.write(prompt_template_binary)
-        self.tracer.db_client.deploy_asset(template.name, template.version)
+    # def _handle_prompt_template_deploy(self, template: PromptTemplate, target_dir: str):
+    #     logger.debug(
+    #         f"Handling prompt template deploy: {template.name} to {target_dir}"
+    #     )
+    #     asset = self.tracer.db_client.get_asset(template.name, template.version)
+    #     prompt_template_name = asset.asset_name
+    #     prompt_template_binary = asset.asset_binary
+    #     prompt_template_path = os.path.join(target_dir, prompt_template_name)
+    #     with open(prompt_template_path, "w", encoding="utf-8") as file:
+    #         file.write(prompt_template_binary)
+    #     self.tracer.db_client.deploy_asset(template.name, template.version)

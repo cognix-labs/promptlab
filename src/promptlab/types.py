@@ -37,6 +37,15 @@ class EmbeddingModel(Protocol):
 
 
 @dataclass
+class Asset:
+    name: str
+    description: str
+    file_path: str
+    version: int = 0
+    user_id: int = None
+
+
+@dataclass
 class Dataset:
     name: str
     description: str

@@ -1,0 +1,194 @@
+from datetime import datetime
+from typing import Any, Dict, List
+import json
+
+from promptlab._config import ExperimentConfig, TracerConfig
+from promptlab.sqlite.session import get_session, init_engine
+from promptlab.enums import AssetType
+from promptlab.sqlite.sql import SQLQuery
+from promptlab.tracer.tracer import Tracer
+from promptlab.sqlite.models import Experiment as ExperimentModel, ExperimentResult as ExperimentResultModel, User
+from promptlab.types import Asset, Dataset, PromptTemplate
+from promptlab.sqlite.models import Asset as AssetModel
+from sqlalchemy import text
+from sqlalchemy.orm import joinedload
+
+class LocalTracer(Tracer):
+    def __init__(self, tracer_config: TracerConfig):
+        db_url = f"sqlite:///{tracer_config.db_file}"
+        init_engine(db_url)
+
+    def create_asset(self, asset: Asset):
+        session = get_session()
+        try:
+            session.add(asset)
+            session.commit()
+        except Exception as e:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+    def trace_experiment(
+        self, experiment_config: ExperimentConfig, experiment_summary: List[Dict]
+    ) -> None:
+        session = get_session()
+        try:
+            timestamp = datetime.now().isoformat()
+            experiment_id = experiment_summary[0]["experiment_id"]
+
+            # Convert model_config objects to dict for JSON serialization
+            inference_model_config = (
+                vars(experiment_config.inference_model.model_config)
+                if experiment_config.inference_model
+                else None
+            )
+            embedding_model_config = (
+                vars(experiment_config.embedding_model.model_config)
+                if experiment_config.embedding_model
+                else None
+            )
+
+            model = {
+                "inference_model_config": inference_model_config,
+                "embedding_model_config": embedding_model_config,
+            }
+
+            asset = {
+                "prompt_template_name": experiment_config.prompt_template.name
+                if experiment_config.prompt_template
+                else None,
+                "prompt_template_version": experiment_config.prompt_template.version
+                if experiment_config.prompt_template
+                else None,
+                "dataset_name": experiment_config.dataset.name,
+                "dataset_version": experiment_config.dataset.version,
+            }
+
+            exp = ExperimentModel(
+                experiment_id=experiment_id,
+                model=json.dumps(model),
+                asset=json.dumps(asset),
+                created_at=datetime.utcnow(),
+                user_id=1,
+            )
+            session.add(exp)
+            results = [
+                ExperimentResultModel(
+                    experiment_id=record["experiment_id"],
+                    dataset_record_id=record["dataset_record_id"],
+                    inference=record["inference"],
+                    prompt_tokens=record["prompt_tokens"],
+                    completion_tokens=record["completion_tokens"],
+                    latency_ms=record["latency_ms"],
+                    evaluation=json.dumps(record["evaluation"])
+                    if isinstance(record["evaluation"], (dict, list))
+                    else record["evaluation"],
+                    created_at=datetime.utcnow(),
+                )
+                for record in experiment_summary
+            ]
+            session.add_all(results)
+            session.commit()
+        except Exception as e:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+    def get_asset(self, asset_name: str, asset_version: int) -> Asset:
+        session = get_session()
+        try:
+            asset = session.query(AssetModel).filter_by(
+                asset_name=asset_name, asset_version=asset_version).first()
+            if not asset:
+                raise ValueError(f"Asset {asset_name} with version {asset_version} not found.")
+            return asset
+        except Exception as e:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+    def get_assets_by_type(self, asset_type: str) -> List[Any]:
+        session = get_session()
+        try:
+            if asset_type not in AssetType._value2member_map_:
+                raise ValueError(f"Invalid asset type: {asset_type}")
+            assets = session.query(AssetModel).options(joinedload(AssetModel.user)).filter(AssetModel.asset_type == asset_type).all()
+            return assets
+        except Exception as e:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+    
+    def get_latest_asset(self, asset_name: str) -> Asset:
+        session = get_session()
+        try:
+            asset = session.query(AssetModel).filter_by(asset_name=asset_name).order_by(
+                AssetModel.asset_version.desc()).first()
+            return asset
+        except Exception as e:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+    def get_user_by_username(self, username: str) -> User:
+        session = get_session()
+        try:
+            user = session.query(User).filter_by(username=username).first()
+            if not user:
+                raise ValueError(f"User {username} not found.")
+            return user
+        except Exception as e:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+    def get_experiments(self):
+        session = get_session()
+        try:
+            return session.execute(text(SQLQuery.SELECT_EXPERIMENTS_QUERY)).mappings().all()
+        except Exception as e:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+    def get_users(self):
+        session = get_session()
+        try:
+            return session.query(User).filter(User.status == 1).all()
+        except Exception as e:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+    def create_user(self, user: User):
+        session = get_session()
+        try:
+            session.add(user)
+            session.commit()
+        except Exception as e:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+    def deactivate_user_by_username(self, username: str):
+        session = get_session()
+        try:
+            user = session.query(User).filter_by(username=username).first()
+            if not user:
+                raise ValueError(f"User {username} not found.")
+            user.status = 0  # Deactivate user
+            session.commit()
+        except Exception as e:
+            session.rollback()
+            raise
+        finally:
+            session.close()

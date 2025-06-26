@@ -4,7 +4,7 @@ from promptlab.model.ollama import Ollama, Ollama_Embedding
 from promptlab.types import ModelConfig, PromptTemplate, Dataset
 
 # Initialize PromptLab with SQLite storage
-tracer_config = {"type": "sqlite", "db_file": "./promptlab1.db"}
+tracer_config = {"type": "local", "db_file": "./promptlab3.db"}
 pl = PromptLab(tracer_config)
 
 # Create a prompt template
@@ -32,7 +32,7 @@ dataset = Dataset(
 )
 # ds = pl.asset.create(dataset)
 
-# Retrieve assets
+# # Retrieve assets
 pt = pl.asset.get(asset_name=prompt_name, version=0)
 ds = pl.asset.get(asset_name=dataset_name, version=0)
 
@@ -44,7 +44,7 @@ embedding_model = Ollama_Embedding(
 
 # Run an experiment
 experiment_config = {
-    "name": "demo_experimet1230981",
+    "name": "demo_experimet123098145",
     "inference_model": inference_model,
     "embedding_model": embedding_model,
     "prompt_template": pt,
@@ -63,7 +63,8 @@ experiment_config = {
         },
     ],
 }
-# pl.experiment.run(experiment_config)
+# # pl.experiment.run(experiment_config)
+# asyncio.run(pl.experiment.run_async(experiment_config))
 
 # Start the PromptLab Studio to view results
 asyncio.run(pl.studio.start_async(8000))
