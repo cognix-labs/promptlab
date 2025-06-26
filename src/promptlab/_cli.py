@@ -1,3 +1,4 @@
+import asyncio
 import click
 from promptlab.core import PromptLab
 
@@ -24,9 +25,9 @@ def start(db, port):
 
     click.echo(f"Starting studio with database: {db}")
 
-    tracer_config = {"type": "sqlite", "db_file": db}
+    tracer_config = {"type": "local", "db_file": db}
     pl = PromptLab(tracer_config)
-    pl.studio.start(8000)
+    asyncio.run(pl.studio.start_async(port))
 
     click.echo(f"Running on port: {port}")
 
