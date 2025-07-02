@@ -5,7 +5,7 @@ import requests
 
 from promptlab._config import ExperimentConfig, TracerConfig
 from promptlab.tracer.tracer import Tracer
-from promptlab.sqlite.models import Experiment as ExperimentModel, ExperimentResult as ExperimentResultModel
+from promptlab.sqlite.models import Experiment as ExperimentModel, ExperimentResult as ExperimentResultModel, Asset as AssetModel
 from promptlab.types import Dataset, PromptTemplate
 
 
@@ -33,8 +33,52 @@ class ApiTracer(Tracer):
     def trace_experiment(self, asset: Dataset):
         raise NotImplementedError("trace_experiment method not implemented")
 
-    def get_asset(self, asset_name: str, asset_version: int):
-        raise NotImplementedError("get_asset method not implemented")
+    def get_asset(self, asset_name: str, asset_version: int) -> AssetModel:
+        headers = {}
+        if self.jwt_token:
+            headers["Authorization"] = f"Bearer {self.jwt_token}"
+            
+        params = {
+            "asset_name": asset_name,
+            "asset_version": asset_version
+        }
+        
+        response = requests.get(f"{self.endpoint}/assets", params=params, headers=headers)
+        response.raise_for_status()
+        
+        asset_data = response.json()
+        if asset_data and "asset" in asset_data:
+            # Convert the JSON response back to AssetModel
+            asset_info = asset_data["asset"]
+            
+            # Handle datetime fields
+            created_at = None
+            if asset_info.get("created_at"):
+                try:
+                    created_at = datetime.fromisoformat(asset_info["created_at"].replace('Z', '+00:00'))
+                except:
+                    created_at = None
+            
+            deployment_time = None
+            if asset_info.get("deployment_time"):
+                try:
+                    deployment_time = datetime.fromisoformat(asset_info["deployment_time"].replace('Z', '+00:00'))
+                except:
+                    deployment_time = None
+            
+            return AssetModel(
+                asset_name=asset_info["asset_name"],
+                asset_version=asset_info["asset_version"],
+                asset_description=asset_info.get("asset_description"),
+                asset_type=asset_info["asset_type"],
+                asset_binary=asset_info.get("asset_binary"),
+                created_at=created_at,
+                user_id=asset_info.get("user_id"),
+                is_deployed=asset_info.get("is_deployed"),
+                deployment_time=deployment_time
+            )
+        else:
+            raise ValueError(f"Asset {asset_name} with version {asset_version} not found.")
 
     def get_assets_by_type(self, asset_type: str):
         raise NotImplementedError("get_assets_by_type method not implemented")

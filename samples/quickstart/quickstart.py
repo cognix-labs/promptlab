@@ -20,7 +20,7 @@ prompt_template = PromptTemplate(
     system_prompt=system_prompt,
     user_prompt=user_prompt
 )
-pt = pl.asset.create(prompt_template)
+# pt = pl.asset.create(prompt_template)
 
 # # Create a dataset
 # dataset_name = "essay_sample2s11yy1"
@@ -32,7 +32,7 @@ pt = pl.asset.create(prompt_template)
 # ds = pl.asset.create(dataset)
 
 # # # Retrieve assets
-pt = pl.asset.get(asset_name=prompt_name, version=0)
+# pt = pl.asset.get(asset_name=prompt_name, version=0)
 # ds = pl.asset.get(asset_name=dataset_name, version=0)
 
 # # model instnace

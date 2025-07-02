@@ -121,6 +121,31 @@ class StudioApi:
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
+        @self.app.get("/assets")
+        async def get_asset(asset_name: str, asset_version: int, auth=Depends(self._auth_dependency)):
+            try:
+                asset = await asyncio.to_thread(self.tracer.get_asset, asset_name, asset_version)
+                if not asset:
+                    raise HTTPException(status_code=404, detail=f"Asset {asset_name} with version {asset_version} not found")
+                
+                asset_data = {
+                    "asset_name": asset.asset_name,
+                    "asset_version": asset.asset_version,
+                    "asset_description": asset.asset_description,
+                    "asset_type": asset.asset_type,
+                    "asset_binary": asset.asset_binary,
+                    "created_at": asset.created_at.isoformat() if asset.created_at else None,
+                    "user_id": asset.user_id,
+                    "is_deployed": asset.is_deployed,
+                    "deployment_time": asset.deployment_time.isoformat() if asset.deployment_time else None
+                }
+                
+                return {"success": True, "asset": asset_data}
+            except ValueError as e:
+                raise HTTPException(status_code=404, detail=str(e))
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
         @self.app.post("/login")
         async def login(request: Request):
             try:
