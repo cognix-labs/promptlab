@@ -109,7 +109,7 @@ class AssetService:
 
     def _create_prompt_template(self, template: PromptTemplate) -> PromptTemplate:
         logger.debug(f"Creating prompt template asset: {template.name}")
-        self.tracer.create_asset(template)
+        self.tracer.create_prompttemplate(template)
         logger.debug(f"Prompt template asset created: {template.name}")
 
         return template
