@@ -1,5 +1,5 @@
 from typing import Any, overload, TypeVar
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 import re
 import os
@@ -44,6 +44,7 @@ class AssetService:
 
     def create(self, asset: T) -> T:
         logger.info(f"Creating asset: {getattr(asset, 'name', str(asset))}")
+
         if not AssetService.is_valid_name(asset.name):
             logger.warning(f"Invalid asset name: {asset.name}")
             raise ValueError(
@@ -73,6 +74,7 @@ class AssetService:
 
     def _create_dataset(self, dataset: Dataset) -> Dataset:
         logger.debug(f"Creating dataset asset: {dataset.name}")
+
         dataset.version = 0
         binary = {"file_path": dataset.file_path}
         asset = AssetModel(
@@ -81,15 +83,17 @@ class AssetService:
             asset_description=dataset.description,
             asset_type=AssetType.DATASET.value,
             asset_binary=json.dumps(binary),
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(timezone.utc),
             user_id=self.tracer.me().id
         )        
+
         self.tracer.create_asset(asset)
+        logger.debug(f"Dataset asset created: {dataset.name}")
+
         return dataset
 
     def _update_dataset(self, dataset: Dataset) -> Dataset:
         logger.debug(f"Updating dataset asset: {dataset.name}")
-
 
         prev = self.tracer.get_latest_asset(dataset.name)
         dataset.description = (
@@ -107,13 +111,18 @@ class AssetService:
             asset_description=dataset.description,
             asset_type=AssetType.DATASET.value,
             asset_binary=binary,
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(timezone.utc),
             user_id=self.tracer.me().id
         )
-        return self.tracer.create_asset(asset)
+
+        self.tracer.create_asset(asset)
+        logger.debug(f"Dataset asset created: {dataset.name}")
+
+        return dataset
 
     def _create_prompt_template(self, template: PromptTemplate) -> PromptTemplate:
         logger.debug(f"Creating prompt template asset: {template.name}")
+
         template.version = 0
         binary = f"""
             <<system>>
@@ -127,10 +136,13 @@ class AssetService:
             asset_description=template.description,
             asset_type=AssetType.PROMPT_TEMPLATE.value,
             asset_binary=binary,
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(timezone.utc),
             user_id=self.tracer.me().id
         )
+
         self.tracer.create_asset(asset)
+        logger.debug(f"Prompt template asset created: {template.name}")
+
         return template
 
     def _update_prompt_template(self, template: PromptTemplate) -> PromptTemplate:
@@ -160,16 +172,21 @@ class AssetService:
             asset_description=template.description,
             asset_type=AssetType.PROMPT_TEMPLATE.value,
             asset_binary=binary,
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(timezone.utc),
             user_id=self.tracer.me().id
         )
+
         self.tracer.create_asset(asset)
+        logger.debug(f"Prompt template asset updated: {template.name}")
+
         return template
 
     def get(self, asset_name: str, version: int) -> Any:
         logger.info(f"Fetching asset: {asset_name}, version: {version}")
+
         asset = self.tracer.get_asset(asset_name, version)
         asset_type = asset.asset_type
+
         if asset_type == AssetType.DATASET.value:
             binary = json.loads(asset.asset_binary)
             file_path = binary["file_path"]
