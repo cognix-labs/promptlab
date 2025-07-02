@@ -36,12 +36,12 @@ class EmbeddingModel(Protocol):
     def __call__(self, text: str) -> List[float]: ...
 
 
-@dataclass
-class Asset:
-    name: str
-    description: str
-    file_path: str
-    version: int = 0
+# @dataclass
+# class Asset:
+#     name: str
+#     description: str
+#     file_path: str
+#     version: int = 0
 
 
 class Dataset(BaseModel):
@@ -49,6 +49,7 @@ class Dataset(BaseModel):
     description: str
     file_path: str
     version: int = 0
+    user: str = 'admin'
 
 
 class PromptTemplate(BaseModel):
@@ -57,6 +58,7 @@ class PromptTemplate(BaseModel):
     system_prompt: str
     user_prompt: str
     version: int = 0
+    user: str = 'admin'
 
 
 class EvaluationConfig(BaseModel):

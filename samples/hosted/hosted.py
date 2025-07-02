@@ -4,7 +4,7 @@ from promptlab.model.ollama import Ollama, Ollama_Embedding
 from promptlab.types import ModelConfig, PromptTemplate, Dataset
 
 # Initialize PromptLab with SQLite storage
-tracer_config = {"type": "api", "endpoint": "http://localhost:8001"}
+tracer_config = {"type": "api", "endpoint": "http://localhost:8001", "jwt_token": None}
 pl = PromptLab(tracer_config)
 
 # # Create a prompt template
@@ -24,11 +24,11 @@ pl = PromptLab(tracer_config)
 # pt = pl.asset.create(prompt_template)
 
 # Create a dataset
-dataset_name = "essay_samples"
+dataset_name = "essay_samples222"
 dataset_description = "dataset for evaluating the essay_feedback prompt"
 dataset_file_path = "./samples/data/essay_feedback.jsonl"
 dataset = Dataset(
-    name=dataset_name, description=dataset_description, file_path=dataset_file_path, user_id=1
+    name=dataset_name, description=dataset_description, file_path=dataset_file_path
 )
 ds = pl.asset.create(dataset)
 

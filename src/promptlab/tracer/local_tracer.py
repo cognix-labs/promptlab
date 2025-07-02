@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 import json
 
@@ -8,7 +8,7 @@ from promptlab.enums import AssetType
 from promptlab.sqlite.sql import SQLQuery
 from promptlab.tracer.tracer import Tracer
 from promptlab.sqlite.models import Experiment as ExperimentModel, ExperimentResult as ExperimentResultModel, User
-from promptlab.types import Asset, Dataset, PromptTemplate
+from promptlab.types import Dataset, PromptTemplate
 from promptlab.sqlite.models import Asset as AssetModel
 from sqlalchemy import text
 from sqlalchemy.orm import joinedload
@@ -18,7 +18,42 @@ class LocalTracer(Tracer):
         db_url = f"sqlite:///{tracer_config.db_file}"
         init_engine(db_url)
 
-    def create_asset(self, asset: Asset):
+    def create_dataset(self, dataset: Dataset):
+        dataset.version = 0
+        binary = {"file_path": dataset.file_path}
+        asset = AssetModel(
+            asset_name=dataset.name,
+            asset_version=dataset.version,
+            asset_description=dataset.description,
+            asset_type=AssetType.DATASET.value,
+            asset_binary=json.dumps(binary),
+            created_at=datetime.now(timezone.utc),
+            user_id=self.get_user_by_username(dataset.user).id
+        )     
+    
+        self._create_asset(asset)
+
+    def create_prompttemplate(self, template: PromptTemplate):
+        template.version = 0
+        binary = f"""
+            <<system>>
+                {template.system_prompt}
+            <<user>>
+                {template.user_prompt}
+        """
+        asset = AssetModel(
+            asset_name=template.name,
+            asset_version=template.version,
+            asset_description=template.description,
+            asset_type=AssetType.PROMPT_TEMPLATE.value,
+            asset_binary=binary,
+            created_at=datetime.now(timezone.utc),
+            user_id=self.get_user_by_username(template.user).id
+        )
+
+        self._create_asset(asset)
+
+    def _create_asset(self, asset: AssetModel):
         session = get_session()
         try:
             session.add(asset)
@@ -96,7 +131,7 @@ class LocalTracer(Tracer):
         finally:
             session.close()
 
-    def get_asset(self, asset_name: str, asset_version: int) -> Asset:
+    def get_asset(self, asset_name: str, asset_version: int) -> AssetModel:
         session = get_session()
         try:
             asset = session.query(AssetModel).filter_by(
@@ -123,7 +158,7 @@ class LocalTracer(Tracer):
         finally:
             session.close()
     
-    def get_latest_asset(self, asset_name: str) -> Asset:
+    def get_latest_asset(self, asset_name: str) -> AssetModel:
         session = get_session()
         try:
             asset = session.query(AssetModel).filter_by(asset_name=asset_name).order_by(

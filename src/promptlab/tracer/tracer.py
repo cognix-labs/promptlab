@@ -3,13 +3,17 @@ from typing import Dict, List
 
 from promptlab._config import ExperimentConfig, TracerConfig
 from promptlab.sqlite.models import Asset
+from promptlab.types import Dataset, PromptTemplate
 
 class Tracer(ABC):
     def __init__(self, tracer_config: TracerConfig):
         pass
 
     @abstractmethod
-    def create_asset(self, asset: Asset): pass
+    def create_dataset(self, dataset: Dataset): pass
+
+    @abstractmethod
+    def create_prompttemplate(self, template: PromptTemplate): pass
 
     @abstractmethod
     def trace_experiment(self, asset: Asset): pass

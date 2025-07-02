@@ -74,20 +74,7 @@ class AssetService:
 
     def _create_dataset(self, dataset: Dataset) -> Dataset:
         logger.debug(f"Creating dataset asset: {dataset.name}")
-
-        dataset.version = 0
-        binary = {"file_path": dataset.file_path}
-        asset = AssetModel(
-            asset_name=dataset.name,
-            asset_version=dataset.version,
-            asset_description=dataset.description,
-            asset_type=AssetType.DATASET.value,
-            asset_binary=json.dumps(binary),
-            created_at=datetime.now(timezone.utc),
-            user_id=self.tracer.me().id
-        )        
-
-        self.tracer.create_asset(asset)
+        self.tracer.create_dataset(dataset)
         logger.debug(f"Dataset asset created: {dataset.name}")
 
         return dataset
@@ -122,25 +109,7 @@ class AssetService:
 
     def _create_prompt_template(self, template: PromptTemplate) -> PromptTemplate:
         logger.debug(f"Creating prompt template asset: {template.name}")
-
-        template.version = 0
-        binary = f"""
-            <<system>>
-                {template.system_prompt}
-            <<user>>
-                {template.user_prompt}
-        """
-        asset = AssetModel(
-            asset_name=template.name,
-            asset_version=template.version,
-            asset_description=template.description,
-            asset_type=AssetType.PROMPT_TEMPLATE.value,
-            asset_binary=binary,
-            created_at=datetime.now(timezone.utc),
-            user_id=self.tracer.me().id
-        )
-
-        self.tracer.create_asset(asset)
+        self.tracer.create_asset(template)
         logger.debug(f"Prompt template asset created: {template.name}")
 
         return template
