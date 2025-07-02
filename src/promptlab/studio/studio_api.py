@@ -206,6 +206,7 @@ class StudioApi:
         @self.app.post("/datasets")
         async def create_dataset(dataset: Dataset, auth=Depends(self._auth_dependency)):
             try:             
+                dataset.user = auth["username"]
                 asset_service = AssetService(self.tracer)
                 created_dataset = await asyncio.to_thread(asset_service.create, dataset)
                 
