@@ -6,7 +6,7 @@ import requests
 from promptlab._config import ExperimentConfig, TracerConfig
 from promptlab.tracer.tracer import Tracer
 from promptlab.sqlite.models import Experiment as ExperimentModel, ExperimentResult as ExperimentResultModel
-from promptlab.types import Dataset
+from promptlab.types import Dataset, PromptTemplate
 
 
 class ApiTracer(Tracer):
@@ -20,6 +20,14 @@ class ApiTracer(Tracer):
             headers["Authorization"] = f"Bearer {self.jwt_token}"
             
         response = requests.post(f"{self.endpoint}/datasets", json=dataset, headers=headers)
+        response.raise_for_status()
+
+    def create_prompttemplate(self, template: PromptTemplate):
+        headers = {"Content-Type": "application/json"}
+        if self.jwt_token:
+            headers["Authorization"] = f"Bearer {self.jwt_token}"
+            
+        response = requests.post(f"{self.endpoint}/templates", json=template.model_dump(), headers=headers)
         response.raise_for_status()
 
     def trace_experiment(self, asset: Dataset):
@@ -48,3 +56,6 @@ class ApiTracer(Tracer):
 
     def deactivate_user_by_username(self):
         raise NotImplementedError("deactivate_user_by_username method not implemented")
+
+    def me(self):
+        raise NotImplementedError("me method not implemented")

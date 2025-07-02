@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from promptlab.asset_service import AssetService
 from promptlab.sqlite.sql import SQLQuery
 from promptlab.tracer.tracer import Tracer
-from promptlab.types import Dataset, TracerConfig
+from promptlab.types import Dataset, TracerConfig, PromptTemplate
 from promptlab._utils import Utils
 from promptlab.enums import AssetType
 import asyncio
@@ -218,6 +218,29 @@ class StudioApi:
                         "version": created_dataset.version,
                         "description": created_dataset.description,
                         "file_path": created_dataset.file_path
+                    }
+                })
+            except ValueError as e:
+                return JSONResponse({"success": False, "message": str(e)}, status_code=400)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.post("/templates")
+        async def create_template(template: PromptTemplate, auth=Depends(self._auth_dependency)):
+            try:             
+                template.user = auth["username"]
+                asset_service = AssetService(self.tracer)
+                created_template = await asyncio.to_thread(asset_service.create, template)
+                
+                return JSONResponse({
+                    "success": True, 
+                    "message": "Prompt template created successfully",
+                    "template": {
+                        "name": created_template.name,
+                        "version": created_template.version,
+                        "description": created_template.description,
+                        "system_prompt": created_template.system_prompt,
+                        "user_prompt": created_template.user_prompt
                     }
                 })
             except ValueError as e:
