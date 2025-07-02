@@ -192,3 +192,17 @@ class LocalTracer(Tracer):
             raise
         finally:
             session.close()
+
+    def me(self) -> User:
+        _current_user_name = 'admin'  # This should be replaced with the actual current user logic
+        session = get_session()
+        try:
+            user = session.query(User).filter_by(username=_current_user_name).first()  # Assuming user with ID 1 is the current user
+            if not user:
+                raise ValueError("Current user not found.")
+            return user
+        except Exception as e:
+            session.rollback()
+            raise
+        finally:
+            session.close()

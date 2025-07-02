@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request, Response, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from promptlab.asset_manager import AssetManager
+from promptlab.asset_service import AssetService
 from promptlab.sqlite.sql import SQLQuery
 from promptlab.tracer.tracer import Tracer
 from promptlab.types import Dataset, TracerConfig
@@ -206,8 +206,8 @@ class StudioApi:
         @self.app.post("/datasets")
         async def create_dataset(dataset: Dataset, auth=Depends(self._auth_dependency)):
             try:             
-                asset_manager = AssetManager(self.tracer)
-                created_dataset = await asyncio.to_thread(asset_manager.create, dataset)
+                asset_service = AssetService(self.tracer)
+                created_dataset = await asyncio.to_thread(asset_service.create, dataset)
                 
                 return JSONResponse({
                     "success": True, 

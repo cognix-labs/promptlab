@@ -37,3 +37,6 @@ class Tracer(ABC):
 
     @abstractmethod
     def deactivate_user_by_username(self): pass
+
+    @abstractmethod
+    def me(self): pass

@@ -15,7 +15,7 @@ from promptlab.sqlite.models import Asset as AssetModel
 T = TypeVar("T", Dataset, PromptTemplate)
 
 
-class AssetManager:
+class AssetService:
     def __init__(self, tracer: Tracer):
         self.tracer = tracer
         logger.debug("Asset manager initialized.")
@@ -44,7 +44,7 @@ class AssetManager:
 
     def create(self, asset: T) -> T:
         logger.info(f"Creating asset: {getattr(asset, 'name', str(asset))}")
-        if not Asset.is_valid_name(asset.name):
+        if not AssetService.is_valid_name(asset.name):
             logger.warning(f"Invalid asset name: {asset.name}")
             raise ValueError(
                 "Name must begin with a letter and use only alphanumeric, underscore, or hyphen."
@@ -74,7 +74,6 @@ class AssetManager:
     def _create_dataset(self, dataset: Dataset) -> Dataset:
         logger.debug(f"Creating dataset asset: {dataset.name}")
         dataset.version = 0
-        dataset.user_id = 1
         binary = {"file_path": dataset.file_path}
         asset = AssetModel(
             asset_name=dataset.name,
@@ -83,7 +82,7 @@ class AssetManager:
             asset_type=AssetType.DATASET.value,
             asset_binary=json.dumps(binary),
             created_at=datetime.utcnow(),
-            user_id=dataset.user_id
+            user_id=self.tracer.me().id
         )        
         self.tracer.create_asset(asset)
         return dataset
@@ -91,7 +90,6 @@ class AssetManager:
     def _update_dataset(self, dataset: Dataset) -> Dataset:
         logger.debug(f"Updating dataset asset: {dataset.name}")
 
-        dataset.user_id = 1
 
         prev = self.tracer.get_latest_asset(dataset.name)
         dataset.description = (
@@ -110,14 +108,13 @@ class AssetManager:
             asset_type=AssetType.DATASET.value,
             asset_binary=binary,
             created_at=datetime.utcnow(),
-            user_id=dataset.user_id
+            user_id=self.tracer.me().id
         )
         return self.tracer.create_asset(asset)
 
     def _create_prompt_template(self, template: PromptTemplate) -> PromptTemplate:
         logger.debug(f"Creating prompt template asset: {template.name}")
         template.version = 0
-        template.user_id = 1
         binary = f"""
             <<system>>
                 {template.system_prompt}
@@ -131,7 +128,7 @@ class AssetManager:
             asset_type=AssetType.PROMPT_TEMPLATE.value,
             asset_binary=binary,
             created_at=datetime.utcnow(),
-            user_id=template.user_id
+            user_id=self.tracer.me().id
         )
         self.tracer.create_asset(asset)
         return template
@@ -139,7 +136,6 @@ class AssetManager:
     def _update_prompt_template(self, template: PromptTemplate) -> PromptTemplate:
         logger.debug(f"Updating prompt template asset: {template.name}")
 
-        template.user_id = 1
         prev = self.tracer.get_latest_asset(template.name)
         system_prompt, user_prompt, _ = Utils.split_prompt_template(prev.asset_binary)
         template.description = (
@@ -165,7 +161,7 @@ class AssetManager:
             asset_type=AssetType.PROMPT_TEMPLATE.value,
             asset_binary=binary,
             created_at=datetime.utcnow(),
-            user_id=template.user_id
+            user_id=self.tracer.me().id
         )
         self.tracer.create_asset(asset)
         return template

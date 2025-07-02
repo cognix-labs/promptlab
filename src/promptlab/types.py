@@ -42,26 +42,21 @@ class Asset:
     description: str
     file_path: str
     version: int = 0
-    user_id: int = None
 
 
-@dataclass
 class Dataset(BaseModel):
     name: str
     description: str
     file_path: str
     version: int = 0
-    user_id: int = None
 
 
-@dataclass
-class PromptTemplate:
-    name: str = None
-    description: str = None
-    system_prompt: str = None
-    user_prompt: str = None
+class PromptTemplate(BaseModel):
+    name: str
+    description: str
+    system_prompt: str
+    user_prompt: str
     version: int = 0
-    user_id: int = None
 
 
 class EvaluationConfig(BaseModel):
@@ -89,7 +84,7 @@ class TracerConfig(BaseModel):
     jwt_token: Optional[str] = None
 
     @field_validator("db_file")
-    def validate_db_server(cls, value):
+    def validate_db_file(cls, value):
         return Utils.sanitize_path(value)
 
     class Config:
