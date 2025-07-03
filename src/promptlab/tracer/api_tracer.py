@@ -30,8 +30,18 @@ class ApiTracer(Tracer):
         response = requests.post(f"{self.endpoint}/templates", json=template.model_dump(), headers=headers)
         response.raise_for_status()
 
-    def trace_experiment(self, asset: Dataset):
-        raise NotImplementedError("trace_experiment method not implemented")
+    def trace_experiment(self, experiment_config: ExperimentConfig, experiment_summary: List[Dict]):
+        headers = {"Content-Type": "application/json"}
+        if self.jwt_token:
+            headers["Authorization"] = f"Bearer {self.jwt_token}"
+            
+        payload = {
+            "experiment_config": experiment_config.model_dump(),
+            "experiment_summary": experiment_summary
+        }
+        
+        response = requests.post(f"{self.endpoint}/experiments", json=payload, headers=headers)
+        response.raise_for_status()
 
     def get_asset(self, asset_name: str, asset_version: int) -> AssetModel:
         headers = {}
