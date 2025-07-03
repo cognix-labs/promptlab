@@ -35,11 +35,14 @@ class ApiTracer(Tracer):
         if self.jwt_token:
             headers["Authorization"] = f"Bearer {self.jwt_token}"
             
+        experiment_config.inference_model = None
+        experiment_config.embedding_model = None
+
         payload = {
             "experiment_config": experiment_config.model_dump(),
             "experiment_summary": experiment_summary
         }
-        
+       
         response = requests.post(f"{self.endpoint}/experiments", json=payload, headers=headers)
         response.raise_for_status()
 
