@@ -72,21 +72,9 @@ class LocalTracer(Tracer):
             timestamp = datetime.now().isoformat()
             experiment_id = experiment_summary[0]["experiment_id"]
 
-            # Convert model_config objects to dict for JSON serialization
-            inference_model_config = (
-                vars(experiment_config.inference_model.model_config)
-                if experiment_config.inference_model
-                else None
-            )
-            embedding_model_config = (
-                vars(experiment_config.embedding_model.model_config)
-                if experiment_config.embedding_model
-                else None
-            )
-
             model = {
-                "inference_model_config": inference_model_config,
-                "embedding_model_config": embedding_model_config,
+                "inference_model_config": experiment_config.completion_model_config.model_dump(),
+                "embedding_model_config": experiment_config.embedding_model_config.model_dump(),
             }
 
             asset = {

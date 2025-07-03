@@ -16,8 +16,7 @@ class ModelResponse:
     latency_ms: int
 
 
-@dataclass
-class ModelConfig:
+class ModelConfig(BaseModel):
     model_deployment: str
     api_key: Optional[str] = None
     api_version: Optional[str] = None
@@ -72,6 +71,8 @@ class ExperimentConfig(BaseModel):
     name: str = None
     inference_model: Optional[Model] = None
     embedding_model: Optional[EmbeddingModel] = None
+    completion_model_config: Optional[ModelConfig] = None
+    embedding_model_config: Optional[ModelConfig] = None
     prompt_template: Optional[PromptTemplate] = None
     agent_proxy: Optional[callable] = None
     dataset: Dataset
