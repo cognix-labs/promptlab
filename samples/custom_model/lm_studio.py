@@ -1,12 +1,7 @@
-from typing import List
-import ollama
-import asyncio
+from promptlab.model.model import Model, ModelResponse, ModelConfig
 
-from promptlab.model.model import EmbeddingModel, Model, ModelResponse, ModelConfig
-
-
-class Ollama(Model):
-    def __init__(self, model_config: ModelConfig):
+class LMStudio(Model):
+    def __init__(self, model_config: dict):
         super().__init__(model_config)
 
         self.client = ollama
@@ -65,22 +60,3 @@ class Ollama(Model):
             completion_tokens=completion_token,
             latency_ms=latency_ms,
         )
-
-
-class Ollama_Embedding(EmbeddingModel):
-    def __init__(self, model_config: ModelConfig):
-        super().__init__(model_config)
-
-        self.client = ollama
-        self.model_name = self.model_config.name.split("/")[1]
-
-    def __call__(self, text: str) -> List[float]:
-        embedding = self.client.embed(
-            model=self.model_name,
-            input=text,
-        )["embeddings"]
-
-        return embedding
-
-ollama_completion = Ollama
-ollama_embedding = Ollama_Embedding

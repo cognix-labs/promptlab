@@ -5,17 +5,34 @@ import uuid
 import asyncio
 
 from promptlab._config import ConfigValidator, ExperimentConfig
+from promptlab.model.model_factory import ModelFactory
 from promptlab.sqlite.sql import SQLQuery
 from promptlab.evaluator.evaluator_factory import EvaluatorFactory
 from promptlab.tracer.tracer import Tracer
 from promptlab._utils import Utils
 from promptlab._logging import logger
+from promptlab.types import ModelConfig
 
 
 class Experiment:
     def __init__(self, tracer: Tracer):
         self.tracer = tracer
         logger.debug("Experiment instance initialized.")
+
+    def get_completion_model(self, type: str, model_deployment: str):
+        if type == "ollama":
+            from promptlab.model.ollama import Ollama
+            return Ollama(model_config=ModelConfig(type="-",model_deployment=model_deployment)) 
+        else:
+            raise ValueError(f"Unsupported model type: {type}. Supported types: 'ollama'.")
+
+    def get_em_model(self, type: str, model_deployment: str):
+        if type == "ollama":
+            from promptlab.model.ollama import Ollama_Embedding
+            return Ollama_Embedding(model_config=ModelConfig(type="-",model_deployment=model_deployment)) 
+        else:
+            raise ValueError(f"Unsupported model type: {type}. Supported types: 'ollama'.")
+
 
     def run(self, config: dict):
         """
@@ -122,7 +139,9 @@ class Experiment:
         """
         Synchronous version of batch evaluation with concurrency limit
         """
-        inference_model = experiment_config.inference_model
+        inference_model = ModelFactory.get_model(experiment_config.completion_model_config, completion=True)
+        # inference_model = experiment_config.inference_model
+        # inference_model = self.get_completion_model(experiment_config.completion_model_config.type, experiment_config.completion_model_config.model_deployment)                                 
         agent_proxy = experiment_config.agent_proxy
         experiment_id = (
             experiment_config.name if experiment_config.name else str(uuid.uuid4())
@@ -170,7 +189,10 @@ class Experiment:
         """
         Asynchronous version of batch evaluation with concurrency limit
         """
-        inference_model = experiment_config.inference_model
+        # inference_model = experiment_config.inference_model
+        # inference_model = self.get_completion_model(experiment_config.completion_model_config.type, experiment_config.completion_model_config.model_deployment)   
+        inference_model = ModelFactory.get_model(experiment_config.completion_model_config, completion=True)
+                              
         agent_proxy = experiment_config.agent_proxy
 
         experiment_id = (
@@ -225,8 +247,12 @@ class Experiment:
         for eval in experiment_config.evaluation:
             evaluator = EvaluatorFactory.get_evaluator(
                 eval.metric,
-                experiment_config.inference_model,
-                experiment_config.embedding_model,
+                # experiment_config.inference_model,
+                # self.get_completion_model(experiment_config.completion_model_config.type, experiment_config.completion_model_config.model_deployment),
+                ModelFactory.get_model(experiment_config.completion_model_config, completion=True),
+                # experiment_config.embedding_model,
+                # self.get_em_model(experiment_config.embedding_model_config.type, experiment_config.embedding_model_config.model_deployment),
+                ModelFactory.get_model(experiment_config.embedding_model_config, completion=False),
                 eval.evaluator,
             )
 

@@ -21,7 +21,7 @@ class OpenRouter(Model):
         self.async_client = AsyncOpenAI(
             api_key=model_config.api_key, base_url=str(model_config.endpoint)
         )
-        self.deployment = model_config.model_deployment
+        self.model_name = self.model_config.name.split("/")[1]
 
     def invoke(self, system_prompt: str, user_prompt: str):
         """
@@ -40,7 +40,7 @@ class OpenRouter(Model):
 
         start_time = time.time()
         chat_completion = self.client.chat.completions.create(
-            model=self.deployment, messages=payload, extra_headers=extra_headers
+            model=self.model_name, messages=payload, extra_headers=extra_headers
         )
         end_time = time.time()
         response = chat_completion.choices[0].message.content
@@ -77,7 +77,7 @@ class OpenRouter(Model):
         start_time = time.time()
 
         chat_completion = await self.async_client.chat.completions.create(
-            model=self.deployment, messages=payload, extra_headers=extra_headers
+            model=self.model_name, messages=payload, extra_headers=extra_headers
         )
 
         end_time = time.time()
@@ -109,6 +109,7 @@ class OpenRouter_Embedding(EmbeddingModel):
         self.client = OpenAI(
             api_key=model_config.api_key, base_url=str(model_config.endpoint)
         )
+        self.model_name = self.model_config.name.split("/")[1]
 
     def __call__(self, text: str) -> List[float]:
         # Add OpenRouter-specific headers
@@ -120,7 +121,7 @@ class OpenRouter_Embedding(EmbeddingModel):
         try:
             # Try to use the embedding API
             response = self.client.embeddings.create(
-                model=self.model_config.model_deployment,
+                model=self.model_name,
                 input=text,
                 extra_headers=extra_headers,
             )
@@ -135,3 +136,6 @@ class OpenRouter_Embedding(EmbeddingModel):
             embedding = np.zeros(1536).tolist()
 
         return embedding
+
+openrouter_completion = OpenRouter
+openrouter_embedding = OpenRouter_Embedding

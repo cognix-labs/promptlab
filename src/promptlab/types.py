@@ -17,11 +17,14 @@ class ModelResponse:
 
 
 class ModelConfig(BaseModel):
-    model_deployment: str
+    name: str   # example "ollama/llama3.2"
+    type: str
     api_key: Optional[str] = None
     api_version: Optional[str] = None
     endpoint: Optional[str] = None
     max_concurrent_tasks: int = 5
+    model: Optional[callable] = None
+    model_config = {"arbitrary_types_allowed": True}
 
 
 @runtime_checkable

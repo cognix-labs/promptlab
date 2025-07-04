@@ -49,8 +49,8 @@ ollama_embedding = Ollama_Embedding(
 
 # Run an experiment
 experiment_config = {
-    "inference_model": lmstudio,
-    "embedding_model": ollama_embedding,
+    "completion_model_config": {"name":"lm-studio/llama-3.2-3b-instruct", "type": "completion", "api_key": "lm-studio", "api_version": "v1", "endpoint": "http://localhost:1234/v1", "model": lmstudio},
+    "embedding_model_config": {"name":"ollama/nomic-embed-text:latest", "type": "embedding"},
     "prompt_template": pt,
     "dataset": ds,
     "evaluation": [

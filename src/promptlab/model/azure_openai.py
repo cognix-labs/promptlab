@@ -21,6 +21,7 @@ class AzOpenAI(Model):
             api_version=model_config.api_version,
             azure_endpoint=str(model_config.endpoint),
         )
+        self.model_name = self.model_config.name.split("/")[1]
 
     def invoke(self, system_prompt: str, user_prompt: str):
         payload = [
@@ -31,7 +32,7 @@ class AzOpenAI(Model):
         start_time = time.time()
 
         chat_completion = self.client.chat.completions.create(
-            model=self.model_config.inference_model_deployment, messages=payload
+            model=self.model_name, messages=payload
         )
 
         end_time = time.time()
@@ -60,7 +61,7 @@ class AzOpenAI(Model):
         start_time = time.time()
 
         chat_completion = await self.async_client.chat.completions.create(
-            model=self.model_config.inference_model_deployment, messages=payload
+            model=self.model_name, messages=payload
         )
 
         end_time = time.time()
@@ -87,14 +88,18 @@ class AzOpenAI_Embedding(EmbeddingModel):
             api_version=model_config.api_version,
             azure_endpoint=str(model_config.endpoint),
         )
+        self.model_name = self.model_config.name.split("/")[1]
 
     def __call__(self, text: str) -> List[float]:
         embedding = (
             self.client.embeddings.create(
-                input=text, model=self.model_config.embedding_model_deployment
+                input=text, model=self.model_name
             )
             .data[0]
             .embedding
         )
 
         return embedding
+
+azure_openai_completion = AzOpenAI
+azure_openai_embedding = AzOpenAI_Embedding
