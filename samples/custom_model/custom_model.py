@@ -1,10 +1,10 @@
+import asyncio
 from promptlab import PromptLab
 from promptlab.types import ModelConfig, PromptTemplate, Dataset
-from lm_studio import LmStudio
-from promptlab.model import Ollama_Embedding
+from custom_ollama import Custom_Ollama, Custom_Ollama_Embedding
 
 # Initialize PromptLab with SQLite storage
-tracer_config = {"type": "sqlite", "db_file": "./promptlab.db"}
+tracer_config = {"type": "local", "db_file": "./promptlab3.db"}
 pl = PromptLab(tracer_config)
 
 # Create a prompt template
@@ -18,7 +18,7 @@ prompt_template = PromptTemplate(
     name=prompt_name,
     description=prompt_description,
     system_prompt=system_prompt,
-    user_prompt=user_prompt,
+    user_prompt=user_prompt
 )
 # pt = pl.asset.create(prompt_template)
 
@@ -31,36 +31,40 @@ dataset = Dataset(
 )
 # ds = pl.asset.create(dataset)
 
-# Retrieve assets
+# # Retrieve assets
 pt = pl.asset.get(asset_name=prompt_name, version=0)
 ds = pl.asset.get(asset_name=dataset_name, version=0)
 
-lmstudio = LmStudio(
-    model_config=ModelConfig(
-        model_deployment="llama-3.2-3b-instruct",
-        api_key="lm-studio",
-        api_version="v1",
-        endpoint="http://localhost:1234/v1",
-    )
+completion_model = Custom_Ollama(
+    ModelConfig(name="ollama/llama3.2", type="completion")
 )
-ollama_embedding = Ollama_Embedding(
-    model_config=ModelConfig(model_deployment="nomic-embed-text:latest")
+embedding_model = Custom_Ollama_Embedding(
+    ModelConfig(name="ollama/nomic-embed-text:latest", type="embedding")
 )
 
 # Run an experiment
 experiment_config = {
-    "completion_model_config": {"name":"lm-studio/llama-3.2-3b-instruct", "type": "completion", "api_key": "lm-studio", "api_version": "v1", "endpoint": "http://localhost:1234/v1", "model": lmstudio},
-    "embedding_model_config": {"name":"ollama/nomic-embed-text:latest", "type": "embedding"},
+    "name": "demo_experimet16",
+    "completion_model_config": {"name":"custom_ollama/llama3.2", "type": "completion", "model": completion_model},
+    "embedding_model_config": {"name":"custom_ollama/nomic-embed-text:latest", "type": "embedding", "model": embedding_model},
     "prompt_template": pt,
     "dataset": ds,
     "evaluation": [
         {
-            "metric": "Fluency",
-            "column_mapping": {"response": "$inference"},
+            "metric": "semantic_similarity",
+            "column_mapping": {"response": "$inference", "reference": "feedback"},
+        },
+        {
+            "metric": "relevance",
+            "column_mapping": {
+                "response": "$inference",
+                "query": "essay_topic",
+            },
         },
     ],
 }
 pl.experiment.run(experiment_config)
+# asyncio.run(pl.experiment.run_async(experiment_config))
 
 # Start the PromptLab Studio to view results
-pl.studio.start(8000)
+asyncio.run(pl.studio.start_async(8000))

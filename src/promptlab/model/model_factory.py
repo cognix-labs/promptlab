@@ -42,7 +42,11 @@ class ModelFactory:
     
 
     @staticmethod
-    def get_model(model_config: ModelConfig, completion: bool = True) -> Union[Model, EmbeddingModel]:     
+    def get_model(model_config: ModelConfig, completion: bool = True, model: Model = None) -> Union[Model, EmbeddingModel]:   
+
+        if model:
+            return model
+        
         available_model_classes = ModelFactory._model_classes if completion else ModelFactory._embedding_classes
 
         class_name = f'{model_config.name.split("/")[0]}_{model_config.type}'

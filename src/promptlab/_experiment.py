@@ -101,7 +101,6 @@ class Experiment:
             logger.error(f"Experiment config validation failed: {e}", exc_info=True)
             raise
 
-        # if experiment_config.prompt_template is None:
         pt_asset_binary = None
         if experiment_config.prompt_template:
             prompt_template = self.tracer.get_asset(
@@ -139,9 +138,7 @@ class Experiment:
         """
         Synchronous version of batch evaluation with concurrency limit
         """
-        inference_model = ModelFactory.get_model(experiment_config.completion_model_config, completion=True)
-        # inference_model = experiment_config.inference_model
-        # inference_model = self.get_completion_model(experiment_config.completion_model_config.type, experiment_config.completion_model_config.model_deployment)                                 
+        inference_model = ModelFactory.get_model(experiment_config.completion_model_config, completion=True, model = experiment_config.completion_model_config.model)
         agent_proxy = experiment_config.agent_proxy
         experiment_id = (
             experiment_config.name if experiment_config.name else str(uuid.uuid4())
@@ -189,9 +186,7 @@ class Experiment:
         """
         Asynchronous version of batch evaluation with concurrency limit
         """
-        # inference_model = experiment_config.inference_model
-        # inference_model = self.get_completion_model(experiment_config.completion_model_config.type, experiment_config.completion_model_config.model_deployment)   
-        inference_model = ModelFactory.get_model(experiment_config.completion_model_config, completion=True)
+        inference_model = ModelFactory.get_model(experiment_config.completion_model_config, completion=True, model = experiment_config.completion_model_config.model)
                               
         agent_proxy = experiment_config.agent_proxy
 
@@ -247,12 +242,8 @@ class Experiment:
         for eval in experiment_config.evaluation:
             evaluator = EvaluatorFactory.get_evaluator(
                 eval.metric,
-                # experiment_config.inference_model,
-                # self.get_completion_model(experiment_config.completion_model_config.type, experiment_config.completion_model_config.model_deployment),
-                ModelFactory.get_model(experiment_config.completion_model_config, completion=True),
-                # experiment_config.embedding_model,
-                # self.get_em_model(experiment_config.embedding_model_config.type, experiment_config.embedding_model_config.model_deployment),
-                ModelFactory.get_model(experiment_config.embedding_model_config, completion=False),
+                ModelFactory.get_model(experiment_config.completion_model_config, completion=True, model = experiment_config.completion_model_config.model),
+                ModelFactory.get_model(experiment_config.embedding_model_config, completion=False, model = experiment_config.embedding_model_config.model),
                 eval.evaluator,
             )
 

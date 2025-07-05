@@ -72,6 +72,8 @@ class LocalTracer(Tracer):
             timestamp = datetime.now().isoformat()
             experiment_id = experiment_summary[0]["experiment_id"]
 
+            experiment_config.completion_model_config.model = None
+            experiment_config.embedding_model_config.model = None
             model = {
                 "inference_model_config": experiment_config.completion_model_config.model_dump(),
                 "embedding_model_config": experiment_config.embedding_model_config.model_dump(),
