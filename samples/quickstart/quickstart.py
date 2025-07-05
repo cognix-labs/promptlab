@@ -56,7 +56,7 @@ experiment_config = {
         },
     ],
 }
-pl.experiment.run(experiment_config)
+# pl.experiment.run(experiment_config)
 # asyncio.run(pl.experiment.run_async(experiment_config))
 
 # Start the PromptLab Studio to view results
