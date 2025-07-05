@@ -10,7 +10,7 @@ from promptlab.tracer.tracer import Tracer
 from promptlab.types import Dataset, PromptTemplate
 from promptlab._utils import Utils
 from promptlab._logging import logger
-from promptlab.sqlite.models import Asset as AssetModel
+from promptlab.sqlite.models import Asset as ORMAsset
 
 T = TypeVar("T", Dataset, PromptTemplate)
 
@@ -92,7 +92,7 @@ class AssetService:
             if dataset.file_path is None
             else json.dumps({"file_path": dataset.file_path})
         )
-        asset = AssetModel(
+        asset = ORMAsset(
             asset_name=dataset.name,
             asset_version=dataset.version,
             asset_description=dataset.description,
@@ -135,7 +135,7 @@ class AssetService:
             <<user>>
                 {template.user_prompt}
         """
-        asset = AssetModel(
+        asset = ORMAsset(
             asset_name=template.name,
             asset_version=template.version,
             asset_description=template.description,

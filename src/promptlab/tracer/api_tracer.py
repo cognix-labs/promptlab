@@ -5,7 +5,7 @@ import requests
 
 from promptlab._config import ExperimentConfig, TracerConfig
 from promptlab.tracer.tracer import Tracer
-from promptlab.sqlite.models import Experiment as ExperimentModel, ExperimentResult as ExperimentResultModel, Asset as AssetModel
+from promptlab.sqlite.models import Experiment as ORMExperiment, ExperimentResult as ORMExperimentResult, Asset as ORMAsset
 from promptlab.types import Dataset, PromptTemplate
 
 
@@ -46,7 +46,7 @@ class ApiTracer(Tracer):
         response = requests.post(f"{self.endpoint}/experiments", json=payload, headers=headers)
         response.raise_for_status()
 
-    def get_asset(self, asset_name: str, asset_version: int) -> AssetModel:
+    def get_asset(self, asset_name: str, asset_version: int) -> ORMAsset:
         headers = {}
         if self.jwt_token:
             headers["Authorization"] = f"Bearer {self.jwt_token}"
@@ -61,7 +61,7 @@ class ApiTracer(Tracer):
         
         asset_data = response.json()
         if asset_data and "asset" in asset_data:
-            # Convert the JSON response back to AssetModel
+            # Convert the JSON response back to ORMAsset
             asset_info = asset_data["asset"]
             
             # Handle datetime fields
@@ -79,7 +79,7 @@ class ApiTracer(Tracer):
                 except:
                     deployment_time = None
             
-            return AssetModel(
+            return ORMAsset(
                 asset_name=asset_info["asset_name"],
                 asset_version=asset_info["asset_version"],
                 asset_description=asset_info.get("asset_description"),

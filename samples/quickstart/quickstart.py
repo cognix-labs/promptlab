@@ -37,7 +37,7 @@ ds = pl.asset.get(asset_name=dataset_name, version=0)
 
 # Run an experiment
 experiment_config = {
-    "name": "demo_experimet16",
+    "name": "demo_experimet19",
     "completion_model_config": {"name":"ollama/llama3.2", "type": "completion"},
     "embedding_model_config": {"name":"ollama/nomic-embed-text:latest", "type": "embedding"},
     "prompt_template": pt,
