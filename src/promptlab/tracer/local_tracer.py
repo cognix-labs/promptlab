@@ -103,7 +103,7 @@ class LocalTracer(Tracer):
                 experiment_id=experiment_id,
                 model=json.dumps(model),
                 asset=json.dumps(asset),
-                created_at=datetime.utcnow(),
+                created_at=datetime.now(),
                 user_id=1,
             )
             session.add(exp)
@@ -118,7 +118,7 @@ class LocalTracer(Tracer):
                     evaluation=json.dumps(record["evaluation"])
                     if isinstance(record["evaluation"], (dict, list))
                     else record["evaluation"],
-                    created_at=datetime.utcnow(),
+                    created_at=datetime.now(),
                 )
                 for record in experiment_summary
             ]

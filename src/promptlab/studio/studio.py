@@ -3,11 +3,11 @@ from http.server import HTTPServer
 from typing import Optional
 import threading
 
-from promptlab._config import TracerConfig
-from promptlab.studio.studio_api import StudioApi
-from promptlab.studio.studio_web import StudioWebHandler
 from art import tprint
 import uvicorn
+
+from promptlab.studio.studio_api import StudioApi
+from promptlab.studio.studio_web import StudioWebHandler
 from promptlab.tracer.tracer import Tracer
 
 

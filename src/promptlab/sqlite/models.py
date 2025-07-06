@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import (
     Column,
     Integer,
@@ -11,7 +13,6 @@ from sqlalchemy import (
 )
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from datetime import datetime
 
 Base = declarative_base()
 
@@ -26,7 +27,7 @@ class Asset(Base):
     is_deployed = Column(Boolean, default=False)
     deployment_time = Column(DateTime)
     status = Column(Integer, default=1)  # 1 - 'active', 0 - 'inactive'
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now())
     user_id = Column(Integer, ForeignKey("users.id"))
     user = relationship("User", back_populates="assets")
 
@@ -37,7 +38,7 @@ class Experiment(Base):
     model = Column(Text)  # Store as JSON/text
     asset = Column(Text)  # Store as JSON/text
     status = Column(Integer, default=1)  # 1 - 'active', 0 - 'inactive'
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now())
     user_id = Column(Integer, ForeignKey("users.id"))
     user = relationship("User", back_populates="experiments")
     results = relationship("ExperimentResult", back_populates="experiment")
@@ -53,7 +54,7 @@ class ExperimentResult(Base):
     completion_tokens = Column(Integer)
     latency_ms = Column(Float)
     evaluation = Column(Text)  # Store as JSON/text
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now())
     experiment = relationship("Experiment", back_populates="results")
 
 
@@ -64,6 +65,6 @@ class User(Base):
     password_hash = Column(String, nullable=False)
     role = Column(String, nullable=False)  # 'admin' or 'engineer'
     status = Column(Integer, default=1)  # 1 - 'active', 0 - 'inactive'
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now())
     assets = relationship("Asset", back_populates="user")
     experiments = relationship("Experiment", back_populates="user")
