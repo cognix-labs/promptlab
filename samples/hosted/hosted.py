@@ -19,7 +19,7 @@ prompt_template = PromptTemplate(
     description=prompt_description,
     system_prompt=system_prompt,
     user_prompt=user_prompt,
-    user_id=1
+    user_id=1,
 )
 pt = pl.asset.create(prompt_template)
 
@@ -45,10 +45,7 @@ ds = pl.asset.get(asset_name=dataset_name, version=0)
 # Run an experiment
 experiment_config = {
     "name": "hosted_experimet",
-    "completion_model_config": {
-        "name": "ollama/llama3.2", 
-        "type": "completion"
-    },
+    "completion_model_config": {"name": "ollama/llama3.2", "type": "completion"},
     "embedding_model_config": {
         "name": "ollama/nomic-embed-text:latest",
         "type": "embedding",

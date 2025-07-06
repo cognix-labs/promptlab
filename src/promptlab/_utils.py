@@ -47,7 +47,7 @@ class Utils:
     @staticmethod
     def split_prompt_template(asset: str) -> Tuple[str, str, List[str]]:
         logger.debug("Splitting prompt template.")
-        
+
         if asset is None:
             logger.warning("Prompt template asset is None.")
             return ("", "", [])

@@ -83,13 +83,17 @@ class LocalTracer(Tracer):
                 completion_model_config = None
             else:
                 experiment_config.completion_model_config.model = None
-                completion_model_config = experiment_config.completion_model_config.model_dump()
-                
+                completion_model_config = (
+                    experiment_config.completion_model_config.model_dump()
+                )
+
             if experiment_config.embedding_model_config is None:
                 embedding_model_config = None
             else:
                 experiment_config.embedding_model_config.model = None
-                embedding_model_config = experiment_config.embedding_model_config.model_dump()
+                embedding_model_config = (
+                    experiment_config.embedding_model_config.model_dump()
+                )
 
             model = {
                 "completion_model_config": completion_model_config,

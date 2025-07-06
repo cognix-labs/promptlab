@@ -73,7 +73,7 @@ class Asset:
         logger.debug(f"Creating dataset asset: {dataset.name}")
 
         self.tracer.create_dataset(dataset)
-        
+
         logger.debug(f"Dataset asset created: {dataset.name}")
 
         return dataset
@@ -123,7 +123,7 @@ class Asset:
         template.version = prev.asset_version + 1
 
         self.tracer.create_prompttemplate(template)
-        
+
         logger.debug(f"Prompt template asset updated: {template.name}")
 
         return template

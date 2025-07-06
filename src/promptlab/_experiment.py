@@ -19,7 +19,6 @@ class Experiment:
         self.tracer = tracer
         logger.debug("Experiment instance initialized.")
 
-
     def run(self, config: dict):
         """
         Synchronous version of experiment execution
@@ -119,11 +118,15 @@ class Experiment:
         """
         Synchronous version of batch evaluation with concurrency limit
         """
-        completion_model = ModelFactory.get_model(
-            experiment_config.completion_model_config,
-            completion=True,
-            model=experiment_config.completion_model_config.model,
-        ) if experiment_config.completion_model_config else None
+        completion_model = (
+            ModelFactory.get_model(
+                experiment_config.completion_model_config,
+                completion=True,
+                model=experiment_config.completion_model_config.model,
+            )
+            if experiment_config.completion_model_config
+            else None
+        )
 
         agent_proxy = experiment_config.agent_proxy
         experiment_id = (
@@ -172,11 +175,15 @@ class Experiment:
         """
         Asynchronous version of batch evaluation with concurrency limit
         """
-        completion_model = ModelFactory.get_model(
-            experiment_config.completion_model_config,
-            completion=True,
-            model=experiment_config.completion_model_config.model,
-        ) if experiment_config.completion_model_config else None
+        completion_model = (
+            ModelFactory.get_model(
+                experiment_config.completion_model_config,
+                completion=True,
+                model=experiment_config.completion_model_config.model,
+            )
+            if experiment_config.completion_model_config
+            else None
+        )
 
         agent_proxy = experiment_config.agent_proxy
 
@@ -230,17 +237,25 @@ class Experiment:
     ) -> str:
         evaluations = []
 
-        completion_model = ModelFactory.get_model(
-            experiment_config.completion_model_config,
-            completion=True,
-            model=experiment_config.completion_model_config.model,
-        ) if experiment_config.completion_model_config else None
+        completion_model = (
+            ModelFactory.get_model(
+                experiment_config.completion_model_config,
+                completion=True,
+                model=experiment_config.completion_model_config.model,
+            )
+            if experiment_config.completion_model_config
+            else None
+        )
 
-        embedding_model = ModelFactory.get_model(
-            experiment_config.embedding_model_config,
-            completion=False,
-            model=experiment_config.embedding_model_config.model,
-        ) if experiment_config.embedding_model_config else None
+        embedding_model = (
+            ModelFactory.get_model(
+                experiment_config.embedding_model_config,
+                completion=False,
+                model=experiment_config.embedding_model_config.model,
+            )
+            if experiment_config.embedding_model_config
+            else None
+        )
 
         for eval in experiment_config.evaluation:
             evaluator = EvaluatorFactory.get_evaluator(

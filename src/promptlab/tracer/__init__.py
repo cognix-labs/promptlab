@@ -6,6 +6,6 @@ from promptlab.tracer.api_tracer import ApiTracer
 __all__ = [
     "Tracer",
     "TracerFactory",
-    "LocalTracer", 
+    "LocalTracer",
     "ApiTracer",
 ]

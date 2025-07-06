@@ -25,9 +25,13 @@ class StudioApi:
         self.SECRET_KEY = os.getenv("PROMPTLAB_SECRET_KEY")
         if not self.SECRET_KEY:
             self.SECRET_KEY = secrets.token_urlsafe(32)
-            print("WARNING: Using auto-generated SECRET_KEY. Set PROMPTLAB_SECRET_KEY environment variable for production.")
+            print(
+                "WARNING: Using auto-generated SECRET_KEY. Set PROMPTLAB_SECRET_KEY environment variable for production."
+            )
         elif len(self.SECRET_KEY) < 32:
-            print("WARNING: SECRET_KEY should be at least 32 characters long for security.")
+            print(
+                "WARNING: SECRET_KEY should be at least 32 characters long for security."
+            )
         self.ALGORITHM = "HS256"
         self.ACCESS_TOKEN_EXPIRE_MINUTES = 60
         self.app.add_middleware(
