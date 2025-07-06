@@ -2,7 +2,10 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List
 import json
 
-from promptlab._config import ExperimentConfig, TracerConfig
+from sqlalchemy import text
+from sqlalchemy.orm import joinedload
+
+from promptlab.types import ExperimentConfig, TracerConfig, Dataset, PromptTemplate
 from promptlab.sqlite.session import get_session, init_engine
 from promptlab.enums import AssetType
 from promptlab.sqlite.sql import SQLQuery
@@ -12,10 +15,7 @@ from promptlab.sqlite.models import (
     ExperimentResult as ORMExperimentResult,
     User,
 )
-from promptlab.types import Dataset, PromptTemplate
 from promptlab.sqlite.models import Asset as ORMAsset
-from sqlalchemy import text
-from sqlalchemy.orm import joinedload
 
 
 class LocalTracer(Tracer):
@@ -246,13 +246,13 @@ class LocalTracer(Tracer):
             session.close()
 
     def me(self) -> User:
-        _current_user_name = (
+        _current_username = (
             "admin"  # This should be replaced with the actual current user logic
         )
         session = get_session()
         try:
             user = (
-                session.query(User).filter_by(username=_current_user_name).first()
+                session.query(User).filter_by(username=_current_username).first()
             )  # Assuming user with ID 1 is the current user
             if not user:
                 raise ValueError("Current user not found.")

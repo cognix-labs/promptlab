@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List
 
-from promptlab._config import ExperimentConfig, TracerConfig
+from promptlab.types import ExperimentConfig, TracerConfig
 from promptlab.sqlite.models import Asset
 from promptlab.types import Dataset, PromptTemplate
 

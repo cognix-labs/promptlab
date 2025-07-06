@@ -1,9 +1,8 @@
 from datetime import datetime
 from typing import Dict, List
-import json
 import requests
 
-from promptlab._config import ExperimentConfig, TracerConfig
+from promptlab.types import ExperimentConfig, TracerConfig
 from promptlab.tracer.tracer import Tracer
 from promptlab.sqlite.models import (
     Experiment as ORMExperiment,

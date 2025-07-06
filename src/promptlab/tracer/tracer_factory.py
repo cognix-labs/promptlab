@@ -1,4 +1,4 @@
-from promptlab._config import TracerConfig
+from promptlab.types import TracerConfig
 from promptlab.enums import TracerType
 from promptlab.tracer.local_tracer import LocalTracer
 from promptlab.tracer.api_tracer import ApiTracer
