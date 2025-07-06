@@ -15,7 +15,7 @@ pip install promptlab
 The first step to use PromptLab is to initialize the PromptLab object. Please check [Tracer](../../docs/README.md#tracer) to learn more about the tracer configuration.
 
 ```python
-tracer_config = {"type": "sqlite", "db_file": "./promptlab.db"}
+tracer_config = {"type": "local", "db_file": "./promptlab.db"}
 pl = PromptLab(tracer_config)
 ```
 
@@ -68,8 +68,15 @@ In the [quickstart.py](quickstart.py), we are using the prompt template and data
 
 ```python
 experiment_config = {
-    "completion_model": completion_model,
-    "embedding_model": embedding_model,
+    "name": "demo_experimet",
+    "completion_model_config": {
+        "name": "ollama/llama3.2", 
+        "type": "completion"
+    },
+    "embedding_model_config": {
+        "name": "ollama/nomic-embed-text:latest",
+        "type": "embedding",
+    },
     "prompt_template": pt,
     "dataset": ds,
     "evaluation": [
@@ -78,12 +85,14 @@ experiment_config = {
             "column_mapping": {"response": "$completion", "reference": "feedback"},
         },
         {
-            "metric": "fluency",
-            "column_mapping": {"response": "$completion"},
+            "metric": "relevance",
+            "column_mapping": {
+                "response": "$completion",
+                "query": "essay_topic",
+            },
         },
     ],
 }
-pl.experiment.run(experiment_config)
 ```
 
 ![PromptLab Studio](../../img/studio-exp.png)

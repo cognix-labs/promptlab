@@ -1,14 +1,13 @@
 import asyncio
 from promptlab import PromptLab
-from promptlab.model.ollama import Ollama, Ollama_Embedding
-from promptlab.types import ModelConfig, PromptTemplate, Dataset
+from promptlab.types import PromptTemplate, Dataset
 
 # Initialize PromptLab with SQLite storage
-tracer_config = {"type": "local", "db_file": "./promptlab4.db"}
+tracer_config = {"type": "local", "db_file": "./promptlab.db"}
 pl = PromptLab(tracer_config)
 
 # Create a prompt template
-prompt_name = "essay_feedback1"
+prompt_name = "essay_feedback"
 prompt_description = "A prompt for generating feedback on essays"
 system_prompt = "You are a helpful assistant who can provide feedback on essays."
 user_prompt = """The essay topic is - <essay_topic>.
@@ -23,7 +22,7 @@ prompt_template = PromptTemplate(
 pt = pl.asset.create(prompt_template)
 
 # Create a dataset
-dataset_name = "essay_samples1"
+dataset_name = "essay_samples"
 dataset_description = "dataset for evaluating the essay_feedback prompt"
 dataset_file_path = "./samples/data/essay_feedback.jsonl"
 dataset = Dataset(
@@ -37,8 +36,11 @@ ds = pl.asset.get(asset_name=dataset_name, version=0)
 
 # Run an experiment
 experiment_config = {
-    "name": "demo_experimet1",
-    "completion_model_config": {"name": "ollama/llama3.2", "type": "completion"},
+    "name": "demo_experimet",
+    "completion_model_config": {
+        "name": "ollama/llama3.2", 
+        "type": "completion"
+    },
     "embedding_model_config": {
         "name": "ollama/nomic-embed-text:latest",
         "type": "embedding",
@@ -59,7 +61,11 @@ experiment_config = {
         },
     ],
 }
-# # pl.experiment.run(experiment_config)
+
+# Uncomment the following line to run the experiment synchronously
+# pl.experiment.run(experiment_config)
+
+# Run the experiment asynchronously
 asyncio.run(pl.experiment.run_async(experiment_config))
 
 # Start the PromptLab Studio to view results
