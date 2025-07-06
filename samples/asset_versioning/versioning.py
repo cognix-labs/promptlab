@@ -1,8 +1,9 @@
+import asyncio
 from promptlab import PromptLab
 from promptlab.types import PromptTemplate
 
-# Initialize PromptLab with SQLite storage
-tracer_config = {"type": "sqlite", "db_file": "./promptlab.db"}
+# Initialize PromptLab with local tracer
+tracer_config = {"type": "local", "db_file": "./promptlab.db"}
 pl = PromptLab(tracer_config)
 
 # Create a prompt template
@@ -18,7 +19,7 @@ prompt_template = PromptTemplate(
     system_prompt=system_prompt,
     user_prompt=user_prompt,
 )
-pt = pl.asset.create(prompt_template)
+# pt = pl.asset.create(prompt_template)
 
 # Create a new version of the prompt template
 system_prompt = """You are a helpful assistant who can provide feedback on essays. You follow the criteria below while writing feedback.                    
@@ -40,4 +41,4 @@ prompt_template = PromptTemplate(
 pt = pl.asset.update(prompt_template)
 
 # Start the PromptLab Studio to view results
-pl.studio.start(8000)
+asyncio.run(pl.studio.start_async(8000))

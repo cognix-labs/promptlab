@@ -24,7 +24,8 @@ class LocalTracer(Tracer):
         init_engine(db_url)
 
     def create_dataset(self, dataset: Dataset):
-        dataset.version = 0
+        if dataset.version is None:
+            dataset.version = 0
         binary = {"file_path": dataset.file_path}
         asset = ORMAsset(
             asset_name=dataset.name,
@@ -39,7 +40,8 @@ class LocalTracer(Tracer):
         self._create_asset(asset)
 
     def create_prompttemplate(self, template: PromptTemplate):
-        template.version = 0
+        if template.version is None:
+            template.version = 0
         binary = f"""
             <<system>>
                 {template.system_prompt}

@@ -2,7 +2,7 @@ import asyncio
 from promptlab import PromptLab
 from promptlab.types import PromptTemplate, Dataset
 
-# Initialize PromptLab with SQLite storage
+# Initialize PromptLab with local tracer
 tracer_config = {"type": "local", "db_file": "./promptlab.db"}
 pl = PromptLab(tracer_config)
 

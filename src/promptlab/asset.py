@@ -88,22 +88,9 @@ class Asset:
             else dataset.description
         )
         dataset.version = prev.asset_version + 1
-        binary = (
-            prev.asset_binary
-            if dataset.file_path is None
-            else json.dumps({"file_path": dataset.file_path})
-        )
-        asset = ORMAsset(
-            asset_name=dataset.name,
-            asset_version=dataset.version,
-            asset_description=dataset.description,
-            asset_type=AssetType.DATASET.value,
-            asset_binary=binary,
-            created_at=datetime.now(timezone.utc),
-            user_id=self.tracer.me().id,
-        )
-        self.tracer.create_asset(asset)
-        
+
+        self.tracer.create_dataset(dataset)
+
         logger.debug(f"Dataset asset created: {dataset.name}")
 
         return dataset
@@ -134,22 +121,8 @@ class Asset:
             user_prompt if template.user_prompt is None else template.user_prompt
         )
         template.version = prev.asset_version + 1
-        binary = f"""
-            <<system>>
-                {template.system_prompt}
-            <<user>>
-                {template.user_prompt}
-        """
-        asset = ORMAsset(
-            asset_name=template.name,
-            asset_version=template.version,
-            asset_description=template.description,
-            asset_type=AssetType.PROMPT_TEMPLATE.value,
-            asset_binary=binary,
-            created_at=datetime.now(timezone.utc),
-            user_id=self.tracer.me().id,
-        )
-        self.tracer.create_asset(asset)
+
+        self.tracer.create_prompttemplate(template)
         
         logger.debug(f"Prompt template asset updated: {template.name}")
 
