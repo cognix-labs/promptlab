@@ -46,7 +46,7 @@ An experiment evaluates the outcome of a prompt or agent against a set of metric
 In the [agent_evaluation.py](agent_evaluation.py), we are using the dataset created in the previous steps to design an experiment. It also uses an evaluation metrics: `exact_match`. Please check [Metric](../../docs/README.md#metric) to learn more about evaluation metrics. Few key points -
 
 - Use the `agent_proxy` attribute to pass a function or callable class which is a wrapper to the agent or endpoint.
-- The `inference_model`, `embedding_model` are optional. The models may be necessary if they are required by any metric used in the experiment. If they are not used by any metric, skip them.
+- The `completion_model`, `embedding_model` are optional. The models may be necessary if they are required by any metric used in the experiment. If they are not used by any metric, skip them.
 - Attribute `prompt_template` is also not necessary, as we are evaluating an agent or app, not a prompt.
 
 ```python
@@ -58,7 +58,7 @@ experiment_config = {
         {
             "metric": "exact_match",
             "column_mapping": {
-                "response": "$inference",
+                "response": "$completion",
                 "reference": "feedback",
             },
         },

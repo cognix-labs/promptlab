@@ -66,11 +66,11 @@ class Fluency(Evaluator):
                     ## Determine the appropriate Linguistic Articulacy score for the RESPONSE above based on the provided scale. Your evaluation MUST yield a single integer rating (e.g., "1", "2", etc.) corresponding to the defined levels. Provide ONLY the numerical score without any accompanying explanation or commentary.
                         """
 
-        inference = data["response"]
+        completion = data["response"]
 
-        user_prompt = user_prompt.replace("{{feedback}}", inference)
+        user_prompt = user_prompt.replace("{{feedback}}", completion)
 
-        model_response = self.inference(system_prompt, user_prompt)
+        model_response = self.completion(system_prompt, user_prompt)
 
         return model_response.response
 

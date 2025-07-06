@@ -747,7 +747,7 @@
                     row.innerHTML = `
                         <td><input type="checkbox" class="experiment-checkbox" data-id="${exp.experiment_id}"></td>
                         <td>${exp.experiment_id}</td>
-                        <td>${exp.inference_model}</td>
+                        <td>${exp.completion_model}</td>
                         <td>${exp.embedding_model}</td>
                         <td>${exp.prompt_template_name}</td>
                         <td>${exp.prompt_template_version}</td>
@@ -993,7 +993,7 @@
                         'Experiment ID': exp.experiment_id,
                         'User ID': exp.user_id ?? '-',
                         'Dataset Record ID': exp.dataset_record_id,
-                        'Completion': exp.inference,
+                        'Completion': exp.completion,
                         'Completion Tokens': exp.completion_tokens,
                         'Prompt Tokens': exp.prompt_tokens,
                         'Latency (ms)': exp.latency_ms?.toFixed(2) ?? '-',
@@ -1022,7 +1022,7 @@
                         const rowIdx = tr.rowIndex - 1; // skip header
                         // Find the data object
                         const exp = data[rowIdx];
-                        showOverlay(exp.inference);
+                        showOverlay(exp.completion);
                     });
                 });
             }

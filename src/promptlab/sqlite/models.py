@@ -35,7 +35,7 @@ class ExperimentResult(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     experiment_id = Column(String, ForeignKey('experiments.experiment_id'))
     dataset_record_id = Column(String)
-    inference = Column(Text)
+    completion = Column(Text)
     prompt_tokens = Column(Integer)
     completion_tokens = Column(Integer)
     latency_ms = Column(Float)

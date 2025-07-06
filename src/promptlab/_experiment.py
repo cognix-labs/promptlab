@@ -138,7 +138,7 @@ class Experiment:
         """
         Synchronous version of batch evaluation with concurrency limit
         """
-        inference_model = ModelFactory.get_model(experiment_config.completion_model_config, completion=True, model = experiment_config.completion_model_config.model)
+        completion_model = ModelFactory.get_model(experiment_config.completion_model_config, completion=True, model = experiment_config.completion_model_config.model)
         agent_proxy = experiment_config.agent_proxy
         experiment_id = (
             experiment_config.name if experiment_config.name else str(uuid.uuid4())
@@ -155,7 +155,7 @@ class Experiment:
             model_response = (
                 agent_proxy(eval_record)
                 if agent_proxy
-                else inference_model(sys_prompt, usr_prompt)
+                else completion_model(sys_prompt, usr_prompt)
             )
             evaluation = self._evaluate(
                 model_response.response, eval_record, experiment_config
@@ -164,7 +164,7 @@ class Experiment:
             eval = dict()
             eval["experiment_id"] = experiment_id
             eval["dataset_record_id"] = eval_record["id"]
-            eval["inference"] = model_response.response
+            eval["completion"] = model_response.response
             eval["prompt_tokens"] = model_response.prompt_tokens
             eval["completion_tokens"] = model_response.completion_tokens
             eval["latency_ms"] = model_response.latency_ms
@@ -186,7 +186,7 @@ class Experiment:
         """
         Asynchronous version of batch evaluation with concurrency limit
         """
-        inference_model = ModelFactory.get_model(experiment_config.completion_model_config, completion=True, model = experiment_config.completion_model_config.model)
+        completion_model = ModelFactory.get_model(experiment_config.completion_model_config, completion=True, model = experiment_config.completion_model_config.model)
                               
         agent_proxy = experiment_config.agent_proxy
 
@@ -194,7 +194,7 @@ class Experiment:
             experiment_config.name if experiment_config.name else str(uuid.uuid4())
         )
         timestamp = datetime.now().isoformat()
-        max_concurrent_tasks = getattr(inference_model, "max_concurrent_tasks", 5)
+        max_concurrent_tasks = getattr(completion_model, "max_concurrent_tasks", 5)
 
         exp_summary = []
 
@@ -211,7 +211,7 @@ class Experiment:
         async def process_with_semaphore(record, s_prompt, u_prompt):
             async with semaphore:
                 return await self._process_record_async(
-                    inference_model,
+                    completion_model,
                     agent_proxy,
                     s_prompt,
                     u_prompt,
@@ -236,7 +236,7 @@ class Experiment:
         return exp_summary
 
     def _evaluate(
-        self, inference: str, row, experiment_config: ExperimentConfig
+        self, completion: str, row, experiment_config: ExperimentConfig
     ) -> str:
         evaluations = []
         for eval in experiment_config.evaluation:
@@ -249,8 +249,8 @@ class Experiment:
 
             data = dict()
             for key, value in eval.column_mapping.items():
-                if value == "$inference":
-                    data[key] = inference
+                if value == "$completion":
+                    data[key] = completion
                 else:
                     data[key] = row[value]
 
@@ -263,7 +263,7 @@ class Experiment:
 
     async def _process_record_async(
         self,
-        inference_model,
+        completion_model,
         agent_proxy,
         system_prompt,
         user_prompt,
@@ -275,11 +275,11 @@ class Experiment:
         """
         Process a single record asynchronously
         """
-        # model_response = await inference_model(system_prompt, user_prompt)
+        # model_response = await completion_model(system_prompt, user_prompt)
         model_response = (
             await agent_proxy(eval_record)
             if agent_proxy
-            else await inference_model(system_prompt, user_prompt)
+            else await completion_model(system_prompt, user_prompt)
         )
         # Run potentially blocking evaluation in a separate thread
         evaluation = await asyncio.to_thread(
@@ -289,7 +289,7 @@ class Experiment:
         eval_result = dict()
         eval_result["experiment_id"] = experiment_id
         eval_result["dataset_record_id"] = eval_record["id"]
-        eval_result["inference"] = model_response.response
+        eval_result["completion"] = model_response.response
         eval_result["prompt_tokens"] = model_response.prompt_tokens
         eval_result["completion_tokens"] = model_response.completion_tokens
         eval_result["latency_ms"] = model_response.latency_ms

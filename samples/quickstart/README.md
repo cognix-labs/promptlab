@@ -68,18 +68,18 @@ In the [quickstart.py](quickstart.py), we are using the prompt template and data
 
 ```python
 experiment_config = {
-    "inference_model": inference_model,
+    "completion_model": completion_model,
     "embedding_model": embedding_model,
     "prompt_template": pt,
     "dataset": ds,
     "evaluation": [
         {
             "metric": "semantic_similarity",
-            "column_mapping": {"response": "$inference", "reference": "feedback"},
+            "column_mapping": {"response": "$completion", "reference": "feedback"},
         },
         {
             "metric": "fluency",
-            "column_mapping": {"response": "$inference"},
+            "column_mapping": {"response": "$completion"},
         },
     ],
 }

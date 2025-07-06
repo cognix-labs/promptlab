@@ -4,7 +4,7 @@ from promptlab.model.ollama import Ollama, Ollama_Embedding
 from promptlab.types import ModelConfig, PromptTemplate, Dataset
 
 # Initialize PromptLab with SQLite storage
-tracer_config = {"type": "local", "db_file": "./promptlab3.db"}
+tracer_config = {"type": "local", "db_file": "./promptlab4.db"}
 pl = PromptLab(tracer_config)
 
 # Create a prompt template
@@ -20,7 +20,7 @@ prompt_template = PromptTemplate(
     system_prompt=system_prompt,
     user_prompt=user_prompt
 )
-# pt = pl.asset.create(prompt_template)
+pt = pl.asset.create(prompt_template)
 
 # Create a dataset
 dataset_name = "essay_samples"
@@ -29,7 +29,7 @@ dataset_file_path = "./samples/data/essay_feedback.jsonl"
 dataset = Dataset(
     name=dataset_name, description=dataset_description, file_path=dataset_file_path
 )
-# ds = pl.asset.create(dataset)
+ds = pl.asset.create(dataset)
 
 # # Retrieve assets
 pt = pl.asset.get(asset_name=prompt_name, version=0)
@@ -37,7 +37,7 @@ ds = pl.asset.get(asset_name=dataset_name, version=0)
 
 # Run an experiment
 experiment_config = {
-    "name": "demo_experimet19",
+    "name": "demo_experimet",
     "completion_model_config": {"name":"ollama/llama3.2", "type": "completion"},
     "embedding_model_config": {"name":"ollama/nomic-embed-text:latest", "type": "embedding"},
     "prompt_template": pt,
@@ -45,19 +45,19 @@ experiment_config = {
     "evaluation": [
         {
             "metric": "semantic_similarity",
-            "column_mapping": {"response": "$inference", "reference": "feedback"},
+            "column_mapping": {"response": "$completion", "reference": "feedback"},
         },
         {
             "metric": "relevance",
             "column_mapping": {
-                "response": "$inference",
+                "response": "$completion",
                 "query": "essay_topic",
             },
         },
     ],
 }
 # pl.experiment.run(experiment_config)
-# asyncio.run(pl.experiment.run_async(experiment_config))
+asyncio.run(pl.experiment.run_async(experiment_config))
 
 # Start the PromptLab Studio to view results
 asyncio.run(pl.studio.start_async(8000))

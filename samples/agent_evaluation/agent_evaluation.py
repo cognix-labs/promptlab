@@ -40,7 +40,7 @@ experiment_config = {
         {
             "metric": "exact_match",
             "column_mapping": {
-                "response": "$inference",
+                "response": "$completion",
                 "reference": "feedback",
             },
         },

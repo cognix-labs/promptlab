@@ -9,11 +9,11 @@ class BleuScore(Evaluator):
         Utils.download_required_nltk_resources()
 
     def evaluate(self, data: dict):
-        inference = data["response"]
+        completion = data["response"]
         reference = data["reference"]
 
         reference_tokens = word_tokenize(reference)
-        hypothesis_tokens = word_tokenize(inference)
+        hypothesis_tokens = word_tokenize(completion)
 
         # NIST Smoothing
         smoothing_function = SmoothingFunction().method4

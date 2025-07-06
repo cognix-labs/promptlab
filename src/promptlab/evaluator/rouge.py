@@ -38,11 +38,11 @@ class RougeScore(Evaluator):
         Returns:
             float: The ROUGE F1 score for the specified rouge_type
         """
-        inference = data["response"]
+        completion = data["response"]
         reference = data["reference"]
 
         scorer = rouge_scorer.RougeScorer([self.rouge_type], use_stemmer=True)
-        scores = scorer.score(reference, inference)
+        scores = scorer.score(reference, completion)
         rouge_scores = scores[self.rouge_type]
 
         return rouge_scores.fmeasure

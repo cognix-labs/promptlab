@@ -106,7 +106,7 @@ class LocalTracer(Tracer):
                 ORMExperimentResult(
                     experiment_id=record["experiment_id"],
                     dataset_record_id=record["dataset_record_id"],
-                    inference=record["inference"],
+                    completion=record["completion"],
                     prompt_tokens=record["prompt_tokens"],
                     completion_tokens=record["completion_tokens"],
                     latency_ms=record["latency_ms"],

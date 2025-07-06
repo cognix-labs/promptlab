@@ -37,7 +37,7 @@ pt = pl.asset.get(asset_name=prompt_name, version=0)
 ds = pl.asset.get(asset_name=dataset_name, version=0)
 
 # model instnace
-inference_model = Ollama(model_config=ModelConfig(model_deployment="llama3.2"))
+completion_model = Ollama(model_config=ModelConfig(model_deployment="llama3.2"))
 embedding_model = Ollama_Embedding(
     model_config=ModelConfig(model_deployment="nomic-embed-text:latest")
 )
@@ -47,7 +47,7 @@ factual_correctness = RagasFactualCorrectness()
 
 # Run an experiment
 experiment_config = {
-    "inference_model": inference_model,
+    "completion_model": completion_model,
     "embedding_model": embedding_model,
     "prompt_template": pt,
     "dataset": ds,
@@ -55,13 +55,13 @@ experiment_config = {
         {
             "metric": "length",
             "column_mapping": {
-                "response": "$inference",
+                "response": "$completion",
             },
             "evaluator": length,
         },
         {
             "metric": "factual_correctness",
-            "column_mapping": {"response": "$inference", "reference": "feedback"},
+            "column_mapping": {"response": "$completion", "reference": "feedback"},
             "evaluator": factual_correctness,
         },
     ],

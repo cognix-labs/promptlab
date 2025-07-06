@@ -8,13 +8,13 @@ The following code snippet implements a metric using the evaluation library Raga
 
     class RagasFactualCorrectness(Evaluator):
         def evaluate(self, data: dict):
-            inference = data["response"]
+            completion = data["response"]
             reference = data["reference"]
 
-            sample = SingleTurnSample(response=inference, reference=reference)
+            sample = SingleTurnSample(response=completion, reference=reference)
 
             evaluator_llm = LangchainLLMWrapper(
-                ChatOllama(model=self.inference.model_config.model_deployment)
+                ChatOllama(model=self.completion.model_config.model_deployment)
             )
 
             scorer = FactualCorrectness(llm=evaluator_llm)
@@ -28,7 +28,7 @@ The following code snippet demonstrate how to use the custom metric in the exper
     factual_correctness = RagasFactualCorrectness()
 
     experiment_config = {
-        "inference_model": inference_model,
+        "completion_model": completion_model,
         "embedding_model": embedding_model,
         "prompt_template": pt,
         "dataset": ds,
@@ -36,13 +36,13 @@ The following code snippet demonstrate how to use the custom metric in the exper
             {
                 "metric": "length",
                 "column_mapping": {
-                    "response": "$inference",
+                    "response": "$completion",
                 },
                 "evaluator": length,
             },
             {
                 "metric": "factual_correctness",
-                "column_mapping": {"response": "$inference", "reference": "feedback"},
+                "column_mapping": {"response": "$completion", "reference": "feedback"},
                 "evaluator": factual_correctness,
             },
         ],

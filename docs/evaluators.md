@@ -61,7 +61,7 @@ The [Fluency](../src/promptlab/evaluator/fluency.py) is a LLM-as-a-Judge evaluat
   - 5: Masterful Expression
 - **Usage**: Useful for evaluating the linguistic quality and readability of generated content
 
-This evaluator uses another inference model to rate the text's fluency based on a detailed linguistic assessment rubric.
+This evaluator uses another completion model to rate the text's fluency based on a detailed linguistic assessment rubric.
 
 #### Coherence (`Coherence`)
 
@@ -78,7 +78,7 @@ The [Coherence](../src/promptlab/evaluator/coherence.py) is a LLM-as-a-Judge eva
   - 5: Highly Coherent Response
 - **Usage**: Useful for evaluating how well a response presents information in a logical, connected manner that directly addresses the query
 
-This evaluator uses another inference model to rate the text's coherence based on a detailed assessment framework that examines logical flow, transitions between ideas, and overall organization.
+This evaluator uses another completion model to rate the text's coherence based on a detailed assessment framework that examines logical flow, transitions between ideas, and overall organization.
 
 #### F1 Score (`F1Score`)
 
@@ -156,7 +156,7 @@ The [Groundedness](../src/promptlab/evaluator/groundedness.py) is a LLM-as-a-Jud
   - Reasoning that explains the score
 - **Usage**: Useful for evaluating how well RAG systems ensure that responses are factually supported by the provided context
 
-This evaluator uses another inference model to assess groundedness based on how well each claim in the response can be verified from the given context.
+This evaluator uses another completion model to assess groundedness based on how well each claim in the response can be verified from the given context.
 
 #### Relevance (`Relevance`)
 
@@ -173,7 +173,7 @@ The [Relevance](../src/promptlab/evaluator/relevance.py) evaluator assesses how 
   - 5: Highly Relevant Response
 - **Usage**: Useful for evaluating how effectively an AI system interprets inputs and generates meaningful, context-aware responses that meet the user's intent
 
-This evaluator uses an inference model to rate the relevance of the response based on how well it addresses the query content and intent.
+This evaluator uses an completion model to rate the relevance of the response based on how well it addresses the query content and intent.
 
 ## Evaluator Architecture
 

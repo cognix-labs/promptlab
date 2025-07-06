@@ -134,7 +134,7 @@ class Faithfulness(Evaluator):
             user_prompt=formatted_prompt,
         )
 
-        return claim_generator_response.inference.split("\n")
+        return claim_generator_response.completion.split("\n")
 
     def _faithfulness_evaluation(self, context: str, claims: List[str]) -> float:
         """
@@ -163,7 +163,7 @@ class Faithfulness(Evaluator):
 
                 judgement = self.judge_llm.invoke(
                     system_prompt=self.JUDGE_SYSTEM_PROMPT, user_prompt=formatted_prompt
-                ).inference
+                ).completion
 
                 try:
                     verdict = json.loads(judgement)["verdict"]

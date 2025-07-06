@@ -37,7 +37,7 @@ ds = pl.asset.create(dataset)
 # ds = pl.asset.get(asset_name=dataset_name, version=0)
 
 # # model instnace
-# inference_model = Ollama(model_config=ModelConfig(model_deployment="llama3.2"))
+# completion_model = Ollama(model_config=ModelConfig(model_deployment="llama3.2"))
 # embedding_model = Ollama_Embedding(
 #     model_config=ModelConfig(model_deployment="nomic-embed-text:latest")
 # )
@@ -45,19 +45,19 @@ ds = pl.asset.create(dataset)
 # # Run an experiment
 # experiment_config = {
 #     "name": "demo_experimet1230981",
-#     "inference_model": inference_model,
+#     "completion_model": completion_model,
 #     "embedding_model": embedding_model,
 #     "prompt_template": pt,
 #     "dataset": ds,
 #     "evaluation": [
 #         {
 #             "metric": "semantic_similarity",
-#             "column_mapping": {"response": "$inference", "reference": "feedback"},
+#             "column_mapping": {"response": "$completion", "reference": "feedback"},
 #         },
 #         {
 #             "metric": "relevance",
 #             "column_mapping": {
-#                 "response": "$inference",
+#                 "response": "$completion",
 #                 "query": "essay_topic",
 #             },
 #         },

@@ -72,7 +72,7 @@ class EvaluationConfig(BaseModel):
 
 class ExperimentConfig(BaseModel):
     name: str = None
-    inference_model: Optional[Model] = None
+    completion_model: Optional[Model] = None
     embedding_model: Optional[EmbeddingModel] = None
     completion_model_config: Optional[ModelConfig] = None
     embedding_model_config: Optional[ModelConfig] = None

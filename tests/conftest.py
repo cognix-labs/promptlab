@@ -14,7 +14,7 @@ def mock_model_config():
 
     return ModelConfig(
         type="mock",
-        inference_model_deployment="mock-model",
+        completion_model_deployment="mock-model",
         embedding_model_deployment="mock-model",
     )
 

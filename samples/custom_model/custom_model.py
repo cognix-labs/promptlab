@@ -52,12 +52,12 @@ experiment_config = {
     "evaluation": [
         {
             "metric": "semantic_similarity",
-            "column_mapping": {"response": "$inference", "reference": "feedback"},
+            "column_mapping": {"response": "$completion", "reference": "feedback"},
         },
         {
             "metric": "relevance",
             "column_mapping": {
-                "response": "$inference",
+                "response": "$completion",
                 "query": "essay_topic",
             },
         },

@@ -35,7 +35,7 @@ class ApiTracer(Tracer):
         if self.jwt_token:
             headers["Authorization"] = f"Bearer {self.jwt_token}"
             
-        experiment_config.inference_model = None
+        experiment_config.completion_model = None
         experiment_config.embedding_model = None
 
         payload = {

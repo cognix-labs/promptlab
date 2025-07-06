@@ -3,6 +3,6 @@ from promptlab.evaluator.evaluator import Evaluator
 
 class LengthEvaluator(Evaluator):
     def evaluate(self, data: dict):
-        inference = data["response"]
+        completion = data["response"]
 
-        return len(str(inference))
+        return len(str(completion))
