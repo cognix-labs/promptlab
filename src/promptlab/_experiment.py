@@ -80,12 +80,6 @@ class Experiment:
     def _prepare_experiment_data(self, experiment_config: ExperimentConfig):
         logger.debug("Preparing experiment data.")
         experiment_config = ExperimentConfig(**experiment_config)
-        try:
-            ConfigValidator.validate_experiment_config(experiment_config)
-            logger.debug("Experiment config validated.")
-        except Exception as e:
-            logger.error(f"Experiment config validation failed: {e}", exc_info=True)
-            raise
 
         pt_asset_binary = None
         if experiment_config.prompt_template:
