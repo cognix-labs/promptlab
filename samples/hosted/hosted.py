@@ -3,28 +3,28 @@ from promptlab import PromptLab
 from promptlab.model.ollama import Ollama, Ollama_Embedding
 from promptlab.types import ModelConfig, PromptTemplate, Dataset
 
-# Initialize PromptLab with SQLite storage
+# Initialize PromptLab with local tracer
 tracer_config = {"type": "api", "endpoint": "http://localhost:8001", "jwt_token": None}
 pl = PromptLab(tracer_config)
 
-# # Create a prompt template
-# prompt_name = "essay_feedback"
-# prompt_description = "A prompt for generating feedback on essays"
-# system_prompt = "You are a helpful assistant who can provide feedback on essays."
-# user_prompt = """The essay topic is - <essay_topic>.
-#                The submitted essay is - <essay>
-#                Now write feedback on this essay."""
-# prompt_template = PromptTemplate(
-#     name=prompt_name,
-#     description=prompt_description,
-#     system_prompt=system_prompt,
-#     user_prompt=user_prompt,
-#     user_id=1
-# )
-# pt = pl.asset.create(prompt_template)
+# Create a prompt template
+prompt_name = "essay_feedback"
+prompt_description = "A prompt for generating feedback on essays"
+system_prompt = "You are a helpful assistant who can provide feedback on essays."
+user_prompt = """The essay topic is - <essay_topic>.
+               The submitted essay is - <essay>
+               Now write feedback on this essay."""
+prompt_template = PromptTemplate(
+    name=prompt_name,
+    description=prompt_description,
+    system_prompt=system_prompt,
+    user_prompt=user_prompt,
+    user_id=1
+)
+pt = pl.asset.create(prompt_template)
 
 # Create a dataset
-dataset_name = "essay_samples222"
+dataset_name = "essay_samples"
 dataset_description = "dataset for evaluating the essay_feedback prompt"
 dataset_file_path = "./samples/data/essay_feedback.jsonl"
 dataset = Dataset(
@@ -32,9 +32,9 @@ dataset = Dataset(
 )
 ds = pl.asset.create(dataset)
 
-# # Retrieve assets
-# pt = pl.asset.get(asset_name=prompt_name, version=0)
-# ds = pl.asset.get(asset_name=dataset_name, version=0)
+# Retrieve assets
+pt = pl.asset.get(asset_name=prompt_name, version=0)
+ds = pl.asset.get(asset_name=dataset_name, version=0)
 
 # # model instnace
 # completion_model = Ollama(model_config=ModelConfig(model_deployment="llama3.2"))
@@ -42,28 +42,39 @@ ds = pl.asset.create(dataset)
 #     model_config=ModelConfig(model_deployment="nomic-embed-text:latest")
 # )
 
-# # Run an experiment
-# experiment_config = {
-#     "name": "demo_experimet1230981",
-#     "completion_model": completion_model,
-#     "embedding_model": embedding_model,
-#     "prompt_template": pt,
-#     "dataset": ds,
-#     "evaluation": [
-#         {
-#             "metric": "semantic_similarity",
-#             "column_mapping": {"response": "$completion", "reference": "feedback"},
-#         },
-#         {
-#             "metric": "relevance",
-#             "column_mapping": {
-#                 "response": "$completion",
-#                 "query": "essay_topic",
-#             },
-#         },
-#     ],
-# }
-# # pl.experiment.run(experiment_config)
+# Run an experiment
+experiment_config = {
+    "name": "hosted_experimet",
+    "completion_model_config": {
+        "name": "ollama/llama3.2", 
+        "type": "completion"
+    },
+    "embedding_model_config": {
+        "name": "ollama/nomic-embed-text:latest",
+        "type": "embedding",
+    },
+    "prompt_template": pt,
+    "dataset": ds,
+    "evaluation": [
+        {
+            "metric": "semantic_similarity",
+            "column_mapping": {"response": "$completion", "reference": "feedback"},
+        },
+        {
+            "metric": "relevance",
+            "column_mapping": {
+                "response": "$completion",
+                "query": "essay_topic",
+            },
+        },
+    ],
+}
 
-# # Start the PromptLab Studio to view results
-# asyncio.run(pl.studio.start_async(8000))
+# Uncomment the following line to run the experiment synchronously
+# pl.experiment.run(experiment_config)
+
+# Run the experiment asynchronously
+asyncio.run(pl.experiment.run_async(experiment_config))
+
+# Start the PromptLab Studio to view results
+asyncio.run(pl.studio.start_async(8000))
