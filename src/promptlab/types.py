@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Optional, Protocol, runtime_checkable
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, SkipValidation
 
 from promptlab.enums import TracerType
 from promptlab.evaluator.evaluator import Evaluator
@@ -23,7 +23,7 @@ class ModelConfig(BaseModel):
     api_version: Optional[str] = None
     endpoint: Optional[str] = None
     max_concurrent_tasks: int = 5
-    model: Optional[callable] = None
+    model: SkipValidation[Optional[callable]] = None
     model_config = {"arbitrary_types_allowed": True}
 
 
@@ -36,14 +36,6 @@ class Model(Protocol):
 @runtime_checkable
 class EmbeddingModel(Protocol):
     def __call__(self, text: str) -> List[float]: ...
-
-
-# @dataclass
-# class Asset:
-#     name: str
-#     description: str
-#     file_path: str
-#     version: int = 0
 
 
 class Dataset(BaseModel):
@@ -77,7 +69,7 @@ class ExperimentConfig(BaseModel):
     completion_model_config: Optional[ModelConfig] = None
     embedding_model_config: Optional[ModelConfig] = None
     prompt_template: Optional[PromptTemplate] = None
-    agent_proxy: Optional[callable] = None
+    agent_proxy: SkipValidation[Optional[callable]] = None
     dataset: Dataset
     evaluation: List[EvaluationConfig]
     model_config = {"arbitrary_types_allowed": True}
