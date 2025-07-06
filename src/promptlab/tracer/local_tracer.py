@@ -7,11 +7,16 @@ from promptlab.sqlite.session import get_session, init_engine
 from promptlab.enums import AssetType
 from promptlab.sqlite.sql import SQLQuery
 from promptlab.tracer.tracer import Tracer
-from promptlab.sqlite.models import Experiment as ORMExperiment, ExperimentResult as ORMExperimentResult, User
+from promptlab.sqlite.models import (
+    Experiment as ORMExperiment,
+    ExperimentResult as ORMExperimentResult,
+    User,
+)
 from promptlab.types import Dataset, PromptTemplate
 from promptlab.sqlite.models import Asset as ORMAsset
 from sqlalchemy import text
 from sqlalchemy.orm import joinedload
+
 
 class LocalTracer(Tracer):
     def __init__(self, tracer_config: TracerConfig):
@@ -28,9 +33,9 @@ class LocalTracer(Tracer):
             asset_type=AssetType.DATASET.value,
             asset_binary=json.dumps(binary),
             created_at=datetime.now(timezone.utc),
-            user_id=self.get_user_by_username(dataset.user).id
-        )     
-    
+            user_id=self.get_user_by_username(dataset.user).id,
+        )
+
         self._create_asset(asset)
 
     def create_prompttemplate(self, template: PromptTemplate):
@@ -48,7 +53,7 @@ class LocalTracer(Tracer):
             asset_type=AssetType.PROMPT_TEMPLATE.value,
             asset_binary=binary,
             created_at=datetime.now(timezone.utc),
-            user_id=self.get_user_by_username(template.user).id
+            user_id=self.get_user_by_username(template.user).id,
         )
 
         self._create_asset(asset)
@@ -74,10 +79,10 @@ class LocalTracer(Tracer):
 
             experiment_config.completion_model_config.model = None
             experiment_config.completion_model_config.api_key = None
-            
+
             experiment_config.embedding_model_config.model = None
             experiment_config.embedding_model_config.api_key = None
-            
+
             model = {
                 "completion_model_config": experiment_config.completion_model_config.model_dump(),
                 "embedding_model_config": experiment_config.embedding_model_config.model_dump(),
@@ -128,10 +133,15 @@ class LocalTracer(Tracer):
     def get_asset(self, asset_name: str, asset_version: int) -> ORMAsset:
         session = get_session()
         try:
-            asset = session.query(ORMAsset).filter_by(
-                asset_name=asset_name, asset_version=asset_version).first()
+            asset = (
+                session.query(ORMAsset)
+                .filter_by(asset_name=asset_name, asset_version=asset_version)
+                .first()
+            )
             if not asset:
-                raise ValueError(f"Asset {asset_name} with version {asset_version} not found.")
+                raise ValueError(
+                    f"Asset {asset_name} with version {asset_version} not found."
+                )
             return asset
         except Exception as e:
             session.rollback()
@@ -144,19 +154,28 @@ class LocalTracer(Tracer):
         try:
             if asset_type not in AssetType._value2member_map_:
                 raise ValueError(f"Invalid asset type: {asset_type}")
-            assets = session.query(ORMAsset).options(joinedload(ORMAsset.user)).filter(ORMAsset.asset_type == asset_type).all()
+            assets = (
+                session.query(ORMAsset)
+                .options(joinedload(ORMAsset.user))
+                .filter(ORMAsset.asset_type == asset_type)
+                .all()
+            )
             return assets
         except Exception as e:
             session.rollback()
             raise
         finally:
             session.close()
-    
+
     def get_latest_asset(self, asset_name: str) -> ORMAsset:
         session = get_session()
         try:
-            asset = session.query(ORMAsset).filter_by(asset_name=asset_name).order_by(
-                ORMAsset.asset_version.desc()).first()
+            asset = (
+                session.query(ORMAsset)
+                .filter_by(asset_name=asset_name)
+                .order_by(ORMAsset.asset_version.desc())
+                .first()
+            )
             return asset
         except Exception as e:
             session.rollback()
@@ -180,7 +199,11 @@ class LocalTracer(Tracer):
     def get_experiments(self):
         session = get_session()
         try:
-            return session.execute(text(SQLQuery.SELECT_EXPERIMENTS_QUERY)).mappings().all()
+            return (
+                session.execute(text(SQLQuery.SELECT_EXPERIMENTS_QUERY))
+                .mappings()
+                .all()
+            )
         except Exception as e:
             session.rollback()
             raise
@@ -223,10 +246,14 @@ class LocalTracer(Tracer):
             session.close()
 
     def me(self) -> User:
-        _current_user_name = 'admin'  # This should be replaced with the actual current user logic
+        _current_user_name = (
+            "admin"  # This should be replaced with the actual current user logic
+        )
         session = get_session()
         try:
-            user = session.query(User).filter_by(username=_current_user_name).first()  # Assuming user with ID 1 is the current user
+            user = (
+                session.query(User).filter_by(username=_current_user_name).first()
+            )  # Assuming user with ID 1 is the current user
             if not user:
                 raise ValueError("Current user not found.")
             return user

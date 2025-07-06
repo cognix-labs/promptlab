@@ -17,7 +17,7 @@ class ModelResponse:
 
 
 class ModelConfig(BaseModel):
-    name: str   # example "ollama/llama3.2"
+    name: str  # example "ollama/llama3.2"
     type: str
     api_key: Optional[str] = None
     api_version: Optional[str] = None
@@ -43,7 +43,7 @@ class Dataset(BaseModel):
     description: str
     file_path: str
     version: int = 0
-    user: str = 'admin'
+    user: str = "admin"
 
 
 class PromptTemplate(BaseModel):
@@ -52,7 +52,7 @@ class PromptTemplate(BaseModel):
     system_prompt: str
     user_prompt: str
     version: int = 0
-    user: str = 'admin'
+    user: str = "admin"
 
 
 class EvaluationConfig(BaseModel):

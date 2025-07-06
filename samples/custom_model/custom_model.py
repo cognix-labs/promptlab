@@ -18,7 +18,7 @@ prompt_template = PromptTemplate(
     name=prompt_name,
     description=prompt_description,
     system_prompt=system_prompt,
-    user_prompt=user_prompt
+    user_prompt=user_prompt,
 )
 # pt = pl.asset.create(prompt_template)
 
@@ -35,9 +35,7 @@ dataset = Dataset(
 pt = pl.asset.get(asset_name=prompt_name, version=0)
 ds = pl.asset.get(asset_name=dataset_name, version=0)
 
-completion_model = Custom_Ollama(
-    ModelConfig(name="ollama/llama3.2", type="completion")
-)
+completion_model = Custom_Ollama(ModelConfig(name="ollama/llama3.2", type="completion"))
 embedding_model = Custom_Ollama_Embedding(
     ModelConfig(name="ollama/nomic-embed-text:latest", type="embedding")
 )
@@ -45,8 +43,16 @@ embedding_model = Custom_Ollama_Embedding(
 # Run an experiment
 experiment_config = {
     "name": "demo_experimet16",
-    "completion_model_config": {"name":"custom_ollama/llama3.2", "type": "completion", "model": completion_model},
-    "embedding_model_config": {"name":"custom_ollama/nomic-embed-text:latest", "type": "embedding", "model": embedding_model},
+    "completion_model_config": {
+        "name": "custom_ollama/llama3.2",
+        "type": "completion",
+        "model": completion_model,
+    },
+    "embedding_model_config": {
+        "name": "custom_ollama/nomic-embed-text:latest",
+        "type": "embedding",
+        "model": embedding_model,
+    },
     "prompt_template": pt,
     "dataset": ds,
     "evaluation": [

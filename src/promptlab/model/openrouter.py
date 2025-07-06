@@ -137,5 +137,6 @@ class OpenRouter_Embedding(EmbeddingModel):
 
         return embedding
 
+
 openrouter_completion = OpenRouter
 openrouter_embedding = OpenRouter_Embedding

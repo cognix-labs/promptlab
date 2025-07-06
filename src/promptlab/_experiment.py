@@ -22,17 +22,26 @@ class Experiment:
     def get_completion_model(self, type: str, model_deployment: str):
         if type == "ollama":
             from promptlab.model.ollama import Ollama
-            return Ollama(model_config=ModelConfig(type="-",model_deployment=model_deployment)) 
+
+            return Ollama(
+                model_config=ModelConfig(type="-", model_deployment=model_deployment)
+            )
         else:
-            raise ValueError(f"Unsupported model type: {type}. Supported types: 'ollama'.")
+            raise ValueError(
+                f"Unsupported model type: {type}. Supported types: 'ollama'."
+            )
 
     def get_em_model(self, type: str, model_deployment: str):
         if type == "ollama":
             from promptlab.model.ollama import Ollama_Embedding
-            return Ollama_Embedding(model_config=ModelConfig(type="-",model_deployment=model_deployment)) 
-        else:
-            raise ValueError(f"Unsupported model type: {type}. Supported types: 'ollama'.")
 
+            return Ollama_Embedding(
+                model_config=ModelConfig(type="-", model_deployment=model_deployment)
+            )
+        else:
+            raise ValueError(
+                f"Unsupported model type: {type}. Supported types: 'ollama'."
+            )
 
     def run(self, config: dict):
         """
@@ -40,7 +49,7 @@ class Experiment:
         """
         logger.info(
             "Running experiment synchronously. Experiment Name: %s",
-            config['name'],
+            config["name"],
         )
         (
             experiment_config,
@@ -67,7 +76,7 @@ class Experiment:
     async def run_async(self, config: dict):
         logger.info(
             "Running experiment asynchronously. Experiment Name: %s",
-            config['name'],
+            config["name"],
         )
         (
             experiment_config,
@@ -104,8 +113,8 @@ class Experiment:
         pt_asset_binary = None
         if experiment_config.prompt_template:
             prompt_template = self.tracer.get_asset(
-                    experiment_config.prompt_template.name,
-                    experiment_config.prompt_template.version,
+                experiment_config.prompt_template.name,
+                experiment_config.prompt_template.version,
             )
             pt_asset_binary = prompt_template.asset_binary
 
@@ -114,10 +123,11 @@ class Experiment:
         )
 
         eval_dataset_path = self.tracer.get_asset(
-                experiment_config.dataset.name, 
-                experiment_config.dataset.version
+            experiment_config.dataset.name, experiment_config.dataset.version
         )
-        eval_dataset = Utils.load_dataset( json.loads(eval_dataset_path.asset_binary)['file_path'])
+        eval_dataset = Utils.load_dataset(
+            json.loads(eval_dataset_path.asset_binary)["file_path"]
+        )
 
         return (
             experiment_config,
@@ -138,7 +148,11 @@ class Experiment:
         """
         Synchronous version of batch evaluation with concurrency limit
         """
-        completion_model = ModelFactory.get_model(experiment_config.completion_model_config, completion=True, model = experiment_config.completion_model_config.model)
+        completion_model = ModelFactory.get_model(
+            experiment_config.completion_model_config,
+            completion=True,
+            model=experiment_config.completion_model_config.model,
+        )
         agent_proxy = experiment_config.agent_proxy
         experiment_id = (
             experiment_config.name if experiment_config.name else str(uuid.uuid4())
@@ -186,8 +200,12 @@ class Experiment:
         """
         Asynchronous version of batch evaluation with concurrency limit
         """
-        completion_model = ModelFactory.get_model(experiment_config.completion_model_config, completion=True, model = experiment_config.completion_model_config.model)
-                              
+        completion_model = ModelFactory.get_model(
+            experiment_config.completion_model_config,
+            completion=True,
+            model=experiment_config.completion_model_config.model,
+        )
+
         agent_proxy = experiment_config.agent_proxy
 
         experiment_id = (
@@ -242,8 +260,16 @@ class Experiment:
         for eval in experiment_config.evaluation:
             evaluator = EvaluatorFactory.get_evaluator(
                 eval.metric,
-                ModelFactory.get_model(experiment_config.completion_model_config, completion=True, model = experiment_config.completion_model_config.model),
-                ModelFactory.get_model(experiment_config.embedding_model_config, completion=False, model = experiment_config.embedding_model_config.model),
+                ModelFactory.get_model(
+                    experiment_config.completion_model_config,
+                    completion=True,
+                    model=experiment_config.completion_model_config.model,
+                ),
+                ModelFactory.get_model(
+                    experiment_config.embedding_model_config,
+                    completion=False,
+                    model=experiment_config.embedding_model_config.model,
+                ),
                 eval.evaluator,
             )
 

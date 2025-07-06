@@ -92,14 +92,13 @@ class AzOpenAI_Embedding(EmbeddingModel):
 
     def __call__(self, text: str) -> List[float]:
         embedding = (
-            self.client.embeddings.create(
-                input=text, model=self.model_name
-            )
+            self.client.embeddings.create(input=text, model=self.model_name)
             .data[0]
             .embedding
         )
 
         return embedding
+
 
 azure_openai_completion = AzOpenAI
 azure_openai_embedding = AzOpenAI_Embedding

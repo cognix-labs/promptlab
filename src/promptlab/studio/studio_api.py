@@ -14,6 +14,7 @@ from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 
+
 class StudioApi:
     def __init__(self, tracer: Tracer):
         self.tracer = tracer
@@ -32,7 +33,9 @@ class StudioApi:
 
     def _create_access_token(self, data: dict, expires_delta: timedelta = None):
         to_encode = data.copy()
-        expire = datetime.utcnow() + (expires_delta or timedelta(minutes=self.ACCESS_TOKEN_EXPIRE_MINUTES))
+        expire = datetime.utcnow() + (
+            expires_delta or timedelta(minutes=self.ACCESS_TOKEN_EXPIRE_MINUTES)
+        )
         to_encode.update({"exp": expire})
         encoded_jwt = jwt.encode(to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM)
         return encoded_jwt
@@ -62,7 +65,9 @@ class StudioApi:
                 experiments = await asyncio.to_thread(self.tracer.get_experiments)
                 processed_experiments = []
                 for experiment in experiments:
-                    system_prompt, user_prompt, _ = Utils.split_prompt_template(experiment.asset_binary)
+                    system_prompt, user_prompt, _ = Utils.split_prompt_template(
+                        experiment.asset_binary
+                    )
 
                     experiment_data = {
                         k: v for k, v in experiment.items() if k != "asset_binary"
@@ -79,10 +84,14 @@ class StudioApi:
         @self.app.get("/prompttemplates")
         async def get_prompt_templates(auth=Depends(self._auth_dependency)):
             try:
-                prompt_templates = await asyncio.to_thread(self.tracer.get_assets_by_type, AssetType.PROMPT_TEMPLATE.value)
+                prompt_templates = await asyncio.to_thread(
+                    self.tracer.get_assets_by_type, AssetType.PROMPT_TEMPLATE.value
+                )
                 processed_templates = []
                 for template in prompt_templates:
-                    system_prompt, user_prompt, _ = Utils.split_prompt_template(template.asset_binary)
+                    system_prompt, user_prompt, _ = Utils.split_prompt_template(
+                        template.asset_binary
+                    )
                     experiment_data = {
                         "asset_name": template.asset_name,
                         "asset_description": template.asset_description,
@@ -103,7 +112,9 @@ class StudioApi:
         @self.app.get("/datasets")
         async def get_datasets(auth=Depends(self._auth_dependency)):
             try:
-                datasets = await asyncio.to_thread(self.tracer.get_assets_by_type, AssetType.DATASET.value)
+                datasets = await asyncio.to_thread(
+                    self.tracer.get_assets_by_type, AssetType.DATASET.value
+                )
                 processed_datasets = []
                 for dataset in datasets:
                     file_path = json.loads(dataset.asset_binary)["file_path"]
@@ -122,24 +133,35 @@ class StudioApi:
                 raise HTTPException(status_code=500, detail=str(e))
 
         @self.app.get("/assets")
-        async def get_asset(asset_name: str, asset_version: int, auth=Depends(self._auth_dependency)):
+        async def get_asset(
+            asset_name: str, asset_version: int, auth=Depends(self._auth_dependency)
+        ):
             try:
-                asset = await asyncio.to_thread(self.tracer.get_asset, asset_name, asset_version)
+                asset = await asyncio.to_thread(
+                    self.tracer.get_asset, asset_name, asset_version
+                )
                 if not asset:
-                    raise HTTPException(status_code=404, detail=f"Asset {asset_name} with version {asset_version} not found")
-                
+                    raise HTTPException(
+                        status_code=404,
+                        detail=f"Asset {asset_name} with version {asset_version} not found",
+                    )
+
                 asset_data = {
                     "asset_name": asset.asset_name,
                     "asset_version": asset.asset_version,
                     "asset_description": asset.asset_description,
                     "asset_type": asset.asset_type,
                     "asset_binary": asset.asset_binary,
-                    "created_at": asset.created_at.isoformat() if asset.created_at else None,
+                    "created_at": asset.created_at.isoformat()
+                    if asset.created_at
+                    else None,
                     "user_id": asset.user_id,
                     "is_deployed": asset.is_deployed,
-                    "deployment_time": asset.deployment_time.isoformat() if asset.deployment_time else None
+                    "deployment_time": asset.deployment_time.isoformat()
+                    if asset.deployment_time
+                    else None,
                 }
-                
+
                 return {"success": True, "asset": asset_data}
             except ValueError as e:
                 raise HTTPException(status_code=404, detail=str(e))
@@ -153,12 +175,27 @@ class StudioApi:
                 data = await request.json()
                 username = data.get("username")
                 password = data.get("password")
-                user = await asyncio.to_thread(self.tracer.get_user_by_username, username)
+                user = await asyncio.to_thread(
+                    self.tracer.get_user_by_username, username
+                )
                 if user and pwd_context.verify(password, user.password_hash):
-                    access_token = self._create_access_token(data={"sub": username, "role": user.role})
-                    return JSONResponse({"success": True, "access_token": access_token, "token_type": "bearer", "username": username, "role": user.role})
+                    access_token = self._create_access_token(
+                        data={"sub": username, "role": user.role}
+                    )
+                    return JSONResponse(
+                        {
+                            "success": True,
+                            "access_token": access_token,
+                            "token_type": "bearer",
+                            "username": username,
+                            "role": user.role,
+                        }
+                    )
                 else:
-                    return JSONResponse({"success": False, "message": "Invalid credentials"}, status_code=401)
+                    return JSONResponse(
+                        {"success": False, "message": "Invalid credentials"},
+                        status_code=401,
+                    )
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
@@ -168,7 +205,17 @@ class StudioApi:
                 raise HTTPException(status_code=403, detail="Admin access required")
             try:
                 users = await asyncio.to_thread(self.tracer.get_users)
-                return {"users": [{"id": u.id, "username": u.username, "role": u.role, "created_at": u.created_at.isoformat()} for u in users]}
+                return {
+                    "users": [
+                        {
+                            "id": u.id,
+                            "username": u.username,
+                            "role": u.role,
+                            "created_at": u.created_at.isoformat(),
+                        }
+                        for u in users
+                    ]
+                }
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
@@ -183,10 +230,13 @@ class StudioApi:
                 password = data.get("password")
                 role = data.get("role")
                 if not username or not password or role not in ("admin", "engineer"):
-                    return JSONResponse({"success": False, "message": "Invalid input"}, status_code=400)
+                    return JSONResponse(
+                        {"success": False, "message": "Invalid input"}, status_code=400
+                    )
                 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
                 password_hash = pwd_context.hash(password)
                 from promptlab.sqlite.models import User
+
                 user = User(username=username, password_hash=password_hash, role=role)
                 await asyncio.to_thread(self.tracer.create_user, user)
                 return JSONResponse({"success": True})
@@ -200,74 +250,101 @@ class StudioApi:
             try:
                 # Don't allow deleting self
                 if username == auth["username"]:
-                    return JSONResponse({"success": False, "message": "Cannot delete yourself"}, status_code=400)
-                await asyncio.to_thread(self.tracer.deactivate_user_by_username, username)
+                    return JSONResponse(
+                        {"success": False, "message": "Cannot delete yourself"},
+                        status_code=400,
+                    )
+                await asyncio.to_thread(
+                    self.tracer.deactivate_user_by_username, username
+                )
                 return JSONResponse({"success": True})
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
         @self.app.post("/experiments")
-        async def post_experiment(request: Request, auth=Depends(self._auth_dependency)):
+        async def post_experiment(
+            request: Request, auth=Depends(self._auth_dependency)
+        ):
             try:
                 data = await request.json()
                 experiment_config_data = data.get("experiment_config")
                 experiment_summary = data.get("experiment_summary")
-                
+
                 if not experiment_config_data or not experiment_summary:
-                    return JSONResponse({"success": False, "message": "Missing experiment_config or experiment_summary data"}, status_code=400)
+                    return JSONResponse(
+                        {
+                            "success": False,
+                            "message": "Missing experiment_config or experiment_summary data",
+                        },
+                        status_code=400,
+                    )
 
                 from promptlab.types import ExperimentConfig
-                
-                experiment_config = ExperimentConfig.model_validate(experiment_config_data)
-                
+
+                experiment_config = ExperimentConfig.model_validate(
+                    experiment_config_data
+                )
+
                 # Use the trace_experiment method to properly save to database
-                await asyncio.to_thread(self.tracer.trace_experiment, experiment_config, experiment_summary)
+                await asyncio.to_thread(
+                    self.tracer.trace_experiment, experiment_config, experiment_summary
+                )
                 return JSONResponse({"success": True})
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
         @self.app.post("/datasets")
         async def create_dataset(dataset: Dataset, auth=Depends(self._auth_dependency)):
-            try:             
+            try:
                 dataset.user = auth["username"]
                 asset = Asset(self.tracer)
                 created_dataset = await asyncio.to_thread(asset.create, dataset)
-                
-                return JSONResponse({
-                    "success": True, 
-                    "message": "Dataset created successfully",
-                    "dataset": {
-                        "name": created_dataset.name,
-                        "version": created_dataset.version,
-                        "description": created_dataset.description,
-                        "file_path": created_dataset.file_path
+
+                return JSONResponse(
+                    {
+                        "success": True,
+                        "message": "Dataset created successfully",
+                        "dataset": {
+                            "name": created_dataset.name,
+                            "version": created_dataset.version,
+                            "description": created_dataset.description,
+                            "file_path": created_dataset.file_path,
+                        },
                     }
-                })
+                )
             except ValueError as e:
-                return JSONResponse({"success": False, "message": str(e)}, status_code=400)
+                return JSONResponse(
+                    {"success": False, "message": str(e)}, status_code=400
+                )
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
         @self.app.post("/templates")
-        async def create_template(template: PromptTemplate, auth=Depends(self._auth_dependency)):
-            try:             
+        async def create_template(
+            template: PromptTemplate, auth=Depends(self._auth_dependency)
+        ):
+            try:
                 template.user = auth["username"]
                 asset = Asset(self.tracer)
                 created_template = await asyncio.to_thread(asset.create, template)
-                
-                return JSONResponse({
-                    "success": True, 
-                    "message": "Prompt template created successfully",
-                    "template": {
-                        "name": created_template.name,
-                        "version": created_template.version,
-                        "description": created_template.description,
-                        "system_prompt": created_template.system_prompt,
-                        "user_prompt": created_template.user_prompt
+
+                return JSONResponse(
+                    {
+                        "success": True,
+                        "message": "Prompt template created successfully",
+                        "template": {
+                            "name": created_template.name,
+                            "version": created_template.version,
+                            "description": created_template.description,
+                            "system_prompt": created_template.system_prompt,
+                            "user_prompt": created_template.user_prompt,
+                        },
                     }
-                })
+                )
             except ValueError as e:
-                return JSONResponse({"success": False, "message": str(e)}, status_code=400)
+                return JSONResponse(
+                    {"success": False, "message": str(e)}, status_code=400
+                )
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 

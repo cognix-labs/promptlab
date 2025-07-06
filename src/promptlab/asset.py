@@ -84,7 +84,9 @@ class Asset:
 
         prev = self.tracer.get_latest_asset(dataset.name)
         dataset.description = (
-            prev.asset_description if dataset.description is None else dataset.description
+            prev.asset_description
+            if dataset.description is None
+            else dataset.description
         )
         dataset.version = prev.asset_version + 1
         binary = (
@@ -99,7 +101,7 @@ class Asset:
             asset_type=AssetType.DATASET.value,
             asset_binary=binary,
             created_at=datetime.now(timezone.utc),
-            user_id=self.tracer.me().id
+            user_id=self.tracer.me().id,
         )
 
         self.tracer.create_asset(asset)
@@ -120,7 +122,9 @@ class Asset:
         prev = self.tracer.get_latest_asset(template.name)
         system_prompt, user_prompt, _ = Utils.split_prompt_template(prev.asset_binary)
         template.description = (
-            prev.asset_description if template.description is None else template.description
+            prev.asset_description
+            if template.description is None
+            else template.description
         )
         template.system_prompt = (
             system_prompt if template.system_prompt is None else template.system_prompt
@@ -142,7 +146,7 @@ class Asset:
             asset_type=AssetType.PROMPT_TEMPLATE.value,
             asset_binary=binary,
             created_at=datetime.now(timezone.utc),
-            user_id=self.tracer.me().id
+            user_id=self.tracer.me().id,
         )
 
         self.tracer.create_asset(asset)
@@ -166,7 +170,9 @@ class Asset:
                 file_path=file_path,
             )
         if asset_type == AssetType.PROMPT_TEMPLATE.value:
-            system_prompt, user_prompt, _ = Utils.split_prompt_template(asset.asset_binary)
+            system_prompt, user_prompt, _ = Utils.split_prompt_template(
+                asset.asset_binary
+            )
             return PromptTemplate(
                 name=asset_name,
                 version=version,

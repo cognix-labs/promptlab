@@ -5,6 +5,7 @@ from .models import Base
 _engine = None
 _SessionLocal = None
 
+
 def init_engine(db_url):
     global _engine, _SessionLocal
     _engine = create_engine(db_url, connect_args={"check_same_thread": False})
@@ -14,19 +15,19 @@ def init_engine(db_url):
     # Insert default admin user if not exists
     from .models import User
     from passlib.context import CryptContext
+
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     session = _SessionLocal()
     try:
         if not session.query(User).filter_by(username="admin").first():
             admin_user = User(
-                username="admin",
-                password_hash=pwd_context.hash("admin"),
-                role="admin"
+                username="admin", password_hash=pwd_context.hash("admin"), role="admin"
             )
             session.add(admin_user)
             session.commit()
     finally:
         session.close()
+
 
 def get_session():
     if _SessionLocal is None:

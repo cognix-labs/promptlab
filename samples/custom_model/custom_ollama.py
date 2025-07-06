@@ -12,16 +12,13 @@ class Custom_Ollama(Model):
         self.client = ollama
         self.model_name = self.model_config.name.split("/")[1]
 
-
     def invoke(self, system_prompt: str, user_prompt: str):
         payload = [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ]
 
-        chat_completion = self.client.chat(
-            model=self.model_name, messages=payload
-        )
+        chat_completion = self.client.chat(model=self.model_name, messages=payload)
 
         latency_ms = chat_completion.total_duration / 1000000
         response = chat_completion.message.content
@@ -49,9 +46,7 @@ class Custom_Ollama(Model):
         loop = asyncio.get_event_loop()
         chat_completion = await loop.run_in_executor(
             None,
-            lambda: self.client.chat(
-                model=self.model_name, messages=payload
-            ),
+            lambda: self.client.chat(model=self.model_name, messages=payload),
         )
 
         latency_ms = chat_completion.total_duration / 1000000
@@ -81,6 +76,7 @@ class Custom_Ollama_Embedding(EmbeddingModel):
         )["embeddings"]
 
         return embedding
+
 
 ollama_completion = Custom_Ollama
 ollama_embedding = Custom_Ollama_Embedding

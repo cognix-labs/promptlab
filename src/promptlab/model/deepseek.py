@@ -136,5 +136,6 @@ class DeepSeek_Embedding(EmbeddingModel):
 
         return embedding
 
+
 deepseek_completion = DeepSeek
 deepseek_embedding = DeepSeek_Embedding

@@ -1,12 +1,23 @@
-from sqlalchemy import Column, Integer, String, Text, Boolean, Float, LargeBinary, ForeignKey, DateTime
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Text,
+    Boolean,
+    Float,
+    LargeBinary,
+    ForeignKey,
+    DateTime,
+)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
 Base = declarative_base()
 
+
 class Asset(Base):
-    __tablename__ = 'assets'
+    __tablename__ = "assets"
     asset_name = Column(String, primary_key=True)
     asset_version = Column(Integer, primary_key=True)
     asset_description = Column(Text)
@@ -16,24 +27,26 @@ class Asset(Base):
     deployment_time = Column(DateTime)
     status = Column(Integer, default=1)  # 1 - 'active', 0 - 'inactive'
     created_at = Column(DateTime, default=datetime.utcnow)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    user = relationship('User', back_populates='assets')
+    user_id = Column(Integer, ForeignKey("users.id"))
+    user = relationship("User", back_populates="assets")
+
 
 class Experiment(Base):
-    __tablename__ = 'experiments'
+    __tablename__ = "experiments"
     experiment_id = Column(String, primary_key=True)
     model = Column(Text)  # Store as JSON/text
     asset = Column(Text)  # Store as JSON/text
     status = Column(Integer, default=1)  # 1 - 'active', 0 - 'inactive'
     created_at = Column(DateTime, default=datetime.utcnow)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    user = relationship('User', back_populates='experiments')
-    results = relationship('ExperimentResult', back_populates='experiment')
+    user_id = Column(Integer, ForeignKey("users.id"))
+    user = relationship("User", back_populates="experiments")
+    results = relationship("ExperimentResult", back_populates="experiment")
+
 
 class ExperimentResult(Base):
-    __tablename__ = 'experiment_result'
+    __tablename__ = "experiment_result"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    experiment_id = Column(String, ForeignKey('experiments.experiment_id'))
+    experiment_id = Column(String, ForeignKey("experiments.experiment_id"))
     dataset_record_id = Column(String)
     completion = Column(Text)
     prompt_tokens = Column(Integer)
@@ -41,15 +54,16 @@ class ExperimentResult(Base):
     latency_ms = Column(Float)
     evaluation = Column(Text)  # Store as JSON/text
     created_at = Column(DateTime, default=datetime.utcnow)
-    experiment = relationship('Experiment', back_populates='results')
+    experiment = relationship("Experiment", back_populates="results")
+
 
 class User(Base):
-    __tablename__ = 'users'
+    __tablename__ = "users"
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String, unique=True, nullable=False)
     password_hash = Column(String, nullable=False)
     role = Column(String, nullable=False)  # 'admin' or 'engineer'
     status = Column(Integer, default=1)  # 1 - 'active', 0 - 'inactive'
     created_at = Column(DateTime, default=datetime.utcnow)
-    assets = relationship('Asset', back_populates='user')
-    experiments = relationship('Experiment', back_populates='user')
+    assets = relationship("Asset", back_populates="user")
+    experiments = relationship("Experiment", back_populates="user")

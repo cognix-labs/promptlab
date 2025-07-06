@@ -11,7 +11,6 @@ class ConfigValidator:
         # ConfigValidator.validate_prompt_template(experiment_config.prompt_template.name)
         ConfigValidator.validate_dataset(experiment_config.dataset.name)
 
-
     @staticmethod
     def validate_db_file_exists(db_file: str) -> None:
         if not isinstance(db_file, str):
