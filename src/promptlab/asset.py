@@ -2,15 +2,13 @@ from typing import Any, overload, TypeVar
 from datetime import datetime, timezone
 import json
 import re
-import os
 
 from promptlab.enums import AssetType
-from promptlab.sqlite.sql import SQLQuery
 from promptlab.tracer.tracer import Tracer
 from promptlab.types import Dataset, PromptTemplate
 from promptlab._utils import Utils
-from promptlab._logging import logger
 from promptlab.sqlite.models import Asset as ORMAsset
+from promptlab._logging import logger
 
 T = TypeVar("T", Dataset, PromptTemplate)
 
@@ -18,7 +16,6 @@ T = TypeVar("T", Dataset, PromptTemplate)
 class Asset:
     def __init__(self, tracer: Tracer):
         self.tracer = tracer
-        logger.debug("Asset manager initialized.")
 
     @overload
     def create(self, asset: PromptTemplate) -> PromptTemplate: ...
@@ -74,7 +71,9 @@ class Asset:
 
     def _create_dataset(self, dataset: Dataset) -> Dataset:
         logger.debug(f"Creating dataset asset: {dataset.name}")
+
         self.tracer.create_dataset(dataset)
+        
         logger.debug(f"Dataset asset created: {dataset.name}")
 
         return dataset
@@ -103,15 +102,17 @@ class Asset:
             created_at=datetime.now(timezone.utc),
             user_id=self.tracer.me().id,
         )
-
         self.tracer.create_asset(asset)
+        
         logger.debug(f"Dataset asset created: {dataset.name}")
 
         return dataset
 
     def _create_prompt_template(self, template: PromptTemplate) -> PromptTemplate:
         logger.debug(f"Creating prompt template asset: {template.name}")
+
         self.tracer.create_prompttemplate(template)
+
         logger.debug(f"Prompt template asset created: {template.name}")
 
         return template
@@ -148,8 +149,8 @@ class Asset:
             created_at=datetime.now(timezone.utc),
             user_id=self.tracer.me().id,
         )
-
         self.tracer.create_asset(asset)
+        
         logger.debug(f"Prompt template asset updated: {template.name}")
 
         return template
