@@ -6,13 +6,8 @@ _engine = None
 _SessionLocal = None
 
 
-def init_engine(db_url):
-    global _engine, _SessionLocal
-    _engine = create_engine(db_url, connect_args={"check_same_thread": False})
-    _SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=_engine)
-    Base.metadata.create_all(bind=_engine)
-
-    # Insert default admin user if not exists
+def _create_default_admin_user():
+    """Create default admin user if it doesn't exist."""
     from .models import User
     from passlib.context import CryptContext
 
@@ -27,6 +22,16 @@ def init_engine(db_url):
             session.commit()
     finally:
         session.close()
+
+
+def init_engine(db_url):
+    global _engine, _SessionLocal
+    _engine = create_engine(db_url, connect_args={"check_same_thread": False})
+    _SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=_engine)
+    Base.metadata.create_all(bind=_engine)
+
+    # Insert default admin user if not exists
+    _create_default_admin_user()
 
 
 def get_session():
