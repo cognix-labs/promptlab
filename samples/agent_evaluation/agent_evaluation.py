@@ -16,7 +16,7 @@ async def agent_proxy(inputs: dict) -> ModelResponse:
     )
 
 
-# Initialize PromptLab with SQLite storage
+# Initialize PromptLab with local tracer
 tracer_config = {"type": "local", "db_file": "./promptlab.db"}
 pl = PromptLab(tracer_config)
 
