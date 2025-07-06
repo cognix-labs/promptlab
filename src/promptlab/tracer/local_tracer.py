@@ -77,15 +77,21 @@ class LocalTracer(Tracer):
             timestamp = datetime.now().isoformat()
             experiment_id = experiment_summary[0]["experiment_id"]
 
-            experiment_config.completion_model_config.model = None
-            experiment_config.completion_model_config.api_key = None
-
-            experiment_config.embedding_model_config.model = None
-            experiment_config.embedding_model_config.api_key = None
+            if experiment_config.completion_model_config is None:
+                completion_model_config = None
+            else:
+                experiment_config.completion_model_config.model = None
+                completion_model_config = experiment_config.completion_model_config.model_dump()
+                
+            if experiment_config.embedding_model_config is None:
+                embedding_model_config = None
+            else:
+                experiment_config.embedding_model_config.model = None
+                embedding_model_config = experiment_config.embedding_model_config.model_dump()
 
             model = {
-                "completion_model_config": experiment_config.completion_model_config.model_dump(),
-                "embedding_model_config": experiment_config.embedding_model_config.model_dump(),
+                "completion_model_config": completion_model_config,
+                "embedding_model_config": embedding_model_config,
             }
 
             asset = {

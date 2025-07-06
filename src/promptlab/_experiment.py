@@ -123,7 +123,8 @@ class Experiment:
             experiment_config.completion_model_config,
             completion=True,
             model=experiment_config.completion_model_config.model,
-        )
+        ) if experiment_config.completion_model_config else None
+
         agent_proxy = experiment_config.agent_proxy
         experiment_id = (
             experiment_config.name if experiment_config.name else str(uuid.uuid4())
@@ -175,7 +176,7 @@ class Experiment:
             experiment_config.completion_model_config,
             completion=True,
             model=experiment_config.completion_model_config.model,
-        )
+        ) if experiment_config.completion_model_config else None
 
         agent_proxy = experiment_config.agent_proxy
 
@@ -228,19 +229,24 @@ class Experiment:
         self, completion: str, row, experiment_config: ExperimentConfig
     ) -> str:
         evaluations = []
+
+        completion_model = ModelFactory.get_model(
+            experiment_config.completion_model_config,
+            completion=True,
+            model=experiment_config.completion_model_config.model,
+        ) if experiment_config.completion_model_config else None
+
+        embedding_model = ModelFactory.get_model(
+            experiment_config.embedding_model_config,
+            completion=False,
+            model=experiment_config.embedding_model_config.model,
+        ) if experiment_config.embedding_model_config else None
+
         for eval in experiment_config.evaluation:
             evaluator = EvaluatorFactory.get_evaluator(
                 eval.metric,
-                ModelFactory.get_model(
-                    experiment_config.completion_model_config,
-                    completion=True,
-                    model=experiment_config.completion_model_config.model,
-                ),
-                ModelFactory.get_model(
-                    experiment_config.embedding_model_config,
-                    completion=False,
-                    model=experiment_config.embedding_model_config.model,
-                ),
+                completion_model,
+                embedding_model,
                 eval.evaluator,
             )
 
