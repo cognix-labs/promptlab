@@ -10,8 +10,8 @@ from promptlab.sqlite.sql import SQLQuery
 from promptlab.evaluator.evaluator_factory import EvaluatorFactory
 from promptlab.tracer.tracer import Tracer
 from promptlab._utils import Utils
-from promptlab._logging import logger
 from promptlab.types import ModelConfig
+from promptlab._logging import logger
 
 
 class Experiment:
@@ -19,29 +19,6 @@ class Experiment:
         self.tracer = tracer
         logger.debug("Experiment instance initialized.")
 
-    def get_completion_model(self, type: str, model_deployment: str):
-        if type == "ollama":
-            from promptlab.model.ollama import Ollama
-
-            return Ollama(
-                model_config=ModelConfig(type="-", model_deployment=model_deployment)
-            )
-        else:
-            raise ValueError(
-                f"Unsupported model type: {type}. Supported types: 'ollama'."
-            )
-
-    def get_em_model(self, type: str, model_deployment: str):
-        if type == "ollama":
-            from promptlab.model.ollama import Ollama_Embedding
-
-            return Ollama_Embedding(
-                model_config=ModelConfig(type="-", model_deployment=model_deployment)
-            )
-        else:
-            raise ValueError(
-                f"Unsupported model type: {type}. Supported types: 'ollama'."
-            )
 
     def run(self, config: dict):
         """
@@ -301,7 +278,6 @@ class Experiment:
         """
         Process a single record asynchronously
         """
-        # model_response = await completion_model(system_prompt, user_prompt)
         model_response = (
             await agent_proxy(eval_record)
             if agent_proxy
