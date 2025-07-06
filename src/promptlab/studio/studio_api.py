@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request, Response, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from promptlab.asset_service import AssetService
+from promptlab.asset import Asset
 from promptlab.sqlite.sql import SQLQuery
 from promptlab.tracer.tracer import Tracer
 from promptlab.types import Dataset, TracerConfig, PromptTemplate
@@ -230,8 +230,8 @@ class StudioApi:
         async def create_dataset(dataset: Dataset, auth=Depends(self._auth_dependency)):
             try:             
                 dataset.user = auth["username"]
-                asset_service = AssetService(self.tracer)
-                created_dataset = await asyncio.to_thread(asset_service.create, dataset)
+                asset = Asset(self.tracer)
+                created_dataset = await asyncio.to_thread(asset.create, dataset)
                 
                 return JSONResponse({
                     "success": True, 
@@ -252,8 +252,8 @@ class StudioApi:
         async def create_template(template: PromptTemplate, auth=Depends(self._auth_dependency)):
             try:             
                 template.user = auth["username"]
-                asset_service = AssetService(self.tracer)
-                created_template = await asyncio.to_thread(asset_service.create, template)
+                asset = Asset(self.tracer)
+                created_template = await asyncio.to_thread(asset.create, template)
                 
                 return JSONResponse({
                     "success": True, 

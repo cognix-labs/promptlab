@@ -15,7 +15,7 @@ from promptlab.sqlite.models import Asset as ORMAsset
 T = TypeVar("T", Dataset, PromptTemplate)
 
 
-class AssetService:
+class Asset:
     def __init__(self, tracer: Tracer):
         self.tracer = tracer
         logger.debug("Asset manager initialized.")
@@ -45,7 +45,7 @@ class AssetService:
     def create(self, asset: T) -> T:
         logger.info(f"Creating asset: {getattr(asset, 'name', str(asset))}")
 
-        if not AssetService.is_valid_name(asset.name):
+        if not Asset.is_valid_name(asset.name):
             logger.warning(f"Invalid asset name: {asset.name}")
             raise ValueError(
                 "Name must begin with a letter and use only alphanumeric, underscore, or hyphen."
