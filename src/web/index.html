@@ -419,6 +419,14 @@
             border-bottom: none;
         }
 
+        .profile-username {
+            padding: 12px 18px;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            color: #2c3e50;
+            background-color: #f8fafc;
+        }
+
         /* Token modal styles */
         #tokenModal {
             display: none;
@@ -514,6 +522,7 @@
                 </svg>
             </div>
             <div id="profileDropdown">
+                <div class="profile-username" id="profileUsername">User</div>
                 <div class="profile-option" id="showTokenOption">Auth Token</div>
                 <div class="profile-option" id="logoutOption">Logout</div>
             </div>
@@ -646,6 +655,11 @@
             const payload = parseJwt(token);
             return payload && payload.role ? payload.role : null;
         }
+        function getUsername() {
+            const token = localStorage.getItem('access_token');
+            const payload = parseJwt(token);
+            return payload && payload.sub ? payload.sub : 'User';
+        }
         function showLogin() {
             document.getElementById('loginContainer').style.display = 'block';
             document.getElementById('mainApp').style.display = 'none';
@@ -653,6 +667,14 @@
         function showApp() {
             document.getElementById('loginContainer').style.display = 'none';
             document.getElementById('mainApp').style.display = 'flex';
+            
+            // Update profile username
+            const username = getUsername();
+            const profileUsernameElement = document.getElementById('profileUsername');
+            if (profileUsernameElement) {
+                profileUsernameElement.textContent = username;
+            }
+            
             // document.getElementById('logoutBtn').style.display = 'block';
             // Show/hide Admin tab
             const role = getUserRole();
@@ -1288,11 +1310,21 @@
                     </svg>
                 </div>
                 <div id="profileDropdown" style="display:none;position:absolute;right:0;top:44px;background:#fff;border-radius:8px;box-shadow:0 2px 12px rgba(44,62,80,0.12);min-width:180px;">
+                    <div class="profile-username" id="profileUsername" style="padding:12px 18px;border-bottom:1px solid #eee;font-weight:600;color:#2c3e50;background-color:#f8fafc;">User</div>
                     <div class="profile-option" id="showTokenOption" style="padding:12px 18px;cursor:pointer;border-bottom:1px solid #eee;">Auth Token</div>
                     <div class="profile-option" id="logoutOption" style="padding:12px 18px;cursor:pointer;">Logout</div>
                 </div>
             `;
             document.body.appendChild(profileMenu);
+            
+            // Update username if logged in
+            if (isLoggedIn()) {
+                const username = getUsername();
+                const profileUsernameElement = document.getElementById('profileUsername');
+                if (profileUsernameElement) {
+                    profileUsernameElement.textContent = username;
+                }
+            }
         }
         // Profile icon dropdown logic (safe checks)
         const profileIcon = document.getElementById('profileIcon');
