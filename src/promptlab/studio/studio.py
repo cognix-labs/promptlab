@@ -45,14 +45,14 @@ class Studio:
         """Start the API server asynchronously using FastAPI"""
         self.api_server = StudioApi(self.tracer)
         config = uvicorn.Config(
-            self.api_server.get_app(), host="localhost", port=api_port, log_level="info"
+            self.api_server.get_app(), host="0.0.0.0", port=api_port, log_level="info"
         )
         server = uvicorn.Server(config)
         await server.serve()
 
     def start_web_server(self, web_port: int):
         """Start the web server in a separate thread"""
-        self.web_server = HTTPServer(("localhost", web_port), StudioWebHandler)
+        self.web_server = HTTPServer(("0.0.0.0", web_port), StudioWebHandler)
 
         self.web_thread = threading.Thread(
             target=self.web_server.serve_forever, daemon=True
