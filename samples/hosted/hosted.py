@@ -4,7 +4,11 @@ from promptlab.model.ollama import Ollama, Ollama_Embedding
 from promptlab.types import ModelConfig, PromptTemplate, Dataset
 
 # Initialize PromptLab with api tracer
-tracer_config = {"type": "api", "endpoint": "http://localhost:8001", "jwt_token": 'your_jwt_token_here'}
+tracer_config = {
+    "type": "api",
+    "endpoint": "http://localhost:8001",
+    "jwt_token": "your_jwt_token_here",
+}
 pl = PromptLab(tracer_config)
 
 # Create a prompt template
