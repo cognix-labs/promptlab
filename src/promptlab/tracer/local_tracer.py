@@ -116,7 +116,7 @@ class LocalTracer(Tracer):
                 model=json.dumps(model),
                 asset=json.dumps(asset),
                 created_at=datetime.now(),
-                user_id=1,
+                user_id=self.get_user_by_username(experiment_config.user).id,
             )
             session.add(exp)
             results = [

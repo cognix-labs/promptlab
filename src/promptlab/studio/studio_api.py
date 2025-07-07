@@ -297,6 +297,8 @@ class StudioApi:
                     experiment_config_data
                 )
 
+                experiment_config.user = auth["username"]
+
                 # Use the trace_experiment method to properly save to database
                 await asyncio.to_thread(
                     self.tracer.trace_experiment, experiment_config, experiment_summary

@@ -70,6 +70,7 @@ class ExperimentConfig(BaseModel):
     agent_proxy: SkipValidation[Optional[callable]] = None
     dataset: Dataset
     evaluation: List[EvaluationConfig]
+    user: str = "admin"
     model_config = {"arbitrary_types_allowed": True}
 
 

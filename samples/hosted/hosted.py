@@ -3,12 +3,12 @@ from promptlab import PromptLab
 from promptlab.model.ollama import Ollama, Ollama_Embedding
 from promptlab.types import ModelConfig, PromptTemplate, Dataset
 
-# Initialize PromptLab with local tracer
-tracer_config = {"type": "api", "endpoint": "http://localhost:8001", "jwt_token": None}
+# Initialize PromptLab with api tracer
+tracer_config = {"type": "api", "endpoint": "http://localhost:8001", "jwt_token": 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyYWloYW4iLCJyb2xlIjoiZW5naW5lZXIiLCJleHAiOjE3NTE5MTgyNTB9.aZWHhZySCjFUzKjZAXnn1DGn-gaiKhX2Sg8e78h1Ie4'}
 pl = PromptLab(tracer_config)
 
 # Create a prompt template
-prompt_name = "essay_feedback"
+prompt_name = "essay_feedback2"
 prompt_description = "A prompt for generating feedback on essays"
 system_prompt = "You are a helpful assistant who can provide feedback on essays."
 user_prompt = """The essay topic is - <essay_topic>.
@@ -19,12 +19,11 @@ prompt_template = PromptTemplate(
     description=prompt_description,
     system_prompt=system_prompt,
     user_prompt=user_prompt,
-    user_id=1,
 )
 pt = pl.asset.create(prompt_template)
 
 # Create a dataset
-dataset_name = "essay_samples"
+dataset_name = "essay_samples2"
 dataset_description = "dataset for evaluating the essay_feedback prompt"
 dataset_file_path = "./samples/data/essay_feedback.jsonl"
 dataset = Dataset(
@@ -36,15 +35,9 @@ ds = pl.asset.create(dataset)
 pt = pl.asset.get(asset_name=prompt_name, version=0)
 ds = pl.asset.get(asset_name=dataset_name, version=0)
 
-# # model instnace
-# completion_model = Ollama(model_config=ModelConfig(model_deployment="llama3.2"))
-# embedding_model = Ollama_Embedding(
-#     model_config=ModelConfig(model_deployment="nomic-embed-text:latest")
-# )
-
 # Run an experiment
 experiment_config = {
-    "name": "hosted_experimet",
+    "name": "hosted_experimet2",
     "completion_model_config": {"name": "ollama/llama3.2", "type": "completion"},
     "embedding_model_config": {
         "name": "ollama/nomic-embed-text:latest",
@@ -70,8 +63,8 @@ experiment_config = {
 # Uncomment the following line to run the experiment synchronously
 # pl.experiment.run(experiment_config)
 
-# Run the experiment asynchronously
+# # Run the experiment asynchronously
 asyncio.run(pl.experiment.run_async(experiment_config))
 
-# Start the PromptLab Studio to view results
-asyncio.run(pl.studio.start_async(8000))
+# # Start the PromptLab Studio to view results
+# asyncio.run(pl.studio.start_async(8000))
