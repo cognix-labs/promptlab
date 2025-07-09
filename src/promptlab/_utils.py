@@ -5,6 +5,7 @@ import threading
 from typing import Dict, List, Tuple
 
 import nltk
+
 from promptlab._logging import logger
 
 
@@ -14,6 +15,7 @@ class Utils:
     @staticmethod
     def sanitize_path(value: str) -> str:
         logger.debug(f"Sanitizing path: {value}")
+
         if any(char in value for char in '<>"|?*'):
             logger.warning(f"Invalid characters in file path: {value}")
             raise ValueError("Invalid characters in file path")
@@ -27,6 +29,7 @@ class Utils:
     @staticmethod
     def load_dataset(dataset_path: str) -> List[Dict]:
         logger.info(f"Loading dataset from: {dataset_path}")
+
         dataset_path = Utils.sanitize_path(dataset_path)
 
         dataset = []
@@ -38,11 +41,13 @@ class Utils:
         except Exception as e:
             logger.error(f"Failed to load dataset: {e}", exc_info=True)
             raise
+
         return dataset
 
     @staticmethod
     def split_prompt_template(asset: str) -> Tuple[str, str, List[str]]:
         logger.debug("Splitting prompt template.")
+
         if asset is None:
             logger.warning("Prompt template asset is None.")
             return ("", "", [])

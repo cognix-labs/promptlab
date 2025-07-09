@@ -35,7 +35,7 @@ class SQLQuery:
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         experiment_id TEXT,
                         dataset_record_id TEXT,
-                        inference TEXT,
+                        completion TEXT,
                         prompt_tokens INTEGER,
                         completion_tokens INTEGER,
                         latency_ms REAL,
@@ -49,7 +49,7 @@ class SQLQuery:
                                 INSERT INTO experiment_result (
                                         experiment_id,
                                         dataset_record_id,
-                                        inference,
+                                        completion,
                                         prompt_tokens,
                                         completion_tokens,
                                         latency_ms,
@@ -58,7 +58,7 @@ class SQLQuery:
                                 ) VALUES (
                                         :experiment_id,
                                         :dataset_record_id,
-                                        :inference,
+                                        :completion,
                                         :prompt_tokens,
                                         :completion_tokens,
                                         :latency_ms,
@@ -112,24 +112,27 @@ class SQLQuery:
     SELECT_EXPERIMENTS_QUERY = """
                                 SELECT
                                     e.experiment_id,
-                                    json_extract(model, '$.inference_model_config.model_deployment') AS inference_model,
-                                    json_extract(model, '$.embedding_model_config.model_deployment') AS embedding_model,
+                                    json_extract(model, '$.completion_model_config.name') AS completion_model,
+                                    json_extract(model, '$.embedding_model_config.name') AS embedding_model,
                                     json_extract(asset, '$.prompt_template_name') AS prompt_template_name,
                                     json_extract(asset, '$.prompt_template_version') AS prompt_template_version,
                                     json_extract(asset, '$.dataset_name') AS dataset_name,
                                     json_extract(asset, '$.dataset_version') AS dataset_version,
                                     er.dataset_record_id as dataset_record_id,
-                                    er.inference as inference,
+                                    er.completion as completion,
                                     er.prompt_tokens as prompt_tokens,
                                     er.completion_tokens as completion_tokens,
                                     er.latency_ms as latency_ms,
                                     er.evaluation as evaluation,
-                                    a.asset_binary
+                                    a.asset_binary,
+                                    u.username
                                 FROM experiments e
                                 JOIN experiment_result er on
                                     e.experiment_id = er.experiment_id
                                 LEFT JOIN assets a ON
                                     a.asset_name = prompt_template_name AND a.asset_version = prompt_template_version
+                                LEFT JOIN users u ON
+                                    e.user_id = u.id
                                 ORDER BY e.created_at DESC
                                 """
 

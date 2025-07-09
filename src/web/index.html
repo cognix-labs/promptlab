@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Experiment Comparison</title>
+    <title>PromptLab</title>
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -313,10 +313,183 @@
             font-size: 0.95em;
 
         }
+
+        /* Login form styles */
+        #loginContainer {
+            display: none;
+            max-width: 400px;
+            margin: 60px auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(44,62,80,0.08);
+            padding: 32px 24px;
+        }
+
+        #loginContainer h2 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        #loginContainer label {
+            display: block;
+            margin-bottom: 6px;
+            color: #34495e;
+        }
+
+        #loginContainer input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 18px;
+        }
+
+        #loginContainer button {
+            width: 100%;
+            padding: 12px;
+            background: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        #loginError {
+            color: #e74c3c;
+            margin-top: 12px;
+            display: none;
+        }
+
+        #logoutBtn {
+            position: fixed;
+            top: 24px;
+            right: 36px;
+            padding: 8px 18px;
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 2000;
+            display: none;
+        }
+
+        /* Profile menu styles */
+        #profileMenu {
+            position: fixed;
+            top: 24px;
+            right: 36px;
+            z-index: 2100;
+        }
+
+        #profileIcon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #2980b9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+        }
+
+        #profileDropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 44px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(44,62,80,0.12);
+            min-width: 180px;
+        }
+
+        .profile-option {
+            padding: 12px 18px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-option:last-child {
+            border-bottom: none;
+        }
+
+        .profile-username {
+            padding: 12px 18px;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            color: #2c3e50;
+            background-color: #f8fafc;
+        }
+
+        /* Token modal styles */
+        #tokenModal {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(44,62,80,0.7);
+            z-index: 3000;
+        }
+
+        #tokenModal .modal-content {
+            background: #fff;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90vw;
+            margin: 80px auto;
+            padding: 32px 24px;
+            position: relative;
+            box-shadow: 0 4px 32px rgba(44,62,80,0.2);
+        }
+
+        #tokenModal .close-modal {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #34495e;
+            cursor: pointer;
+        }
+
+        #tokenModal pre {
+            white-space: pre-wrap;
+            word-break: break-all;
+            background: #f5f7fa;
+            padding: 16px;
+            border-radius: 6px;
+            font-size: 0.95em;
+            max-height: 300px;
+            overflow: auto;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div id="loginContainer">
+        <h2>PromptLab</h2>
+        <form id="loginForm">
+            <div>
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Login</button>
+            <div id="loginError"></div>
+        </form>
+    </div>
+    <div class="container" id="mainApp">
         <nav class="left-menu">
             <button class="nav-toggle" title="Toggle menu">☰</button>
             <ul>
@@ -341,6 +514,20 @@
             </ul>
         </nav>
         
+        <div id="profileMenu">
+            <div id="profileIcon" title="Profile">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="white"/>
+                    <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="white"/>
+                </svg>
+            </div>
+            <div id="profileDropdown">
+                <div class="profile-username" id="profileUsername">User</div>
+                <div class="profile-option" id="showTokenOption">Auth Token</div>
+                <div class="profile-option" id="logoutOption">Logout</div>
+            </div>
+        </div>
+        
         <main class="content-area">
             <div id="experimentContent">
                 <h1>PromptLab</h1>
@@ -364,7 +551,7 @@
                         <tr>
                             <th><input type="checkbox" id="selectAll"></th>
                             <th>Experiment ID</th>
-                            <th>Inference Model</th>
+                            <th>Completion Model</th>
                             <th>Embedding Model</th>
                             <th>Prompt Template</th>
                             <th>Prompt Template Version</th>
@@ -372,6 +559,7 @@
                             <th>Dataset Version</th>
                             <th>System Prompt</th>
                             <th>User Prompt</th>
+                            <th>User ID</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
@@ -382,7 +570,7 @@
                         <tr>
                             <th>Experiment ID</th>
                             <th>Dataset Record ID</th>
-                            <th>Inference</th>
+                            <th>Completion</th>
                             <th>Completion Tokens</th>
                             <th>Prompt Tokens</th>
                             <th>Latency (ms)</th>
@@ -399,7 +587,6 @@
                 <table id="promptTemplateTable">
                     <thead>
                         <tr>
-                            <!-- <th>Id</th> -->
                             <th>Name</th>
                             <th>Description</th>
                             <th>Version</th>
@@ -408,6 +595,7 @@
                             <th>User Prompt</th>
                             <th>Deployment Time</th>
                             <th>Is Deployed</th>
+                            <th>User ID</th>
                         </tr>
                     </thead>
                     <tbody id="promptTemplateTableBody"></tbody>
@@ -424,12 +612,12 @@
                 <table id="datasetTable">
                     <thead>
                         <tr>
-                            <!-- <th>Id</th> -->
                             <th>Name</th>
                             <th>Description</th>
                             <th>Version</th>
                             <th>Created At</th>
                             <th>File Path</th>
+                            <th>User ID</th>
                         </tr>
                     </thead>
                     <tbody id="datasetTableBody"></tbody>
@@ -438,8 +626,120 @@
         </main>
     </div>
 
+    <!-- JWT Token Modal -->
+    <div id="tokenModal" style="display:none;position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(44,62,80,0.7);z-index:3000;">
+        <div class="modal-content" style="background:#fff;border-radius:8px;max-width:600px;width:90vw;margin:80px auto;padding:32px 24px;position:relative;box-shadow:0 4px 32px rgba(44,62,80,0.2);">
+            <button id="closeTokenModal" class="close-modal" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:2rem;color:#34495e;cursor:pointer;">&times;</button>
+            <h2 style="margin-top:0;">Your Auth Token</h2>
+            <pre id="jwtTokenText" style="white-space:pre-wrap;word-break:break-all;background:#f5f7fa;padding:16px;border-radius:6px;font-size:0.95em;max-height:300px;overflow:auto;"></pre>
+        </div>
+    </div>
+
     <script>
-        // Add this at the beginning of your script section
+        // --- AUTH LOGIC ---
+        function isLoggedIn() {
+            return !!localStorage.getItem('access_token');
+        }
+        function parseJwt(token) {
+            if (!token) return null;
+            const base64Url = token.split('.')[1];
+            if (!base64Url) return null;
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        }
+        function getUserRole() {
+            const token = localStorage.getItem('access_token');
+            const payload = parseJwt(token);
+            return payload && payload.role ? payload.role : null;
+        }
+        function getUsername() {
+            const token = localStorage.getItem('access_token');
+            const payload = parseJwt(token);
+            return payload && payload.sub ? payload.sub : 'User';
+        }
+        function showLogin() {
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('mainApp').style.display = 'none';
+        }
+        function showApp() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'flex';
+            
+            // Update profile username
+            const username = getUsername();
+            const profileUsernameElement = document.getElementById('profileUsername');
+            if (profileUsernameElement) {
+                profileUsernameElement.textContent = username;
+            }
+            
+            // document.getElementById('logoutBtn').style.display = 'block';
+            // Show/hide Admin tab
+            const role = getUserRole();
+            const adminTab = document.getElementById('adminTab');
+            if (role === 'admin') {
+                if (!adminTab) {
+                    const li = document.createElement('li');
+                    li.id = 'adminTab';
+                    li.dataset.content = 'adminContent';
+                    li.innerHTML = `<div class="menu-item"><i class="menu-icon">🔒</i><span>Admin</span></div>`;
+                    document.querySelector('.left-menu ul').appendChild(li);
+                    li.addEventListener('click', () => {
+                        showTab('adminContent');
+                    });
+                } else {
+                    adminTab.style.display = '';
+                }
+                var adminContent = document.getElementById('adminContent');
+                if (adminContent) adminContent.style.display = 'none'; // Hide by default
+            } else if (adminTab) {
+                adminTab.style.display = 'none';
+            }
+        }
+        function logout() {
+            localStorage.removeItem('access_token');
+            showLogin();
+        }
+        // document.getElementById('logoutBtn').addEventListener('click', logout);
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.style.display = 'none';
+            try {
+                const currentPort = window.location.port || '8000';
+                const apiPort = parseInt(currentPort) + 1;
+                const apiUrl = `http://${window.location.hostname}:${apiPort}/login`;
+                const resp = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    localStorage.setItem('access_token', data.access_token);
+                    showApp();
+                    location.reload();
+                } else {
+                    errorDiv.textContent = data.message || 'Login failed';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (err) {
+                errorDiv.textContent = 'Login error';
+                errorDiv.style.display = 'block';
+            }
+        });
+        // On load, show login or app
+        if (isLoggedIn()) {
+            showApp();
+        } else {
+            showLogin();
+        }
+
         document.querySelector('.nav-toggle').addEventListener('click', () => {
             document.querySelector('.container').classList.toggle('nav-collapsed');
         });
@@ -451,8 +751,10 @@
                 const currentPort = window.location.port || '8000'; // default to 8000 if no port
                 const apiPort = parseInt(currentPort) + 1;
                 const apiUrl = `http://${window.location.hostname}:${apiPort}/experiments`;
-                
-                const response = await fetch(apiUrl);
+                const token = localStorage.getItem('access_token');
+                const response = await fetch(apiUrl, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
                 experimentsData = await response.json();
                 
                 // Get unique experiments based on experiment_id
@@ -467,7 +769,7 @@
                     row.innerHTML = `
                         <td><input type="checkbox" class="experiment-checkbox" data-id="${exp.experiment_id}"></td>
                         <td>${exp.experiment_id}</td>
-                        <td>${exp.inference_model}</td>
+                        <td>${exp.completion_model}</td>
                         <td>${exp.embedding_model}</td>
                         <td>${exp.prompt_template_name}</td>
                         <td>${exp.prompt_template_version}</td>
@@ -475,6 +777,7 @@
                         <td>${exp.dataset_version}</td>
                         <td>${exp.system_prompt_template.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
                         <td>${exp.user_prompt_template.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
+                        <td>${exp.user_id ?? '-'}</td>
                     `;
                     tableBody.appendChild(row);
                 });
@@ -548,8 +851,9 @@
             // Define fixed columns
             const fixedColumns = [
                 'Experiment ID',
+                'User ID',
                 'Dataset Record ID',
-                'Inference',
+                'Completion',
                 'Completion Tokens',
                 'Prompt Tokens',
                 'Latency (ms)'
@@ -709,18 +1013,19 @@
                     // Map of all possible values
                     const allValues = {
                         'Experiment ID': exp.experiment_id,
+                        'User ID': exp.user_id ?? '-',
                         'Dataset Record ID': exp.dataset_record_id,
-                        'Inference': exp.inference,
+                        'Completion': exp.completion,
                         'Completion Tokens': exp.completion_tokens,
                         'Prompt Tokens': exp.prompt_tokens,
-                        'Latency (ms)': exp.latency_ms.toFixed(2),
+                        'Latency (ms)': exp.latency_ms?.toFixed(2) ?? '-',
                         ...metricResults
                     };
 
                     // Add only selected columns in the same order as headers
                     selectedColumns.forEach((colName, colIdx) => {
                         const td = document.createElement('td');
-                        if (colName === 'Inference' && allValues[colName]) {
+                        if (colName === 'Completion' && allValues[colName]) {
                             td.innerHTML = getTruncatedCellContent(allValues[colName]);
                         } else {
                             td.textContent = allValues[colName] || '-';
@@ -739,7 +1044,7 @@
                         const rowIdx = tr.rowIndex - 1; // skip header
                         // Find the data object
                         const exp = data[rowIdx];
-                        showOverlay(exp.inference);
+                        showOverlay(exp.completion);
                     });
                 });
             }
@@ -747,6 +1052,47 @@
             // Initial table render
             updateTable();
         }
+
+        // --- ROUTING LOGIC ---
+        function showTab(tab) {
+            // Remove active from all
+            document.querySelectorAll('.left-menu li').forEach(item => item.classList.remove('active'));
+            // Hide all content
+            document.querySelectorAll('.content-area > div').forEach(content => content.style.display = 'none');
+            // Show selected
+            document.getElementById(tab).style.display = 'block';
+            // Set active nav
+            const navItem = Array.from(document.querySelectorAll('.left-menu li')).find(li => li.dataset.content === tab);
+            if (navItem) navItem.classList.add('active');
+            // Load data if needed
+            if (tab === 'promptTemplateContent') loadPromptTemplates();
+            else if (tab === 'datasetContent') loadDatasets();
+            else if (tab === 'adminContent') loadUsers();
+        }
+        function handleRoute() {
+            const path = window.location.pathname;
+            if (path === '/datasets') {
+                showTab('datasetContent');
+            } else if (path === '/prompts') {
+                showTab('promptTemplateContent');
+            } else {
+                showTab('experimentContent');
+            }
+        }
+        window.addEventListener('popstate', handleRoute);
+        // Navigation click handlers
+        document.querySelectorAll('.left-menu li').forEach(menuItem => {
+            menuItem.addEventListener('click', () => {
+                const contentId = menuItem.dataset.content;
+                let url = '/';
+                if (contentId === 'datasetContent') url = '/datasets';
+                else if (contentId === 'promptTemplateContent') url = '/prompts';
+                window.history.pushState({}, '', url);
+                handleRoute();
+            });
+        });
+        // On load, show correct tab
+        handleRoute();
 
         // Add this after the existing event listeners
         document.querySelectorAll('.left-menu li').forEach(menuItem => {
@@ -777,8 +1123,10 @@
                 const currentPort = window.location.port || '8000'; // default to 8000 if no port
                 const apiPort = parseInt(currentPort) + 1;
                 const apiUrl = `http://${window.location.hostname}:${apiPort}/prompttemplates`;
-
-                const response = await fetch(apiUrl);
+                const token = localStorage.getItem('access_token');
+                const response = await fetch(apiUrl, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
                 const data = await response.json();
                 
                 const tableBody = document.getElementById('promptTemplateTableBody');
@@ -788,12 +1136,10 @@
                     const row = document.createElement('tr');
                     const createdAt = new Date(template.created_at).toLocaleString();
                     const deploymentTime = template.deployment_time ? new Date(template.deployment_time).toLocaleString() : '-';
-                    
                     // Add deployed-row class if template is deployed
                     if (template.is_deployed) {
                         row.classList.add('deployed-row');
                     }
-                    
                     row.innerHTML = `
                         <td>${template.asset_name}</td>
                         <td>${template.asset_description}</td>
@@ -803,6 +1149,7 @@
                         <td class="evaluation-cell">${template.user_prompt_template.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
                         <td>${deploymentTime}</td>
                         <td>${template.is_deployed ? '✓' : '✗'}</td>
+                        <td>${template.user_id ?? '-'}</td>
                     `;
                     tableBody.appendChild(row);
                 });
@@ -816,8 +1163,10 @@
                 const currentPort = window.location.port || '8000'; // default to 8000 if no port
                 const apiPort = parseInt(currentPort) + 1;
                 const apiUrl = `http://${window.location.hostname}:${apiPort}/datasets`;
-
-                const response = await fetch(apiUrl);
+                const token = localStorage.getItem('access_token');
+                const response = await fetch(apiUrl, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
                 const data = await response.json();
                 
                 const tableBody = document.getElementById('datasetTableBody');
@@ -826,19 +1175,195 @@
                 data.datasets.forEach(dataset => {
                     const row = document.createElement('tr');
                     const createdAt = new Date(dataset.created_at).toLocaleString();
-                    
                     row.innerHTML = `
                         <td>${dataset.asset_name}</td>
                         <td>${dataset.asset_description}</td>
                         <td>${dataset.asset_version}</td>
                         <td>${createdAt}</td>
                         <td class="evaluation-cell">${dataset.file_path}</td>
+                        <td>${dataset.user_id ?? '-'}</td>
                     `;
                     tableBody.appendChild(row);
                 });
             } catch (error) {
                 console.error('Error fetching datasets:', error);
             }
+        }
+
+        // --- ADMIN TAB UI ---
+        // Add Admin tab content
+        if (!document.getElementById('adminContent')) {
+            const adminDiv = document.createElement('div');
+            adminDiv.id = 'adminContent';
+            adminDiv.style.display = 'none';
+            adminDiv.innerHTML = `
+                <h1>User Management</h1>
+                <form id="addUserForm" style="margin-bottom:20px;display:flex;gap:10px;align-items:center;">
+                    <input type="text" id="newUsername" placeholder="Username" required style="padding:6px;">
+                    <input type="password" id="newPassword" placeholder="Password" required style="padding:6px;">
+                    <select id="newRole" required style="padding:6px;">
+                        <option value="engineer">Engineer</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <button type="submit">Add User</button>
+                    <span id="addUserError" style="color:#e74c3c;margin-left:10px;"></span>
+                </form>
+                <table id="userTable" style="width:100%;background:#fff;">
+                    <thead><tr><th>Username</th><th>Role</th><th>Created At</th><th>Action</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            `;
+            document.querySelector('.content-area').appendChild(adminDiv);
+        }
+        async function loadUsers() {
+            const currentPort = window.location.port || '8000';
+            const apiPort = parseInt(currentPort) + 1;
+            const apiUrl = `http://${window.location.hostname}:${apiPort}/users`;
+            const token = localStorage.getItem('access_token');
+            const resp = await fetch(apiUrl, { headers: { 'Authorization': 'Bearer ' + token } });
+            const data = await resp.json();
+            const tbody = document.querySelector('#userTable tbody');
+            tbody.innerHTML = '';
+            data.users.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${user.username}</td><td>${user.role}</td><td>${new Date(user.created_at).toLocaleString()}</td><td><button class="removeUserBtn" data-username="${user.username}">Remove</button></td>`;
+                tbody.appendChild(tr);
+            });
+            // Remove user event
+            document.querySelectorAll('.removeUserBtn').forEach(btn => {
+                btn.onclick = async function() {
+                    if (!confirm('Remove user ' + this.dataset.username + '?')) return;
+                    const currentPort = window.location.port || '8000';
+                    const apiPort = parseInt(currentPort) + 1;
+                    const apiUrl = `http://${window.location.hostname}:${apiPort}/users/${this.dataset.username}`;
+                    const token = localStorage.getItem('access_token');
+                    const resp = await fetch(apiUrl, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+                    const result = await resp.json();
+                    if (result.success) loadUsers();
+                    else alert(result.message || 'Failed to remove user');
+                };
+            });
+        }
+        // Add user event
+        document.addEventListener('submit', async function(e) {
+            if (e.target && e.target.id === 'addUserForm') {
+                e.preventDefault();
+                const username = document.getElementById('newUsername').value;
+                const password = document.getElementById('newPassword').value;
+                const role = document.getElementById('newRole').value;
+                const errorSpan = document.getElementById('addUserError');
+                errorSpan.textContent = '';
+                const currentPort = window.location.port || '8000';
+                const apiPort = parseInt(currentPort) + 1;
+                const apiUrl = `http://${window.location.hostname}:${apiPort}/users`;
+                const token = localStorage.getItem('access_token');
+                const resp = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, role })
+                });
+                const result = await resp.json();
+                if (result.success) {
+                    document.getElementById('addUserForm').reset();
+                    loadUsers();
+                } else {
+                    errorSpan.textContent = result.message || 'Failed to add user';
+                }
+            }
+        });
+        // Show admin tab logic in showTab
+        function showTab(tab) {
+            // Remove active from all
+            document.querySelectorAll('.left-menu li').forEach(item => item.classList.remove('active'));
+            // Hide all content
+            document.querySelectorAll('.content-area > div').forEach(content => content.style.display = 'none');
+            // Show selected
+            document.getElementById(tab).style.display = 'block';
+            // Set active nav
+            const navItem = Array.from(document.querySelectorAll('.left-menu li')).find(li => li.dataset.content === tab);
+            if (navItem) navItem.classList.add('active');
+            // Load data if needed
+            if (tab === 'promptTemplateContent') loadPromptTemplates();
+            else if (tab === 'datasetContent') loadDatasets();
+            else if (tab === 'adminContent') loadUsers();
+        }
+        // On load, show correct tab and admin tab if needed
+        handleRoute();
+        if (getUserRole() === 'admin') {
+            showApp();
+        }
+
+        // --- PROFILE ICON & DROPDOWN ---
+        // Add profile icon and dropdown
+        if (!document.getElementById('profileMenu')) {
+            const profileMenu = document.createElement('div');
+            profileMenu.id = 'profileMenu';
+            profileMenu.style.position = 'fixed';
+            profileMenu.style.top = '24px';
+            profileMenu.style.right = '36px';
+            profileMenu.style.zIndex = '2100';
+            profileMenu.innerHTML = `
+                <div id="profileIcon" style="width:36px;height:36px;border-radius:50%;background:#2980b9;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(44,62,80,0.08);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="white"/>
+                        <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="white"/>
+                    </svg>
+                </div>
+                <div id="profileDropdown" style="display:none;position:absolute;right:0;top:44px;background:#fff;border-radius:8px;box-shadow:0 2px 12px rgba(44,62,80,0.12);min-width:180px;">
+                    <div class="profile-username" id="profileUsername" style="padding:12px 18px;border-bottom:1px solid #eee;font-weight:600;color:#2c3e50;background-color:#f8fafc;">User</div>
+                    <div class="profile-option" id="showTokenOption" style="padding:12px 18px;cursor:pointer;border-bottom:1px solid #eee;">Auth Token</div>
+                    <div class="profile-option" id="logoutOption" style="padding:12px 18px;cursor:pointer;">Logout</div>
+                </div>
+            `;
+            document.body.appendChild(profileMenu);
+            
+            // Update username if logged in
+            if (isLoggedIn()) {
+                const username = getUsername();
+                const profileUsernameElement = document.getElementById('profileUsername');
+                if (profileUsernameElement) {
+                    profileUsernameElement.textContent = username;
+                }
+            }
+        }
+        // Profile icon dropdown logic (safe checks)
+        const profileIcon = document.getElementById('profileIcon');
+        const profileDropdown = document.getElementById('profileDropdown');
+        if (profileIcon && profileDropdown) {
+            profileIcon.onclick = function(e) {
+                e.stopPropagation();
+                profileDropdown.style.display = profileDropdown.style.display === 'block' ? 'none' : 'block';
+            };
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('#profileMenu')) {
+                    profileDropdown.style.display = 'none';
+                }
+            });
+        }
+        // Show JWT token modal (safe checks)
+        const showTokenOption = document.getElementById('showTokenOption');
+        const closeTokenModal = document.getElementById('closeTokenModal');
+        if (showTokenOption && document.getElementById('tokenModal')) {
+            showTokenOption.onclick = function() {
+                const token = localStorage.getItem('access_token') || '';
+                document.getElementById('jwtTokenText').textContent = token;
+                document.getElementById('tokenModal').style.display = 'block';
+                if (profileDropdown) profileDropdown.style.display = 'none';
+            };
+        }
+        if (closeTokenModal) {
+            closeTokenModal.onclick = function() {
+                document.getElementById('tokenModal').style.display = 'none';
+            };
+        }
+        // Logout option (safe check)
+        const logoutOption = document.getElementById('logoutOption');
+        if (logoutOption) {
+            logoutOption.onclick = function() {
+                localStorage.removeItem('access_token');
+                showLogin();
+                if (profileDropdown) profileDropdown.style.display = 'none';
+            };
         }
     </script>
 </body>

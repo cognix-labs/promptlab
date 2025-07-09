@@ -78,12 +78,12 @@ class Relevance(Evaluator):
         """
 
         query = data["query"]
-        inference = data["response"]
+        completion = data["response"]
 
-        user_prompt = user_prompt.replace("{{response}}", inference)
+        user_prompt = user_prompt.replace("{{response}}", completion)
         user_prompt = user_prompt.replace("{{query}}", query)
 
-        model_response = self.inference(system_prompt, user_prompt)
+        model_response = self.completion(system_prompt, user_prompt)
 
         return model_response.response
 

@@ -24,7 +24,7 @@ async def test_async_model_invocation():
             """Synchronous invocation"""
             time.sleep(0.1)
             return ModelResponse(
-                inference=f"Response to: {user_prompt}",
+                completion=f"Response to: {user_prompt}",
                 prompt_tokens=10,
                 completion_tokens=20,
                 latency_ms=100,
@@ -34,7 +34,7 @@ async def test_async_model_invocation():
             """Asynchronous invocation"""
             await asyncio.sleep(0.1)
             return ModelResponse(
-                inference=f"Async response to: {user_prompt}",
+                completion=f"Async response to: {user_prompt}",
                 prompt_tokens=10,
                 completion_tokens=20,
                 latency_ms=100,
@@ -69,7 +69,7 @@ async def test_async_model_invocation():
 
     # Check that the results are correct
     for i, result in enumerate(async_results):
-        assert result.inference == f"Async response to: Test prompt {i}"
+        assert result.completion == f"Async response to: Test prompt {i}"
         assert result.prompt_tokens == 10
         assert result.completion_tokens == 20
         assert result.latency_ms == 100
@@ -223,7 +223,7 @@ async def test_model_max_concurrent_tasks():
             """Synchronous invocation"""
             time.sleep(0.1)
             return ModelResponse(
-                inference=f"Response to: {user_prompt}",
+                completion=f"Response to: {user_prompt}",
                 prompt_tokens=10,
                 completion_tokens=20,
                 latency_ms=100,
@@ -234,7 +234,7 @@ async def test_model_max_concurrent_tasks():
             self.invocation_times.append(time.time())
             await asyncio.sleep(0.5)  # Simulate a slow API call
             return ModelResponse(
-                inference=f"Async response to: {user_prompt}",
+                completion=f"Async response to: {user_prompt}",
                 prompt_tokens=10,
                 completion_tokens=20,
                 latency_ms=500,
@@ -278,7 +278,7 @@ async def test_experiment_concurrency_limit():
 
         def invoke(self, system_prompt, user_prompt):
             return ModelResponse(
-                inference="Test response",
+                completion="Test response",
                 prompt_tokens=10,
                 completion_tokens=20,
                 latency_ms=100,
@@ -299,7 +299,7 @@ async def test_experiment_concurrency_limit():
             self.active_count -= 1
 
             return ModelResponse(
-                inference="Test async response",
+                completion="Test async response",
                 prompt_tokens=10,
                 completion_tokens=20,
                 latency_ms=200,
@@ -346,7 +346,7 @@ async def test_experiment_concurrency_limit():
         # Attach the mocks to the experiment_config
         experiment_config.prompt_template = prompt_template
         experiment_config.dataset = dataset
-        experiment_config.inference_model = model
+        experiment_config.completion_model = model
         experiment_config.evaluation = []  # Run the experiment asynchronously
         await experiment._init_batch_eval_async(
             dataset, "system: test", "user: test", [], experiment_config

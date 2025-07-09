@@ -1,10 +1,13 @@
 import asyncio
 from promptlab import PromptLab
-from promptlab.types import ModelConfig, PromptTemplate, Dataset
-from custom_ollama import Custom_Ollama, Custom_Ollama_Embedding
+from promptlab.types import PromptTemplate, Dataset
 
-# Initialize PromptLab with local tracer
-tracer_config = {"type": "local", "db_file": "./promptlab.db"}
+# Initialize PromptLab with api tracer
+tracer_config = {
+    "type": "api",
+    "endpoint": "http://localhost:8001",
+    "jwt_token": "your_jwt_token_here",
+}
 pl = PromptLab(tracer_config)
 
 # Create a prompt template
@@ -31,27 +34,17 @@ dataset = Dataset(
 )
 ds = pl.asset.create(dataset)
 
-# # Retrieve assets
+# Retrieve assets
 pt = pl.asset.get(asset_name=prompt_name, version=0)
 ds = pl.asset.get(asset_name=dataset_name, version=0)
 
-completion_model = Custom_Ollama(ModelConfig(name="ollama/llama3.2", type="completion"))
-embedding_model = Custom_Ollama_Embedding(
-    ModelConfig(name="ollama/nomic-embed-text:latest", type="embedding")
-)
-
 # Run an experiment
 experiment_config = {
-    "name": "demo_experimet",
-    "completion_model_config": {
-        "name": "custom_ollama/llama3.2",
-        "type": "completion",
-        "model": completion_model,
-    },
+    "name": "hosted_experimet",
+    "completion_model_config": {"name": "ollama/llama3.2", "type": "completion"},
     "embedding_model_config": {
-        "name": "custom_ollama/nomic-embed-text:latest",
+        "name": "ollama/nomic-embed-text:latest",
         "type": "embedding",
-        "model": embedding_model,
     },
     "prompt_template": pt,
     "dataset": ds,
@@ -69,11 +62,12 @@ experiment_config = {
         },
     ],
 }
+
 # Uncomment the following line to run the experiment synchronously
 # pl.experiment.run(experiment_config)
 
-# Run the experiment asynchronously
+# # Run the experiment asynchronously
 asyncio.run(pl.experiment.run_async(experiment_config))
 
-# Start the PromptLab Studio to view results
-asyncio.run(pl.studio.start_async(8000))
+# # Start the PromptLab Studio to view results
+# asyncio.run(pl.studio.start_async(8000))

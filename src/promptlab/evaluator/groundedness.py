@@ -33,7 +33,7 @@ class Groundedness(Evaluator):
         
         ### [2] Minimally Grounded Response
         - Contains mostly ungrounded claims with few supported statements
-        - Includes notable fabrications beyond reasonable inference
+        - Includes notable fabrications beyond reasonable completion
         - Shows minimal relationship to the provided context
         
         **Example**
@@ -42,7 +42,7 @@ class Groundedness(Evaluator):
         
         ### [3] Partially Grounded Response
         - Contains a mix of grounded and ungrounded claims
-        - Makes some reasonable inferences but goes beyond context in places
+        - Makes some reasonable completions but goes beyond context in places
         - Has clear connections to the context but includes unsupported details
         
         **Example**
@@ -51,7 +51,7 @@ class Groundedness(Evaluator):
         
         ### [4] Mostly Grounded Response
         - Contains predominantly grounded claims with minimal unsupported information
-        - Makes reasonable inferences closely tied to the context
+        - Makes reasonable completions closely tied to the context
         - Presents information largely aligned with the provided context
         
         **Example**
@@ -88,16 +88,16 @@ class Groundedness(Evaluator):
             # Remove the query section placeholder if no query is provided
             user_prompt = user_prompt.replace("{query_section}", "")
 
-        inference = data["response"]
+        completion = data["response"]
         context = data["context"]
 
-        user_prompt = user_prompt.replace("{{response}}", inference)
+        user_prompt = user_prompt.replace("{{response}}", completion)
         user_prompt = user_prompt.replace("{{context}}", context)
 
         if query_section:
             user_prompt = user_prompt.replace("{query_section}", query_section)
 
-        model_response = self.inference(system_prompt, user_prompt)
+        model_response = self.completion(system_prompt, user_prompt)
 
         return model_response.response
 

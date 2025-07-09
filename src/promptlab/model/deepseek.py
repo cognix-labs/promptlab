@@ -12,7 +12,7 @@ class DeepSeek(Model):
         super().__init__(model_config)
 
         self.model_config = model_config
-        self.deployment = model_config.inference_model_deployment
+        self.model_name = self.model_config.name.split("/")[1]
         self.client = OpenAI(
             api_key=model_config.api_key, base_url=str(model_config.endpoint)
         )
@@ -36,7 +36,7 @@ class DeepSeek(Model):
 
         start_time = time.time()
         chat_completion = self.client.chat.completions.create(
-            model=self.deployment,
+            model=self.model_name,
             messages=payload,
             extra_headers=extra_headers if extra_headers else None,
         )
@@ -77,7 +77,7 @@ class DeepSeek(Model):
         start_time = time.time()
 
         chat_completion = await self.async_client.chat.completions.create(
-            model=self.deployment,
+            model=self.model_name,
             messages=payload,
             extra_headers=extra_headers if extra_headers else None,
         )
@@ -106,6 +106,7 @@ class DeepSeek_Embedding(EmbeddingModel):
         self.client = OpenAI(
             api_key=model_config.api_key, base_url=str(model_config.endpoint)
         )
+        self.model_name = self.model_config.name.split("/")[1]
 
     def __call__(self, text: str) -> List[float]:
         # Check if we're using OpenRouter
@@ -119,7 +120,7 @@ class DeepSeek_Embedding(EmbeddingModel):
         try:
             # Try to use the embedding API
             response = self.client.embeddings.create(
-                model=self.model_config.embedding_model_deployment,
+                model=self.model_name,
                 input=text,
                 extra_headers=extra_headers if extra_headers else None,
             )
@@ -134,3 +135,7 @@ class DeepSeek_Embedding(EmbeddingModel):
             embedding = np.zeros(1536).tolist()
 
         return embedding
+
+
+deepseek_completion = DeepSeek
+deepseek_embedding = DeepSeek_Embedding

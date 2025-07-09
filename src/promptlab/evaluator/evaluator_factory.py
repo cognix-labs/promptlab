@@ -32,7 +32,7 @@ class EvaluatorFactory:
     @staticmethod
     def get_evaluator(
         metric: str,
-        inference_model: Model,
+        completion_model: Model,
         embedding_model: Model,
         evaluator: Evaluator = None,
     ) -> Evaluator:
@@ -42,7 +42,7 @@ class EvaluatorFactory:
                 raise ValueError(f"Unknown evaluator: {metric}")
             evaluator = evaluator_class()
 
-        evaluator.inference = inference_model
+        evaluator.completion = completion_model
         evaluator.embedding = embedding_model
 
         return evaluator

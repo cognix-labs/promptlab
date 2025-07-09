@@ -1,9 +1,10 @@
+import asyncio
 from promptlab import PromptLab
 from promptlab.types import ModelResponse, Dataset
 
 
 # Replace the implementation of the target function with code that calls your agent/API and returns a ModelResponse.
-def agent_proxy(inputs: dict) -> ModelResponse:
+async def agent_proxy(inputs: dict) -> ModelResponse:
     # topic = inputs["essay_topic"]
     # essay = inputs["essay"]
 
@@ -15,8 +16,8 @@ def agent_proxy(inputs: dict) -> ModelResponse:
     )
 
 
-# Initialize PromptLab with SQLite storage
-tracer_config = {"type": "sqlite", "db_file": "./promptlab.db"}
+# Initialize PromptLab with local tracer
+tracer_config = {"type": "local", "db_file": "./promptlab.db"}
 pl = PromptLab(tracer_config)
 
 # Create a dataset
@@ -26,7 +27,7 @@ dataset_file_path = "./samples/data/essay_feedback.jsonl"
 dataset = Dataset(
     name=dataset_name, description=dataset_description, file_path=dataset_file_path
 )
-ds = pl.asset.create(dataset)
+# ds = pl.asset.create(dataset)
 
 # Retrieve assets
 ds = pl.asset.get(asset_name=dataset_name, version=0)
@@ -40,13 +41,18 @@ experiment_config = {
         {
             "metric": "exact_match",
             "column_mapping": {
-                "response": "$inference",
+                "response": "$completion",
                 "reference": "feedback",
             },
         },
     ],
 }
-pl.experiment.run(experiment_config)
+
+# Uncomment the following line to run the experiment synchronously
+# pl.experiment.run(experiment_config)
+
+# Run the experiment asynchronously
+asyncio.run(pl.experiment.run_async(experiment_config))
 
 # Start the PromptLab Studio to view results
-pl.studio.start(8000)
+asyncio.run(pl.studio.start_async(8000))

@@ -1,10 +1,11 @@
-from promptlab.model.model import Model
-
-__version__ = "0.1.0"
+from promptlab.tracer.tracer import Tracer
+from promptlab.tracer.tracer_factory import TracerFactory
+from promptlab.tracer.local_tracer import LocalTracer
+from promptlab.tracer.api_tracer import ApiTracer
 
 __all__ = [
-    "PromptLab",
-    "EvaluationFactory",
+    "Tracer",
     "TracerFactory",
-    "Model",
+    "LocalTracer",
+    "ApiTracer",
 ]

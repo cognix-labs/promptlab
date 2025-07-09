@@ -2,18 +2,13 @@ from promptlab.asset import Asset
 from promptlab._experiment import Experiment
 from promptlab.studio.studio import Studio
 from promptlab.tracer.tracer_factory import TracerFactory
-from promptlab._config import ConfigValidator, TracerConfig
 from promptlab._logging import logger
 
 
 class PromptLab:
     def __init__(self, tracer_config: dict):
-        tracer_config = TracerConfig(**tracer_config)
-        ConfigValidator.validate_tracer_config(tracer_config)
-        logger.info("Tracer config validated successfully.")
-
         self.tracer = TracerFactory.get_tracer(tracer_config)
-        self.tracer.init_db()
+        logger.info("Tracer initialized successfully.")
 
         self.asset = Asset(self.tracer)
         self.experiment = Experiment(self.tracer)

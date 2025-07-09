@@ -3,10 +3,10 @@ from promptlab.evaluator.evaluator import Evaluator
 
 class ExactMatch(Evaluator):
     def evaluate(self, data: dict):
-        inference = data["response"]
+        completion = data["response"]
         reference = data["reference"]
 
-        return inference == reference
+        return completion == reference
 
 
 exact_match = ExactMatch

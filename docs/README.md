@@ -68,12 +68,12 @@ Experiment is at the center of PromptLab. An experiment means running a prompt f
 A sample experiment definition:
 
     experiment = {
-        "inference_model" : {
+        "completion_model" : {
             "type": "<model_type>",
             "api_key": "<your_api_key>",
             "api_version": "<api_version>",
             "endpoint": "<your_model_endpoint>",
-            "inference_model_deployment": "<inference_model_name>",
+            "completion_model_deployment": "<completion_model_name>",
         },
         "embedding_model" : {
             "type": "<model_type>",
@@ -108,7 +108,7 @@ Now, let's take a look into the parts of the experiment definition.
 
 #### Model
 
-PromptLab needs two models to work properly. An inference model for prompt inference and some "LLM as judge" metrics. And an embedding model for generating embeddings for some metrics.
+PromptLab needs two models to work properly. An completion model for prompt completion and some "LLM as judge" metrics. And an embedding model for generating embeddings for some metrics.
 
 Fields definition:
 
@@ -116,7 +116,7 @@ Fields definition:
 - api_key (optional)
 - api_version (optional)
 - endpoint (optional)
-- inference_model_deployment (mandatory): deployment name of the inference model
+- completion_model_deployment (mandatory): deployment name of the completion model
 - embedding_model_name (mandatory): deployment name of the embedding model
 
 #### Evaluation
@@ -127,7 +127,7 @@ It is a list of evaluation metrics with column mapping. You can use built in met
 Fields definition:
 
 - metric (mandatory): name of the metric from the specific library
-- column_mapping (mandatory): column mapping to map the metric paramaeters with dataset columns and the inference output. To map a parameter to inference output, use `$inference`.
+- column_mapping (mandatory): column mapping to map the metric paramaeters with dataset columns and the completion output. To map a parameter to completion output, use `$completion`.
 - evaluator (required for custom metric): it's the evaluator object that's required for custom metrics. 
 
 ### Metric

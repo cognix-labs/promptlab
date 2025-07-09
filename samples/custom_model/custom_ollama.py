@@ -5,7 +5,7 @@ import asyncio
 from promptlab.model.model import EmbeddingModel, Model, ModelResponse, ModelConfig
 
 
-class Ollama(Model):
+class Custom_Ollama(Model):
     def __init__(self, model_config: ModelConfig):
         super().__init__(model_config)
 
@@ -62,7 +62,7 @@ class Ollama(Model):
         )
 
 
-class Ollama_Embedding(EmbeddingModel):
+class Custom_Ollama_Embedding(EmbeddingModel):
     def __init__(self, model_config: ModelConfig):
         super().__init__(model_config)
 
@@ -78,5 +78,5 @@ class Ollama_Embedding(EmbeddingModel):
         return embedding
 
 
-ollama_completion = Ollama
-ollama_embedding = Ollama_Embedding
+ollama_completion = Custom_Ollama
+ollama_embedding = Custom_Ollama_Embedding

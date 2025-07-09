@@ -4,8 +4,8 @@ import json
 import uuid
 import asyncio
 
-from promptlab._config import ConfigValidator, ExperimentConfig
-from promptlab.db.sql import SQLQuery
+from promptlab.types import ExperimentConfig
+from promptlab.model.model_factory import ModelFactory
 from promptlab.evaluator.evaluator_factory import EvaluatorFactory
 from promptlab.tracer.tracer import Tracer
 from promptlab._utils import Utils
@@ -17,13 +17,13 @@ class Experiment:
         self.tracer = tracer
         logger.debug("Experiment instance initialized.")
 
-    def run(self, experiment_config: ExperimentConfig):
+    def run(self, config: dict):
         """
         Synchronous version of experiment execution
         """
         logger.info(
             "Running experiment synchronously. Experiment Name: %s",
-            experiment_config.name,
+            config["name"],
         )
         (
             experiment_config,
@@ -31,7 +31,7 @@ class Experiment:
             system_prompt,
             user_prompt,
             prompt_template_variables,
-        ) = self._prepare_experiment_data(experiment_config)
+        ) = self._prepare_experiment_data(config)
 
         exp_summary = self._init_batch_eval(
             eval_dataset,
@@ -41,16 +41,16 @@ class Experiment:
             experiment_config,
         )
 
-        self.tracer.trace(experiment_config, exp_summary)
+        self.tracer.trace_experiment(experiment_config, exp_summary)
         logger.info(
             "Experiment run complete and traced. Experiment Name: %s",
             experiment_config.name,
         )
 
-    async def run_async(self, experiment_config: ExperimentConfig):
+    async def run_async(self, config: dict):
         logger.info(
             "Running experiment asynchronously. Experiment Name: %s",
-            experiment_config.name,
+            config["name"],
         )
         (
             experiment_config,
@@ -58,7 +58,7 @@ class Experiment:
             system_prompt,
             user_prompt,
             prompt_template_variables,
-        ) = self._prepare_experiment_data(experiment_config)
+        ) = self._prepare_experiment_data(config)
 
         exp_summary = await self._init_batch_eval_async(
             eval_dataset,
@@ -68,7 +68,7 @@ class Experiment:
             experiment_config,
         )
 
-        self.tracer.trace(experiment_config, exp_summary)
+        self.tracer.trace_experiment(experiment_config, exp_summary)
         logger.info(
             "Async experiment run complete and traced. Experiment Name: %s",
             experiment_config.name,
@@ -77,34 +77,25 @@ class Experiment:
     def _prepare_experiment_data(self, experiment_config: ExperimentConfig):
         logger.debug("Preparing experiment data.")
         experiment_config = ExperimentConfig(**experiment_config)
-        try:
-            ConfigValidator.validate_experiment_config(experiment_config)
-            logger.debug("Experiment config validated.")
-        except Exception as e:
-            logger.error(f"Experiment config validation failed: {e}", exc_info=True)
-            raise
 
-        # if experiment_config.prompt_template is None:
         pt_asset_binary = None
         if experiment_config.prompt_template:
-            prompt_template = self.tracer.db_client.fetch_data(
-                SQLQuery.SELECT_ASSET_QUERY,
-                (
-                    experiment_config.prompt_template.name,
-                    experiment_config.prompt_template.version,
-                ),
-            )[0]
-            pt_asset_binary = prompt_template["asset_binary"]
+            prompt_template = self.tracer.get_asset(
+                experiment_config.prompt_template.name,
+                experiment_config.prompt_template.version,
+            )
+            pt_asset_binary = prompt_template.asset_binary
 
         system_prompt, user_prompt, prompt_template_variables = (
             Utils.split_prompt_template(pt_asset_binary)
         )
 
-        eval_dataset_path = self.tracer.db_client.fetch_data(
-            SQLQuery.SELECT_DATASET_FILE_PATH_QUERY,
-            (experiment_config.dataset.name, experiment_config.dataset.version),
-        )[0]
-        eval_dataset = Utils.load_dataset(eval_dataset_path["file_path"])
+        eval_dataset_path = self.tracer.get_asset(
+            experiment_config.dataset.name, experiment_config.dataset.version
+        )
+        eval_dataset = Utils.load_dataset(
+            json.loads(eval_dataset_path.asset_binary)["file_path"]
+        )
 
         return (
             experiment_config,
@@ -125,7 +116,16 @@ class Experiment:
         """
         Synchronous version of batch evaluation with concurrency limit
         """
-        inference_model = experiment_config.inference_model
+        completion_model = (
+            ModelFactory.get_model(
+                experiment_config.completion_model_config,
+                completion=True,
+                model=experiment_config.completion_model_config.model,
+            )
+            if experiment_config.completion_model_config
+            else None
+        )
+
         agent_proxy = experiment_config.agent_proxy
         experiment_id = (
             experiment_config.name if experiment_config.name else str(uuid.uuid4())
@@ -142,7 +142,7 @@ class Experiment:
             model_response = (
                 agent_proxy(eval_record)
                 if agent_proxy
-                else inference_model(sys_prompt, usr_prompt)
+                else completion_model(sys_prompt, usr_prompt)
             )
             evaluation = self._evaluate(
                 model_response.response, eval_record, experiment_config
@@ -151,7 +151,7 @@ class Experiment:
             eval = dict()
             eval["experiment_id"] = experiment_id
             eval["dataset_record_id"] = eval_record["id"]
-            eval["inference"] = model_response.response
+            eval["completion"] = model_response.response
             eval["prompt_tokens"] = model_response.prompt_tokens
             eval["completion_tokens"] = model_response.completion_tokens
             eval["latency_ms"] = model_response.latency_ms
@@ -173,14 +173,23 @@ class Experiment:
         """
         Asynchronous version of batch evaluation with concurrency limit
         """
-        inference_model = experiment_config.inference_model
+        completion_model = (
+            ModelFactory.get_model(
+                experiment_config.completion_model_config,
+                completion=True,
+                model=experiment_config.completion_model_config.model,
+            )
+            if experiment_config.completion_model_config
+            else None
+        )
+
         agent_proxy = experiment_config.agent_proxy
 
         experiment_id = (
             experiment_config.name if experiment_config.name else str(uuid.uuid4())
         )
         timestamp = datetime.now().isoformat()
-        max_concurrent_tasks = getattr(inference_model, "max_concurrent_tasks", 5)
+        max_concurrent_tasks = getattr(completion_model, "max_concurrent_tasks", 5)
 
         exp_summary = []
 
@@ -197,7 +206,7 @@ class Experiment:
         async def process_with_semaphore(record, s_prompt, u_prompt):
             async with semaphore:
                 return await self._process_record_async(
-                    inference_model,
+                    completion_model,
                     agent_proxy,
                     s_prompt,
                     u_prompt,
@@ -222,21 +231,42 @@ class Experiment:
         return exp_summary
 
     def _evaluate(
-        self, inference: str, row, experiment_config: ExperimentConfig
+        self, completion: str, row, experiment_config: ExperimentConfig
     ) -> str:
         evaluations = []
+
+        completion_model = (
+            ModelFactory.get_model(
+                experiment_config.completion_model_config,
+                completion=True,
+                model=experiment_config.completion_model_config.model,
+            )
+            if experiment_config.completion_model_config
+            else None
+        )
+
+        embedding_model = (
+            ModelFactory.get_model(
+                experiment_config.embedding_model_config,
+                completion=False,
+                model=experiment_config.embedding_model_config.model,
+            )
+            if experiment_config.embedding_model_config
+            else None
+        )
+
         for eval in experiment_config.evaluation:
             evaluator = EvaluatorFactory.get_evaluator(
                 eval.metric,
-                experiment_config.inference_model,
-                experiment_config.embedding_model,
+                completion_model,
+                embedding_model,
                 eval.evaluator,
             )
 
             data = dict()
             for key, value in eval.column_mapping.items():
-                if value == "$inference":
-                    data[key] = inference
+                if value == "$completion":
+                    data[key] = completion
                 else:
                     data[key] = row[value]
 
@@ -249,7 +279,7 @@ class Experiment:
 
     async def _process_record_async(
         self,
-        inference_model,
+        completion_model,
         agent_proxy,
         system_prompt,
         user_prompt,
@@ -261,11 +291,10 @@ class Experiment:
         """
         Process a single record asynchronously
         """
-        # model_response = await inference_model(system_prompt, user_prompt)
         model_response = (
             await agent_proxy(eval_record)
             if agent_proxy
-            else await inference_model(system_prompt, user_prompt)
+            else await completion_model(system_prompt, user_prompt)
         )
         # Run potentially blocking evaluation in a separate thread
         evaluation = await asyncio.to_thread(
@@ -275,7 +304,7 @@ class Experiment:
         eval_result = dict()
         eval_result["experiment_id"] = experiment_id
         eval_result["dataset_record_id"] = eval_record["id"]
-        eval_result["inference"] = model_response.response
+        eval_result["completion"] = model_response.response
         eval_result["prompt_tokens"] = model_response.prompt_tokens
         eval_result["completion_tokens"] = model_response.completion_tokens
         eval_result["latency_ms"] = model_response.latency_ms

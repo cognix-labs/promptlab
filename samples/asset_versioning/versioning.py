@@ -1,8 +1,9 @@
+import asyncio
 from promptlab import PromptLab
-from promptlab.types import PromptTemplate
+from promptlab.types import Dataset, PromptTemplate
 
-# Initialize PromptLab with SQLite storage
-tracer_config = {"type": "sqlite", "db_file": "./promptlab.db"}
+# Initialize PromptLab with local tracer
+tracer_config = {"type": "local", "db_file": "./promptlab.db"}
 pl = PromptLab(tracer_config)
 
 # Create a prompt template
@@ -39,5 +40,24 @@ prompt_template = PromptTemplate(
 )
 pt = pl.asset.update(prompt_template)
 
+# Create a dataset
+dataset_name = "essay_samples"
+dataset_description = "dataset for evaluating the essay_feedback prompt"
+dataset_file_path = "./samples/data/essay_feedback.jsonl"
+dataset = Dataset(
+    name=dataset_name, description=dataset_description, file_path=dataset_file_path
+)
+ds = pl.asset.create(dataset)
+
+# Create a new version of the dataset
+dataset_description = (
+    "dataset for evaluating the essay_feedback prompt with additional examples"
+)
+dataset_file_path = "./samples/data/essay_feedback2.jsonl"
+dataset = Dataset(
+    name=dataset_name, description=dataset_description, file_path=dataset_file_path
+)
+ds = pl.asset.update(dataset)
+
 # Start the PromptLab Studio to view results
-pl.studio.start(8000)
+asyncio.run(pl.studio.start_async(8000))

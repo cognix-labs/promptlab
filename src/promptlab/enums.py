@@ -2,8 +2,8 @@ from enum import Enum
 
 
 class TracerType(Enum):
-    SQLITE = "sqlite"
-    API = "api"  # upcoming
+    API = "api"
+    LOCAL = "local"
 
 
 class AssetType(Enum):

@@ -53,14 +53,14 @@ The following code snippet demonstrate how to use the custom model in the experi
 
     # Run an experiment
     experiment_config = {
-        "inference_model": lmstudio,
+        "completion_model": lmstudio,
         "embedding_model": ollama_embedding,
         "prompt_template": pt,
         "dataset": ds,
         "evaluation": [
             {
                 "metric": "Fluency",
-                "column_mapping": {"response": "$inference"},
+                "column_mapping": {"response": "$completion"},
             },
         ],
     }

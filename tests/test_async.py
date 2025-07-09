@@ -20,17 +20,17 @@ class TestAsyncSupport(unittest.TestCase):
         # Create a mock model config
         model_config = ModelConfig(
             type="mock",
-            inference_model_deployment="mock-model",
+            completion_model_deployment="mock-model",
             embedding_model_deployment="mock-model",
         )
 
         # Create a concrete implementation of the abstract class
         class ConcreteModel(Model):
             def invoke(self, system_prompt, user_prompt):
-                return {"inference": "test"}
+                return {"completion": "test"}
 
             async def ainvoke(self, system_prompt, user_prompt):
-                return {"inference": "test"}
+                return {"completion": "test"}
 
         # Create an instance of the concrete model
         model = ConcreteModel(model_config)
@@ -82,7 +82,7 @@ class TestAsyncSupport(unittest.TestCase):
             api_key="test-key",
             api_version="2023-05-15",
             endpoint="https://test.openai.azure.com",
-            inference_model_deployment="gpt-35-turbo",
+            completion_model_deployment="gpt-35-turbo",
             embedding_model_deployment="text-embedding-ada-002",
         )
 
@@ -103,7 +103,7 @@ class TestAsyncSupport(unittest.TestCase):
         # Mock the invoke method
         model.invoke = MagicMock(
             return_value=ModelResponse(
-                inference="Test response",
+                completion="Test response",
                 prompt_tokens=10,
                 completion_tokens=20,
                 latency_ms=100,
@@ -115,7 +115,7 @@ class TestAsyncSupport(unittest.TestCase):
         result = model("System prompt", "User prompt")
 
         # Check that the result has the expected structure
-        self.assertEqual(result.inference, "Test response")
+        self.assertEqual(result.completion, "Test response")
         self.assertEqual(result.prompt_tokens, 10)
         self.assertEqual(result.completion_tokens, 20)
         self.assertIsNotNone(result.latency_ms)

@@ -20,10 +20,6 @@ class Model(ABC):
         """Asynchronous invocation of the model"""
         pass
 
-    def invoke_async(self, system_prompt: str, user_prompt: str) -> ModelResponse:
-        """Helper method to run async method in sync context"""
-        return asyncio.run(self.ainvoke(system_prompt, user_prompt))
-
     def __call__(
         self, system_prompt: str, user_prompt: str
     ) -> Union[ModelResponse, Awaitable[ModelResponse]]:

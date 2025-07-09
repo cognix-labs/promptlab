@@ -4,10 +4,10 @@ import numpy as np
 
 class SemanticSimilarity(Evaluator):
     def evaluate(self, data: dict):
-        inference = data["response"]
+        completion = data["response"]
         reference = data["reference"]
 
-        embedding_1 = np.array(self.embedding(inference))
+        embedding_1 = np.array(self.embedding(completion))
         embedding_2 = np.array(self.embedding(reference))
 
         # Normalization factors of the above embeddings

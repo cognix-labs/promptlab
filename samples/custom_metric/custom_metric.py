@@ -1,11 +1,11 @@
+import asyncio
 from promptlab import PromptLab
-from promptlab.model.ollama import Ollama, Ollama_Embedding
-from promptlab.types import ModelConfig, PromptTemplate, Dataset
+from promptlab.types import PromptTemplate, Dataset
 from factual_correctness import RagasFactualCorrectness
 from length import LengthEvaluator
 
-# Initialize PromptLab with SQLite storage
-tracer_config = {"type": "sqlite", "db_file": "./promptlab.db"}
+# Initialize PromptLab with local tracer
+tracer_config = {"type": "local", "db_file": "./promptlab.db"}
 pl = PromptLab(tracer_config)
 
 # Create a prompt template
@@ -36,37 +36,40 @@ ds = pl.asset.create(dataset)
 pt = pl.asset.get(asset_name=prompt_name, version=0)
 ds = pl.asset.get(asset_name=dataset_name, version=0)
 
-# model instnace
-inference_model = Ollama(model_config=ModelConfig(model_deployment="llama3.2"))
-embedding_model = Ollama_Embedding(
-    model_config=ModelConfig(model_deployment="nomic-embed-text:latest")
-)
-
 length = LengthEvaluator()
 factual_correctness = RagasFactualCorrectness()
 
 # Run an experiment
 experiment_config = {
-    "inference_model": inference_model,
-    "embedding_model": embedding_model,
+    "name": "custom_metric_experimet",
+    "completion_model_config": {"name": "ollama/llama3.2", "type": "completion"},
+    "embedding_model_config": {
+        "name": "ollama/nomic-embed-text:latest",
+        "type": "embedding",
+    },
     "prompt_template": pt,
     "dataset": ds,
     "evaluation": [
         {
             "metric": "length",
             "column_mapping": {
-                "response": "$inference",
+                "response": "$completion",
             },
             "evaluator": length,
         },
         {
             "metric": "factual_correctness",
-            "column_mapping": {"response": "$inference", "reference": "feedback"},
+            "column_mapping": {"response": "$completion", "reference": "feedback"},
             "evaluator": factual_correctness,
         },
     ],
 }
-pl.experiment.run(experiment_config)
+
+# Uncomment the following line to run the experiment synchronously
+# pl.experiment.run(experiment_config)
+
+# Run the experiment asynchronously
+asyncio.run(pl.experiment.run_async(experiment_config))
 
 # Start the PromptLab Studio to view results
-pl.studio.start(8000)
+asyncio.run(pl.studio.start_async(8000))
