@@ -70,22 +70,19 @@ class ApiTracer(Tracer):
             # Convert the JSON response back to ORMAsset
             asset_info = asset_data["asset"]
 
-            # Handle datetime fields
-            if asset_info.get("created_at"):
+            created_at = None
+            if ts := asset_info.get("created_at"):
                 try:
-                    created_at = datetime.fromisoformat(
-                        asset_info["created_at"].replace("Z", "+00:00")
-                    )
+                    created_at = datetime.fromisoformat(ts.replace("Z", "+00:00"))
                 except (ValueError, TypeError):
-                    created_at = None
+                    pass
 
-            if asset_info.get("deployment_time"):
+            deployment_time = None
+            if ts := asset_info.get("deployment_time"):
                 try:
-                    deployment_time = datetime.fromisoformat(
-                        asset_info["deployment_time"].replace("Z", "+00:00")
-                    )
+                    deployment_time = datetime.fromisoformat(ts.replace("Z", "+00:00"))
                 except (ValueError, TypeError):
-                    deployment_time = None
+                    pass
 
             return ORMAsset(
                 asset_name=asset_info["asset_name"],
