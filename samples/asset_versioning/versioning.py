@@ -50,7 +50,9 @@ dataset = Dataset(
 ds = pl.asset.create(dataset)
 
 # Create a new version of the dataset
-dataset_description = "dataset for evaluating the essay_feedback prompt with additional examples"
+dataset_description = (
+    "dataset for evaluating the essay_feedback prompt with additional examples"
+)
 dataset_file_path = "./samples/data/essay_feedback2.jsonl"
 dataset = Dataset(
     name=dataset_name, description=dataset_description, file_path=dataset_file_path
