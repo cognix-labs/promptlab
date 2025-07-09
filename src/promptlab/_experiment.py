@@ -6,11 +6,9 @@ import asyncio
 
 from promptlab.types import ExperimentConfig
 from promptlab.model.model_factory import ModelFactory
-from promptlab.sqlite.sql import SQLQuery
 from promptlab.evaluator.evaluator_factory import EvaluatorFactory
 from promptlab.tracer.tracer import Tracer
 from promptlab._utils import Utils
-from promptlab.types import ModelConfig
 from promptlab._logging import logger
 
 

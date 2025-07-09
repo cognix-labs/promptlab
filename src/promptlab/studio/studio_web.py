@@ -1,5 +1,4 @@
 import http
-import sys
 from importlib.resources import files
 
 

@@ -1,7 +1,6 @@
 import asyncio
 from promptlab import PromptLab
-from promptlab.model.ollama import Ollama, Ollama_Embedding
-from promptlab.types import ModelConfig, PromptTemplate, Dataset
+from promptlab.types import PromptTemplate, Dataset
 
 # Initialize PromptLab with api tracer
 tracer_config = {

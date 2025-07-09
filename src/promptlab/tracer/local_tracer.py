@@ -65,7 +65,7 @@ class LocalTracer(Tracer):
         try:
             session.add(asset)
             session.commit()
-        except Exception as e:
+        except Exception:
             session.rollback()
             raise
         finally:
@@ -76,7 +76,6 @@ class LocalTracer(Tracer):
     ) -> None:
         session = get_session()
         try:
-            timestamp = datetime.now().isoformat()
             experiment_id = experiment_summary[0]["experiment_id"]
 
             if experiment_config.completion_model_config is None:
@@ -136,7 +135,7 @@ class LocalTracer(Tracer):
             ]
             session.add_all(results)
             session.commit()
-        except Exception as e:
+        except Exception:
             session.rollback()
             raise
         finally:
@@ -155,7 +154,7 @@ class LocalTracer(Tracer):
                     f"Asset {asset_name} with version {asset_version} not found."
                 )
             return asset
-        except Exception as e:
+        except Exception:
             session.rollback()
             raise
         finally:
@@ -173,7 +172,7 @@ class LocalTracer(Tracer):
                 .all()
             )
             return assets
-        except Exception as e:
+        except Exception:
             session.rollback()
             raise
         finally:
@@ -189,7 +188,7 @@ class LocalTracer(Tracer):
                 .first()
             )
             return asset
-        except Exception as e:
+        except Exception:
             session.rollback()
             raise
         finally:
@@ -202,7 +201,7 @@ class LocalTracer(Tracer):
             if not user:
                 raise ValueError(f"User {username} not found.")
             return user
-        except Exception as e:
+        except Exception:
             session.rollback()
             raise
         finally:
@@ -216,7 +215,7 @@ class LocalTracer(Tracer):
                 .mappings()
                 .all()
             )
-        except Exception as e:
+        except Exception:
             session.rollback()
             raise
         finally:
@@ -226,7 +225,7 @@ class LocalTracer(Tracer):
         session = get_session()
         try:
             return session.query(User).filter(User.status == 1).all()
-        except Exception as e:
+        except Exception:
             session.rollback()
             raise
         finally:
@@ -237,7 +236,7 @@ class LocalTracer(Tracer):
         try:
             session.add(user)
             session.commit()
-        except Exception as e:
+        except Exception:
             session.rollback()
             raise
         finally:
@@ -251,7 +250,7 @@ class LocalTracer(Tracer):
                 raise ValueError(f"User {username} not found.")
             user.status = 0  # Deactivate user
             session.commit()
-        except Exception as e:
+        except Exception:
             session.rollback()
             raise
         finally:
@@ -269,7 +268,7 @@ class LocalTracer(Tracer):
             if not user:
                 raise ValueError("Current user not found.")
             return user
-        except Exception as e:
+        except Exception:
             session.rollback()
             raise
         finally:

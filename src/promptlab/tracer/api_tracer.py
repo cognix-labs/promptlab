@@ -4,11 +4,7 @@ import requests
 
 from promptlab.types import ExperimentConfig, TracerConfig
 from promptlab.tracer.tracer import Tracer
-from promptlab.sqlite.models import (
-    Experiment as ORMExperiment,
-    ExperimentResult as ORMExperimentResult,
-    Asset as ORMAsset,
-)
+from promptlab.sqlite.models import Asset as ORMAsset
 from promptlab.types import Dataset, PromptTemplate
 
 
@@ -75,22 +71,20 @@ class ApiTracer(Tracer):
             asset_info = asset_data["asset"]
 
             # Handle datetime fields
-            created_at = None
             if asset_info.get("created_at"):
                 try:
                     created_at = datetime.fromisoformat(
                         asset_info["created_at"].replace("Z", "+00:00")
                     )
-                except:
+                except (ValueError, TypeError):
                     created_at = None
 
-            deployment_time = None
             if asset_info.get("deployment_time"):
                 try:
                     deployment_time = datetime.fromisoformat(
                         asset_info["deployment_time"].replace("Z", "+00:00")
                     )
-                except:
+                except (ValueError, TypeError):
                     deployment_time = None
 
             return ORMAsset(
