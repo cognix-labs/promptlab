@@ -4,7 +4,7 @@ from promptlab.types import ModelConfig, PromptTemplate, Dataset
 from custom_ollama import Custom_Ollama, Custom_Ollama_Embedding
 
 # Initialize PromptLab with local tracer
-tracer_config = {"type": "local", "db_file": "./promptlab3.db"}
+tracer_config = {"type": "local", "db_file": "./promptlab.db"}
 pl = PromptLab(tracer_config)
 
 # Create a prompt template
@@ -42,7 +42,7 @@ embedding_model = Custom_Ollama_Embedding(
 
 # Run an experiment
 experiment_config = {
-    "name": "demo_experimet16",
+    "name": "demo_experimet",
     "completion_model_config": {
         "name": "custom_ollama/llama3.2",
         "type": "completion",

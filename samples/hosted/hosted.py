@@ -11,7 +11,7 @@ tracer_config = {
 pl = PromptLab(tracer_config)
 
 # Create a prompt template
-prompt_name = "essay_feedback2"
+prompt_name = "essay_feedback"
 prompt_description = "A prompt for generating feedback on essays"
 system_prompt = "You are a helpful assistant who can provide feedback on essays."
 user_prompt = """The essay topic is - <essay_topic>.
@@ -26,7 +26,7 @@ prompt_template = PromptTemplate(
 pt = pl.asset.create(prompt_template)
 
 # Create a dataset
-dataset_name = "essay_samples2"
+dataset_name = "essay_samples"
 dataset_description = "dataset for evaluating the essay_feedback prompt"
 dataset_file_path = "./samples/data/essay_feedback.jsonl"
 dataset = Dataset(
@@ -40,7 +40,7 @@ ds = pl.asset.get(asset_name=dataset_name, version=0)
 
 # Run an experiment
 experiment_config = {
-    "name": "hosted_experimet2",
+    "name": "hosted_experimet",
     "completion_model_config": {"name": "ollama/llama3.2", "type": "completion"},
     "embedding_model_config": {
         "name": "ollama/nomic-embed-text:latest",
