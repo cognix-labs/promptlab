@@ -1,8 +1,8 @@
-name: PromptLab Tests
+name: Tests
 
 on:
   push:
-    branches: [main, feature/async-support]
+    branches: [main, feature/*]
   pull_request:
     branches: [main]
 
