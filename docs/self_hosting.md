@@ -34,11 +34,12 @@ docker run -p 8000:8000 -p 8001:8001 --name promptlab-container promptlab:latest
 
 #### Production Setup with Persistent Data
 
-For production use, mount a volume to persist your database:
+For production use, mount a volume to persist your database and set security environment variables:
 
 ```bash
 docker run -p 8000:8000 -p 8001:8001 \
   -v /your/local/data/path:/app/data \
+  -e PROMPTLAB_SECRET_KEY="your-secure-32-character-secret-key-here" \
   --name promptlab-container \
   --restart unless-stopped \
   promptlab:latest
@@ -46,8 +47,18 @@ docker run -p 8000:8000 -p 8001:8001 \
 
 **Windows Example:**
 ```powershell
-docker run -p 8000:8000 -p 8001:8001 -v C:\work\promptlab_data:/app/data --name promptlab-container --restart unless-stopped promptlab:latest
+docker run -p 8000:8000 -p 8001:8001 -v C:\work\promptlab_data:/app/data -e PROMPTLAB_SECRET_KEY="your-secure-32-character-secret-key-here" --name promptlab-container --restart unless-stopped promptlab:latest
 ```
+
+#### Environment Variables
+
+| Variable | Required | Description | Default |
+|----------|----------|-------------|---------|
+| `PROMPTLAB_SECRET_KEY` | **Recommended** | JWT signing key for authentication. Should be 32+ characters for security. | Auto-generated (not persistent) |
+| `PROMPTLAB_LOG_LEVEL` | Optional | Logging level (`DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`) | `INFO` |
+| `PROMPTLAB_LOG_DIR` | Optional | Custom directory for log files | Platform-specific default |
+
+**⚠️ Security Note:** Always set `PROMPTLAB_SECRET_KEY` in production to ensure consistent JWT token validation across container restarts.
 
 ### Accessing the Application
 
@@ -109,7 +120,8 @@ az container create \
   --cpu 2 \
   --memory 4 \
   --os-type Linux \
-  --restart-policy Always
+  --restart-policy Always \
+  --environment-variables PROMPTLAB_SECRET_KEY="your-secure-32-character-secret-key-here"
 ```
 
 #### Step 4: Access Your Application
@@ -150,5 +162,8 @@ az containerapp create \
   --cpu 1.0 \
   --memory 2.0Gi \
   --min-replicas 1 \
-  --max-replicas 3
+  --max-replicas 3 \
+  --env-vars PROMPTLAB_SECRET_KEY="your-secure-32-character-secret-key-here"
 ```
+
+**Note:** For Container Apps, you can also set environment variables through the Azure portal or use Azure Key Vault for enhanced security.
