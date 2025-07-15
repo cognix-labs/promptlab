@@ -38,7 +38,7 @@ class Studio:
         app = studio_api.get_app()
         
         # Mount static files using FastAPI's StaticFiles
-        static_path = Path(__file__).parent.parent.parent.parent / "src/web"
+        static_path = Path(__file__).resolve().parent.parent / "web"
         if static_path.exists():
             app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
         
