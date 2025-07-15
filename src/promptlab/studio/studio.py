@@ -1,34 +1,25 @@
 import asyncio
-from http.server import HTTPServer
-from typing import Optional
-import threading
+import logging
+import signal
+import sys
+from pathlib import Path
 
 from art import tprint
 import uvicorn
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from promptlab.studio.studio_api import StudioApi
-from promptlab.studio.studio_web import StudioWebHandler
 from promptlab.tracer.tracer import Tracer
 
 
 class Studio:
     def __init__(self, tracer: Tracer):
         self.tracer = tracer
-
-        self.web_server: Optional[HTTPServer] = None
-        self.api_server = None  # Can be either StudioApi or AsyncStudioApi
-        self.api_thread: Optional[threading.Thread] = None
-        self.web_thread: Optional[threading.Thread] = None
-        self.api_task = None  # For async operation
-
-    def start_api_server(self, api_port: int):
-        """Start the API server synchronously"""
-        self.api_server = StudioApi(self.tracer_config)
-        self.api_thread = threading.Thread(
-            target=self.api_server.run, args=("localhost", api_port), daemon=True
-        )
-
-        self.api_thread.start()
+        self.shutdown_event = asyncio.Event()
+        
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger(__name__)
 
     @staticmethod
     def print_welcome_text(port: int) -> None:
@@ -41,87 +32,78 @@ class Studio:
         tprint("PromptLab")
         print(f"\n🚀 PromptLab Studio running on: http://localhost:{port} 🚀")
 
-    async def start_api_server_async(self, api_port: int):
-        """Start the API server asynchronously using FastAPI"""
-        self.api_server = StudioApi(self.tracer)
-        config = uvicorn.Config(
-            self.api_server.get_app(), host="0.0.0.0", port=api_port, log_level="info"
-        )
-        server = uvicorn.Server(config)
-        await server.serve()
+    def create_web_app(self):
+        """Create a production-ready FastAPI app that serves both API and static files"""
+        studio_api = StudioApi(self.tracer)
+        app = studio_api.get_app()
+        
+        # Mount static files using FastAPI's StaticFiles
+        static_path = Path(__file__).parent.parent.parent.parent / "src/web"
+        if static_path.exists():
+            app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
+        
+        # Serve index.html for SPA routes
+        @app.get("/")
+        @app.get("/datasets")
+        @app.get("/prompts")
+        async def serve_spa():
+            return FileResponse(str(static_path / "index.html"))
+        
+        # Health check endpoint
+        @app.get("/health")
+        async def health_check():
+            return {"status": "healthy", "service": "promptlab-studio"}
+        
+        return app
 
-    def start_web_server(self, web_port: int):
-        """Start the web server in a separate thread"""
-        self.web_server = HTTPServer(("0.0.0.0", web_port), StudioWebHandler)
+    def setup_signal_handlers(self):
+        """Setup graceful shutdown signal handlers"""
+        def signal_handler(signum, frame):
+            self.logger.info(f"Received signal {signum}, initiating graceful shutdown...")
+            self.shutdown_event.set()
+        
+        signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGTERM, signal_handler)
 
-        self.web_thread = threading.Thread(
-            target=self.web_server.serve_forever, daemon=True
-        )
-
-        self.web_thread.start()
-
-    def shutdown(self):
-        """Shutdown all servers"""
-        if self.web_server:
-            self.web_server.shutdown()
-
-        if self.web_thread and self.web_thread.is_alive():
-            self.web_thread.join(timeout=5)
-
-        if self.api_thread and self.api_thread.is_alive():
-            self.api_thread.join(timeout=5)
-
-        if self.api_task:
-            self.api_task.cancel()
-
-    def start(self, port: int = 8000):
-        """Start the studio synchronously"""
+    async def start_async(self, port: int = 8000, workers: int = 1):
+        """
+        Async start method using FastAPI for both API and static files.
+        """
         try:
-            # Print welcome text
-            Studio.print_welcome_text(port)
-
-            # Start API server first in a separate thread
-            self.start_api_server(port + 1)
-
-            # Start web server in separate thread
-            self.start_web_server(port)
-
-            print(f"Studio started at http://localhost:{port}")
-
-            # Keep main thread alive until interrupted
-            try:
-                while True:
-                    import time
-
-                    time.sleep(1)
-            except KeyboardInterrupt:
-                print("\nShutting down servers...")
-                self.shutdown()
-
-        except Exception:
-            self.shutdown()
-            raise
-
-    async def start_async(self, port: int = 8000):
-        """Start the studio asynchronously"""
-        try:
-            # Print welcome text
-            Studio.print_welcome_text(port)
-
-            # Start web server in a separate thread
-            self.start_web_server(port)
-
-            # Start API server asynchronously
-            self.api_task = asyncio.create_task(self.start_api_server_async(port + 1))
-
-            print(f"Studio started at http://localhost:{port}")
-
-            # Keep the task running
-            await self.api_task
-
-        except asyncio.CancelledError:
-            print("\nShutting down servers...")
-            self.shutdown()
+            self.print_welcome_text(port)            
+            app = self.create_web_app()
+            self.setup_signal_handlers()
+            
+            config = uvicorn.Config(
+                app,
+                host="0.0.0.0",
+                port=port,
+                workers=workers,
+                log_level="info",
+                access_log=True,
+                # Production optimizations (use uvloop on Unix systems)
+                loop="uvloop" if sys.platform != "win32" else "asyncio",
+                http="httptools" if sys.platform != "win32" else "h11",
+                # Security headers
+                server_header=False,
+                date_header=False,
+                # Connection settings
+                timeout_keep_alive=5,
+            )
+            
+            server = uvicorn.Server(config)            
+            server_task = asyncio.create_task(server.serve())
+            
+            self.logger.info(f"PromptLab Studio started at http://localhost:{port}")
+            
+            # Wait for shutdown signal
+            await self.shutdown_event.wait()
+            
+            # Graceful shutdown
+            self.logger.info("Initiating graceful shutdown...")
+            server.should_exit = True
+            await server_task
+            
         except Exception as e:
-            self.shutdown()
+            self.logger.error(f"Error starting PromptLab Studio: {e}")
             raise e

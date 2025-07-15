@@ -30,12 +30,14 @@ dependencies = [
     "art>=6.5",
     "setuptools",
     "fastapi",
-    "uvicorn",
+    "uvicorn[standard]>=0.18.0",
     "sqlalchemy",
     "passlib",
     "python-jose",
     "python-multipart",
-    "bcrypt"
+    "bcrypt",
+    "uvloop>=0.17.0; sys_platform != 'win32'",
+    "httptools>=0.5.0; sys_platform != 'win32'",
 ]
 requires-python = ">=3.8"
 
