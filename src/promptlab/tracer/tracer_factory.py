@@ -10,7 +10,7 @@ class TracerFactory:
     def get_tracer(_tracer_config: dict) -> Tracer:
         tracer_config = TracerConfig(**_tracer_config)
 
-        if tracer_config.type == TracerType.API.value:
+        if tracer_config.type == TracerType.REMOTE.value:
             return ApiTracer(tracer_config)
         if tracer_config.type == TracerType.LOCAL.value:
             return LocalTracer(tracer_config)

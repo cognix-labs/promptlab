@@ -78,21 +78,19 @@ class LocalTracer(Tracer):
         try:
             experiment_id = experiment_summary[0]["experiment_id"]
 
-            if experiment_config.completion_model_config is None:
-                completion_model_config = None
-            else:
-                experiment_config.completion_model_config.model = None
-                completion_model_config = (
-                    experiment_config.completion_model_config.model_dump()
-                )
+            # Serialize completion model configuration
+            completion_model_config = None
+            if experiment_config.completion_model_config is not None:
+                config_copy = experiment_config.completion_model_config.model_copy()
+                config_copy.model = None  # Remove model instance before serialization
+                completion_model_config = config_copy.model_dump()
 
-            if experiment_config.embedding_model_config is None:
-                embedding_model_config = None
-            else:
-                experiment_config.embedding_model_config.model = None
-                embedding_model_config = (
-                    experiment_config.embedding_model_config.model_dump()
-                )
+            # Serialize embedding model configuration
+            embedding_model_config = None
+            if experiment_config.embedding_model_config is not None:
+                config_copy = experiment_config.embedding_model_config.model_copy()
+                config_copy.model = None  # Remove model instance before serialization
+                embedding_model_config = config_copy.model_dump()
 
             model = {
                 "completion_model_config": completion_model_config,

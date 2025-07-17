@@ -181,3 +181,5 @@ ide_docs/*
 .trunk/
 AGENTS.md
 .env
+
+*.whl

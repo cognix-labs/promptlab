@@ -2,9 +2,9 @@ import asyncio
 from promptlab import PromptLab
 from promptlab.types import PromptTemplate, Dataset
 
-# Initialize PromptLab with api tracer
+# Initialize PromptLab with remote tracer
 tracer_config = {
-    "type": "api",
+    "type": "remote",
     "endpoint": "http://HOST-URL:8001",
     "jwt_token": "JWT_TOKEN",
 }

@@ -10,7 +10,7 @@ from promptlab.types import Dataset, PromptTemplate
 
 class ApiTracer(Tracer):
     def __init__(self, tracer_config: TracerConfig):
-        self.endpoint = tracer_config.endpoint
+        self.endpoint = tracer_config.endpoint.rstrip('/') + '/api'
         self.jwt_token = tracer_config.jwt_token
 
     def create_dataset(self, dataset: Dataset):
@@ -40,8 +40,13 @@ class ApiTracer(Tracer):
         if self.jwt_token:
             headers["Authorization"] = f"Bearer {self.jwt_token}"
 
-        experiment_config.completion_model_config.model = None
-        experiment_config.embedding_model_config.model = None
+        if experiment_config.completion_model_config is not None:
+            experiment_config.completion_model_config.model = None
+        if experiment_config.embedding_model_config is not None:
+            experiment_config.embedding_model_config.model = None
+            
+        if experiment_config.agent_proxy is not None:
+            experiment_config.agent_proxy = None
 
         payload = {
             "experiment_config": experiment_config.model_dump(),

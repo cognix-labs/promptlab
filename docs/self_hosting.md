@@ -29,7 +29,7 @@ This guide covers how to deploy PromptLab using Docker containers, both locally 
 Run PromptLab with default settings:
 
 ```bash
-docker run -p 8000:8000 -p 8001:8001 --name promptlab-container promptlab:latest
+docker run -p 8000:8000 --name promptlab-container promptlab:latest
 ```
 
 #### Production Setup with Persistent Data
