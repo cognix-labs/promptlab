@@ -151,9 +151,14 @@ class StudioApi:
             asset_name: str, asset_version: int, auth=Depends(self._auth_dependency)
         ):
             try:
-                asset = await asyncio.to_thread(
-                    self.tracer.get_asset, asset_name, asset_version
-                )
+                if asset_version == -1:
+                    asset = await asyncio.to_thread(
+                        self.tracer.get_latest_asset, asset_name
+                    )
+                else:
+                    asset = await asyncio.to_thread(
+                        self.tracer.get_asset, asset_name, asset_version
+                    )
                 if not asset:
                     raise HTTPException(
                         status_code=404,
