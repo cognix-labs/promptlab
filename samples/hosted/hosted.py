@@ -6,7 +6,7 @@ from promptlab.types import PromptTemplate, Dataset
 tracer_config = {
     "type": "api",
     "endpoint": "http://HOST-URL:8001",
-    "jwt_token": "your_jwt_token_here",
+    "jwt_token": "JWT_TOKEN",
 }
 pl = PromptLab(tracer_config)
 
