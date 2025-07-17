@@ -23,6 +23,38 @@ class LocalTracer(Tracer):
         db_url = f"sqlite:///{tracer_config.db_file}"
         init_engine(db_url)
 
+    def _create_asset(self, asset: ORMAsset):
+        session = get_session()
+        try:
+            session.add(asset)
+            session.commit()
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+    def _make_serializable(self, experiment_config: ExperimentConfig) -> Dict:
+        """Make experiment config serializable by removing non-serializable objects and creating model dict."""
+        # Serialize completion model configuration
+        completion_model_config = None
+        if experiment_config.completion_model_config is not None:
+            config_copy = experiment_config.completion_model_config.model_copy()
+            config_copy.model = None  # Remove model instance before serialization
+            completion_model_config = config_copy.model_dump()
+
+        # Serialize embedding model configuration
+        embedding_model_config = None
+        if experiment_config.embedding_model_config is not None:
+            config_copy = experiment_config.embedding_model_config.model_copy()
+            config_copy.model = None  # Remove model instance before serialization
+            embedding_model_config = config_copy.model_dump()
+
+        return {
+            "completion_model_config": completion_model_config,
+            "embedding_model_config": embedding_model_config,
+        }
+
     def create_dataset(self, dataset: Dataset):
         if dataset.version is None:
             dataset.version = 0
@@ -60,17 +92,6 @@ class LocalTracer(Tracer):
 
         self._create_asset(asset)
 
-    def _create_asset(self, asset: ORMAsset):
-        session = get_session()
-        try:
-            session.add(asset)
-            session.commit()
-        except Exception:
-            session.rollback()
-            raise
-        finally:
-            session.close()
-
     def trace_experiment(
         self, experiment_config: ExperimentConfig, experiment_summary: List[Dict]
     ) -> None:
@@ -78,24 +99,7 @@ class LocalTracer(Tracer):
         try:
             experiment_id = experiment_summary[0]["experiment_id"]
 
-            # Serialize completion model configuration
-            completion_model_config = None
-            if experiment_config.completion_model_config is not None:
-                config_copy = experiment_config.completion_model_config.model_copy()
-                config_copy.model = None  # Remove model instance before serialization
-                completion_model_config = config_copy.model_dump()
-
-            # Serialize embedding model configuration
-            embedding_model_config = None
-            if experiment_config.embedding_model_config is not None:
-                config_copy = experiment_config.embedding_model_config.model_copy()
-                config_copy.model = None  # Remove model instance before serialization
-                embedding_model_config = config_copy.model_dump()
-
-            model = {
-                "completion_model_config": completion_model_config,
-                "embedding_model_config": embedding_model_config,
-            }
+            model = self._make_serializable(experiment_config)
 
             asset = {
                 "prompt_template_name": experiment_config.prompt_template.name
