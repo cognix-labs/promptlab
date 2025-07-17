@@ -12,17 +12,21 @@ pip install promptlab
 
 ## Initialize PromptLab 
 
-The first step to use PromptLab is to initialize the PromptLab object. Please check [Tracer](../../docs/README.md#tracer) to learn more about the tracer configuration.
+The first step to use PromptLab is to initialize the PromptLab object. PromptLab needs a tracer object, please check [Tracer](../../docs/README.md#tracer) to learn more about the tracer configuration.
+
+Initializing PromptLab with local tracer.
 
 ```python
-tracer_config = {"type": "local", "db_file": "./promptlab.db"}
-pl = PromptLab(tracer_config)
+tracer_config = {
+    "type": "local", 
+    "db_file": "./promptlab.db"
+}
 ```
 
-Once the PromptLab object is ready, you can start the PromptLab Studio to check the assets and experiments.
+If you are using PromptLab locally, you can start the PromptLab Studio to check the assets and experiments.
 
 ```python
-pl.studio.start(8000)
+asyncio.run(pl.studio.start_async(8000))
 ```
 
 ## Create a Prompt Template

@@ -3,7 +3,11 @@ from promptlab import PromptLab
 from promptlab.types import PromptTemplate, Dataset
 
 # Initialize PromptLab with local tracer
-tracer_config = {"type": "local", "db_file": "./promptlab.db"}
+tracer_config = {
+    "type": "local", 
+    "db_file": "./promptlab.db"
+}
+
 pl = PromptLab(tracer_config)
 
 # Create a prompt template
@@ -36,7 +40,7 @@ ds = pl.asset.get(asset_name=dataset_name, version=0)
 
 # Run an experiment
 experiment_config = {
-    "name": "demo_experimet",
+    "name": "quickstart_experimet",
     "completion_model_config": {"name": "ollama/llama3.2", "type": "completion"},
     "embedding_model_config": {
         "name": "ollama/nomic-embed-text:latest",
