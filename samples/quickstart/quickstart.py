@@ -6,6 +6,9 @@ from promptlab.types import PromptTemplate, Dataset
 tracer_config = {"type": "local", "db_file": "./promptlab.db"}
 pl = PromptLab(tracer_config)
 
+asyncio.run(pl.studio.start_async(8000))
+
+pass
 # Create a prompt template
 prompt_name = "essay_feedback"
 prompt_description = "A prompt for generating feedback on essays"

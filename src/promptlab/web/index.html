@@ -712,7 +712,7 @@
             errorDiv.style.display = 'none';
             try {
                 const currentPort = window.location.port || '8000';
-                const apiUrl = `http://${window.location.hostname}:${currentPort}/login`;
+                const apiUrl = `http://${window.location.hostname}:${currentPort}/api/login`;
                 const resp = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -748,7 +748,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 const currentPort = window.location.port || '8000'; // default to 8000 if no port
-                const apiUrl = `http://${window.location.hostname}:${currentPort}/experiments`;
+                const apiUrl = `http://${window.location.hostname}:${currentPort}/api/experiments`;
                 const token = localStorage.getItem('access_token');
                 const response = await fetch(apiUrl, {
                     headers: { 'Authorization': 'Bearer ' + token }
@@ -1119,7 +1119,7 @@
         async function loadPromptTemplates() {
             try {
                 const currentPort = window.location.port || '8000'; // default to 8000 if no port
-                const apiUrl = `http://${window.location.hostname}:${currentPort}/prompttemplates`;
+                const apiUrl = `http://${window.location.hostname}:${currentPort}/api/prompts`;
                 const token = localStorage.getItem('access_token');
                 const response = await fetch(apiUrl, {
                     headers: { 'Authorization': 'Bearer ' + token }
@@ -1158,7 +1158,7 @@
         async function loadDatasets() {
             try {
                 const currentPort = window.location.port || '8000'; // default to 8000 if no port
-                const apiUrl = `http://${window.location.hostname}:${currentPort}/datasets`;
+                const apiUrl = `http://${window.location.hostname}:${currentPort}/api/datasets`;
                 const token = localStorage.getItem('access_token');
                 const response = await fetch(apiUrl, {
                     headers: { 'Authorization': 'Bearer ' + token }
@@ -1213,7 +1213,7 @@
         }
         async function loadUsers() {
             const currentPort = window.location.port || '8000';
-            const apiUrl = `http://${window.location.hostname}:${currentPort}/users`;
+            const apiUrl = `http://${window.location.hostname}:${currentPort}/api/users`;
             const token = localStorage.getItem('access_token');
             const resp = await fetch(apiUrl, { headers: { 'Authorization': 'Bearer ' + token } });
             const data = await resp.json();
@@ -1229,7 +1229,7 @@
                 btn.onclick = async function() {
                     if (!confirm('Remove user ' + this.dataset.username + '?')) return;
                     const currentPort = window.location.port || '8000';
-                    const apiUrl = `http://${window.location.hostname}:${currentPort}/users/${this.dataset.username}`;
+                    const apiUrl = `http://${window.location.hostname}:${currentPort}/api/users/${this.dataset.username}`;
                     const token = localStorage.getItem('access_token');
                     const resp = await fetch(apiUrl, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
                     const result = await resp.json();
@@ -1248,7 +1248,7 @@
                 const errorSpan = document.getElementById('addUserError');
                 errorSpan.textContent = '';
                 const currentPort = window.location.port || '8000';
-                const apiUrl = `http://${window.location.hostname}:${currentPort}/users`;
+                const apiUrl = `http://${window.location.hostname}:${currentPort}/api/users`;
                 const token = localStorage.getItem('access_token');
                 const resp = await fetch(apiUrl, {
                     method: 'POST',
