@@ -33,13 +33,8 @@ class ApiTracer(Tracer):
         )
         response.raise_for_status()
 
-    def trace_experiment(
-        self, experiment_config: ExperimentConfig, experiment_summary: List[Dict]
-    ):
-        headers = {"Content-Type": "application/json"}
-        if self.jwt_token:
-            headers["Authorization"] = f"Bearer {self.jwt_token}"
-
+    def make_serializable(self, experiment_config: ExperimentConfig) -> ExperimentConfig:
+        """Make experiment config serializable by removing non-serializable objects."""
         if experiment_config.completion_model_config is not None:
             experiment_config.completion_model_config.model = None
         if experiment_config.embedding_model_config is not None:
@@ -53,9 +48,20 @@ class ApiTracer(Tracer):
             for eval_cfg in experiment_config.evaluation:
                 if hasattr(eval_cfg, "evaluator"):
                     eval_cfg.evaluator = None
+        
+        return experiment_config
+
+    def trace_experiment(
+        self, experiment_config: ExperimentConfig, experiment_summary: List[Dict]
+    ):
+        headers = {"Content-Type": "application/json"}
+        if self.jwt_token:
+            headers["Authorization"] = f"Bearer {self.jwt_token}"
+
+        serializable_config = self.make_serializable(experiment_config)
 
         payload = {
-            "experiment_config": experiment_config.model_dump(),
+            "experiment_config": serializable_config.model_dump(),
             "experiment_summary": experiment_summary,
         }
 
