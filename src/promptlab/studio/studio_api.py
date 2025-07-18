@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 from passlib.context import CryptContext
 from jose import JWTError, jwt
-from fastapi import FastAPI, HTTPException, Request, Depends, Header
+from fastapi import FastAPI, HTTPException, Request, Depends, Header, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -21,6 +21,8 @@ class StudioApi:
     def __init__(self, tracer: Tracer):
         self.tracer = tracer
         self.app = FastAPI()
+        # Create API router with /api prefix
+        self.api_router = APIRouter(prefix="/api")
         # Get SECRET_KEY from environment variable or generate a secure one
         self.SECRET_KEY = os.getenv("PROMPTLAB_SECRET_KEY")
         if not self.SECRET_KEY:
@@ -71,7 +73,7 @@ class StudioApi:
             raise HTTPException(status_code=401, detail="Invalid token")
 
     def _setup_routes(self):
-        @self.app.get("/experiments")
+        @self.api_router.get("/experiments")
         async def get_experiments(auth=Depends(self._auth_dependency)):
             try:
                 experiments = await asyncio.to_thread(self.tracer.get_experiments)
@@ -93,7 +95,7 @@ class StudioApi:
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
-        @self.app.get("/prompttemplates")
+        @self.api_router.get("/prompts")
         async def get_prompt_templates(auth=Depends(self._auth_dependency)):
             try:
                 prompt_templates = await asyncio.to_thread(
@@ -121,7 +123,7 @@ class StudioApi:
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
-        @self.app.get("/datasets")
+        @self.api_router.get("/datasets")
         async def get_datasets(auth=Depends(self._auth_dependency)):
             try:
                 datasets = await asyncio.to_thread(
@@ -144,14 +146,19 @@ class StudioApi:
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
-        @self.app.get("/assets")
+        @self.api_router.get("/assets")
         async def get_asset(
             asset_name: str, asset_version: int, auth=Depends(self._auth_dependency)
         ):
             try:
-                asset = await asyncio.to_thread(
-                    self.tracer.get_asset, asset_name, asset_version
-                )
+                if asset_version == -1:
+                    asset = await asyncio.to_thread(
+                        self.tracer.get_latest_asset, asset_name
+                    )
+                else:
+                    asset = await asyncio.to_thread(
+                        self.tracer.get_asset, asset_name, asset_version
+                    )
                 if not asset:
                     raise HTTPException(
                         status_code=404,
@@ -180,7 +187,7 @@ class StudioApi:
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
-        @self.app.post("/login")
+        @self.api_router.post("/login")
         async def login(request: Request):
             try:
                 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -211,7 +218,7 @@ class StudioApi:
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
-        @self.app.get("/users")
+        @self.api_router.get("/users")
         async def get_users(auth=Depends(self._auth_dependency)):
             if auth["role"] != "admin":
                 raise HTTPException(status_code=403, detail="Admin access required")
@@ -231,7 +238,7 @@ class StudioApi:
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
-        @self.app.post("/users")
+        @self.api_router.post("/users")
         async def add_user(request: Request, auth=Depends(self._auth_dependency)):
             if auth["role"] != "admin":
                 raise HTTPException(status_code=403, detail="Admin access required")
@@ -255,7 +262,7 @@ class StudioApi:
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
-        @self.app.delete("/users/{username}")
+        @self.api_router.delete("/users/{username}")
         async def delete_user(username: str, auth=Depends(self._auth_dependency)):
             if auth["role"] != "admin":
                 raise HTTPException(status_code=403, detail="Admin access required")
@@ -273,7 +280,7 @@ class StudioApi:
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
-        @self.app.post("/experiments")
+        @self.api_router.post("/experiments")
         async def post_experiment(
             request: Request, auth=Depends(self._auth_dependency)
         ):
@@ -307,7 +314,7 @@ class StudioApi:
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
-        @self.app.post("/datasets")
+        @self.api_router.post("/datasets")
         async def create_dataset(dataset: Dataset, auth=Depends(self._auth_dependency)):
             try:
                 dataset.user = auth["username"]
@@ -333,7 +340,7 @@ class StudioApi:
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
-        @self.app.post("/templates")
+        @self.api_router.post("/templates")
         async def create_template(
             template: PromptTemplate, auth=Depends(self._auth_dependency)
         ):
@@ -361,6 +368,9 @@ class StudioApi:
                 )
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
+
+        # Include the API router in the main app
+        self.app.include_router(self.api_router)
 
     def get_app(self):
         return self.app

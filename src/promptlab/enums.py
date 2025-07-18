@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class TracerType(Enum):
-    API = "api"
+    REMOTE = "remote"
     LOCAL = "local"
 
 

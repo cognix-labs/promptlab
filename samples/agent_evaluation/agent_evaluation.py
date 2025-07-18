@@ -27,7 +27,7 @@ dataset_file_path = "./samples/data/essay_feedback.jsonl"
 dataset = Dataset(
     name=dataset_name, description=dataset_description, file_path=dataset_file_path
 )
-# ds = pl.asset.create(dataset)
+ds = pl.asset.create(dataset)
 
 # Retrieve assets
 ds = pl.asset.get(asset_name=dataset_name, version=0)

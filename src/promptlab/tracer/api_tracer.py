@@ -10,50 +10,31 @@ from promptlab.types import Dataset, PromptTemplate
 
 class ApiTracer(Tracer):
     def __init__(self, tracer_config: TracerConfig):
-        self.endpoint = tracer_config.endpoint
+        self.endpoint = tracer_config.endpoint.rstrip("/") + "/api"
         self.jwt_token = tracer_config.jwt_token
 
-    def create_dataset(self, dataset: Dataset):
-        headers = {"Content-Type": "application/json"}
-        if self.jwt_token:
-            headers["Authorization"] = f"Bearer {self.jwt_token}"
+    def _make_serializable(
+        self, experiment_config: ExperimentConfig
+    ) -> ExperimentConfig:
+        """Make experiment config serializable by removing non-serializable objects."""
+        if experiment_config.completion_model_config is not None:
+            experiment_config.completion_model_config.model = None
+        if experiment_config.embedding_model_config is not None:
+            experiment_config.embedding_model_config.model = None
 
-        response = requests.post(
-            f"{self.endpoint}/datasets", json=dataset.model_dump(), headers=headers
-        )
-        response.raise_for_status()
+        if experiment_config.agent_proxy is not None:
+            experiment_config.agent_proxy = None
 
-    def create_prompttemplate(self, template: PromptTemplate):
-        headers = {"Content-Type": "application/json"}
-        if self.jwt_token:
-            headers["Authorization"] = f"Bearer {self.jwt_token}"
+        # Set evaluator to None for each evaluation config
+        if experiment_config.evaluation is not None:
+            for eval_cfg in experiment_config.evaluation:
+                if hasattr(eval_cfg, "evaluator"):
+                    eval_cfg.evaluator = None
 
-        response = requests.post(
-            f"{self.endpoint}/templates", json=template.model_dump(), headers=headers
-        )
-        response.raise_for_status()
+        return experiment_config
 
-    def trace_experiment(
-        self, experiment_config: ExperimentConfig, experiment_summary: List[Dict]
-    ):
-        headers = {"Content-Type": "application/json"}
-        if self.jwt_token:
-            headers["Authorization"] = f"Bearer {self.jwt_token}"
-
-        experiment_config.completion_model_config.model = None
-        experiment_config.embedding_model_config.model = None
-
-        payload = {
-            "experiment_config": experiment_config.model_dump(),
-            "experiment_summary": experiment_summary,
-        }
-
-        response = requests.post(
-            f"{self.endpoint}/experiments", json=payload, headers=headers
-        )
-        response.raise_for_status()
-
-    def get_asset(self, asset_name: str, asset_version: int) -> ORMAsset:
+    def _fetch_asset(self, asset_name: str, asset_version: int) -> ORMAsset:
+        """Fetch asset from API and convert to ORMAsset object."""
         headers = {}
         if self.jwt_token:
             headers["Authorization"] = f"Bearer {self.jwt_token}"
@@ -96,15 +77,57 @@ class ApiTracer(Tracer):
                 deployment_time=deployment_time,
             )
         else:
-            raise ValueError(
-                f"Asset {asset_name} with version {asset_version} not found."
-            )
+            version_msg = f"with version {asset_version}" if asset_version != -1 else ""
+            raise ValueError(f"Asset {asset_name} {version_msg} not found.".strip())
+
+    def create_dataset(self, dataset: Dataset):
+        headers = {"Content-Type": "application/json"}
+        if self.jwt_token:
+            headers["Authorization"] = f"Bearer {self.jwt_token}"
+
+        response = requests.post(
+            f"{self.endpoint}/datasets", json=dataset.model_dump(), headers=headers
+        )
+        response.raise_for_status()
+
+    def create_prompttemplate(self, template: PromptTemplate):
+        headers = {"Content-Type": "application/json"}
+        if self.jwt_token:
+            headers["Authorization"] = f"Bearer {self.jwt_token}"
+
+        response = requests.post(
+            f"{self.endpoint}/templates", json=template.model_dump(), headers=headers
+        )
+        response.raise_for_status()
+
+    def trace_experiment(
+        self, experiment_config: ExperimentConfig, experiment_summary: List[Dict]
+    ):
+        headers = {"Content-Type": "application/json"}
+        if self.jwt_token:
+            headers["Authorization"] = f"Bearer {self.jwt_token}"
+
+        serializable_config = self._make_serializable(experiment_config)
+
+        payload = {
+            "experiment_config": serializable_config.model_dump(),
+            "experiment_summary": experiment_summary,
+        }
+
+        response = requests.post(
+            f"{self.endpoint}/experiments", json=payload, headers=headers
+        )
+        response.raise_for_status()
+
+    def get_asset(self, asset_name: str, asset_version: int) -> ORMAsset:
+        return self._fetch_asset(asset_name, asset_version)
 
     def get_assets_by_type(self, asset_type: str):
         raise NotImplementedError("get_assets_by_type method not implemented")
 
     def get_latest_asset(self, asset_name: str):
-        raise NotImplementedError("get_latest_asset method not implemented")
+        # Use -1 for version to get the latest asset
+        return self._fetch_asset(asset_name, -1)
 
     def get_user_by_username(self, username: str):
         raise NotImplementedError("get_user_by_username method not implemented")

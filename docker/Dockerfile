@@ -13,11 +13,13 @@ RUN apt-get update && apt-get install -y \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements file and wheel file
-COPY requirements.txt .
+# # Uncomment for PROD image build
+# COPY requirements.txt .
+# RUN pip install --no-cache-dir -r requirements.txt
 
-# Install Python dependencies from requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Uncomment for TEST image build
+COPY promptlab-0.1.6-py3-none-any.whl .
+RUN pip install --no-cache-dir promptlab-0.1.6-py3-none-any.whl
 
 # Create directory for database
 RUN mkdir -p /app/data

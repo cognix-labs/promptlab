@@ -1,1 +1,1 @@
-promptlab==0.1.5
+promptlab==0.1.6

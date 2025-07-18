@@ -2,11 +2,11 @@ import asyncio
 from promptlab import PromptLab
 from promptlab.types import PromptTemplate, Dataset
 
-# Initialize PromptLab with api tracer
+# Initialize PromptLab with remote tracer
 tracer_config = {
-    "type": "api",
+    "type": "remote",
     "endpoint": "http://HOST-URL:8001",
-    "jwt_token": "your_jwt_token_here",
+    "jwt_token": "JWT_TOKEN",
 }
 pl = PromptLab(tracer_config)
 
@@ -68,6 +68,3 @@ experiment_config = {
 
 # # Run the experiment asynchronously
 asyncio.run(pl.experiment.run_async(experiment_config))
-
-# # Start the PromptLab Studio to view results
-# asyncio.run(pl.studio.start_async(8000))
