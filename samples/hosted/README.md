@@ -1,4 +1,4 @@
-# Quickstart
+# Self-hosting
 
 This sample ([hosted.py](hosted.py)) demonstrates how to use self-hosted PromptLab. 
 
@@ -28,4 +28,4 @@ pl = PromptLab(tracer_config)
 - HOST-URL is the URL of the hosted service.
 - JWT_TOKEN can be found in the PromptLab page. Copy it from the top right corner profile link.
 
-Everything else for creating assets and running experiments are same.
+Everything else for creating assets and running experiments are same as other examples.
