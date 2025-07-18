@@ -10,16 +10,18 @@ from promptlab.types import Dataset, PromptTemplate
 
 class ApiTracer(Tracer):
     def __init__(self, tracer_config: TracerConfig):
-        self.endpoint = tracer_config.endpoint.rstrip('/') + '/api'
+        self.endpoint = tracer_config.endpoint.rstrip("/") + "/api"
         self.jwt_token = tracer_config.jwt_token
 
-    def _make_serializable(self, experiment_config: ExperimentConfig) -> ExperimentConfig:
+    def _make_serializable(
+        self, experiment_config: ExperimentConfig
+    ) -> ExperimentConfig:
         """Make experiment config serializable by removing non-serializable objects."""
         if experiment_config.completion_model_config is not None:
             experiment_config.completion_model_config.model = None
         if experiment_config.embedding_model_config is not None:
             experiment_config.embedding_model_config.model = None
-            
+
         if experiment_config.agent_proxy is not None:
             experiment_config.agent_proxy = None
 
@@ -28,9 +30,9 @@ class ApiTracer(Tracer):
             for eval_cfg in experiment_config.evaluation:
                 if hasattr(eval_cfg, "evaluator"):
                     eval_cfg.evaluator = None
-        
+
         return experiment_config
-    
+
     def _fetch_asset(self, asset_name: str, asset_version: int) -> ORMAsset:
         """Fetch asset from API and convert to ORMAsset object."""
         headers = {}
@@ -76,9 +78,7 @@ class ApiTracer(Tracer):
             )
         else:
             version_msg = f"with version {asset_version}" if asset_version != -1 else ""
-            raise ValueError(
-                f"Asset {asset_name} {version_msg} not found.".strip()
-            )
+            raise ValueError(f"Asset {asset_name} {version_msg} not found.".strip())
 
     def create_dataset(self, dataset: Dataset):
         headers = {"Content-Type": "application/json"}
