@@ -35,7 +35,7 @@ class StudioApi:
                 "WARNING: SECRET_KEY should be at least 32 characters long for security."
             )
         self.ALGORITHM = "HS256"
-        self.ACCESS_TOKEN_EXPIRE_MINUTES = 30* 24 * 60  # 30 days in minutes
+        self.ACCESS_TOKEN_EXPIRE_MINUTES = 30 * 24 * 60  # 30 days in minutes
         self.app.add_middleware(
             CORSMiddleware,
             allow_origins=["*"],
