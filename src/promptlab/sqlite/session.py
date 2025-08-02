@@ -29,10 +29,10 @@ def _create_default_admin_user():
 
 def init_engine(db_url):
     """Initialize the database engine and session maker.
-    
+
     This function ensures that database initialization only happens once,
     even if called multiple times from different parts of the application.
-    
+
     Args:
         db_url (str): Database URL for SQLite connection
     """
@@ -61,10 +61,10 @@ def init_engine(db_url):
 
 def get_session():
     """Get a database session.
-    
+
     Returns:
         Session: SQLAlchemy session object
-        
+
     Raises:
         RuntimeError: If the database engine has not been initialized
     """
@@ -75,7 +75,7 @@ def get_session():
 
 def is_initialized():
     """Check if the database has been initialized.
-    
+
     Returns:
         bool: True if database is initialized, False otherwise
     """
@@ -84,7 +84,7 @@ def is_initialized():
 
 def reset_initialization():
     """Reset the initialization state. Used primarily for testing.
-    
+
     Warning: This should only be used in test environments.
     """
     global _engine, _SessionLocal, _db_initialized

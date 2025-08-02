@@ -69,23 +69,23 @@ def revision(db, message):
         from alembic.config import Config
         from alembic import command
         from pathlib import Path
-        
+
         # Get the project root directory
         project_root = Path(__file__).parent.parent.parent.parent
         alembic_cfg_path = project_root / "alembic.ini"
-        
+
         if not alembic_cfg_path.exists():
             click.echo("Error: Alembic configuration not found", err=True)
             return
-        
+
         # Configure Alembic
         alembic_cfg = Config(str(alembic_cfg_path))
         alembic_cfg.set_main_option("sqlalchemy.url", f"sqlite:///{db}")
-        
+
         click.echo(f"Creating migration revision: {message}")
         command.revision(alembic_cfg, message=message, autogenerate=True)
         click.echo("Migration revision created successfully!")
-        
+
     except ImportError:
         click.echo("Error: Alembic not installed", err=True)
     except Exception as e:
