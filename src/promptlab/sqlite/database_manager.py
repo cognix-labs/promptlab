@@ -91,7 +91,7 @@ class DatabaseManager:
             # Create a connection to check current revision
             engine = create_engine(self._db_url)
             
-            with engine.connect() as connection:
+            with engine.connect():
                 context = EnvironmentContext(alembic_cfg, script)
                 
                 def get_current_revision():
@@ -108,7 +108,7 @@ class DatabaseManager:
                         else:
                             logger.info("Database is up to date, no migrations needed")
                             
-                except Exception as e:
+                except Exception:
                     logger.info("No migration table found, creating initial migration state")
                     # Stamp the database with the current head revision
                     command.stamp(alembic_cfg, "head")

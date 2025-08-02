@@ -1,6 +1,5 @@
 """Alembic environment configuration for PromptLab migrations."""
 
-import logging
 from logging.config import fileConfig
 from pathlib import Path
 import sys
