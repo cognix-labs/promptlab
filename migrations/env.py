@@ -4,14 +4,14 @@ from logging.config import fileConfig
 from pathlib import Path
 import sys
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-from alembic import context
-
 # Add the src directory to the path so we can import our models
 project_root = Path(__file__).parent.parent
 src_path = project_root / "src"
 sys.path.insert(0, str(src_path))
+
+from sqlalchemy import engine_from_config
+from sqlalchemy import pool
+from alembic import context
 
 # Import your models here
 from promptlab.sqlite.models import Base
