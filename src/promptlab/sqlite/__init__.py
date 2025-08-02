@@ -5,7 +5,7 @@ from .session import get_session, init_engine, is_initialized
 
 __all__ = [
     "db_manager",
-    "get_session", 
+    "get_session",
     "init_engine",
-    "is_initialized"
+    "is_initialized",
 ]

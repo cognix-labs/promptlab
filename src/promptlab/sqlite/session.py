@@ -37,25 +37,25 @@ def init_engine(db_url):
         db_url (str): Database URL for SQLite connection
     """
     global _engine, _SessionLocal, _db_initialized
-    
+
     # Use double-checked locking pattern for thread safety
     if _db_initialized:
         return
-        
+
     with _init_lock:
         # Check again inside the lock to prevent race conditions
         if _db_initialized:
             return
-            
+
         _engine = create_engine(db_url, connect_args={"check_same_thread": False})
         _SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=_engine)
-        
+
         # Create all tables
         Base.metadata.create_all(bind=_engine)
-        
+
         # Insert default admin user if not exists
         _create_default_admin_user()
-        
+
         _db_initialized = True
 
 

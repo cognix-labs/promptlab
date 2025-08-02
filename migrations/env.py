@@ -26,13 +26,14 @@ if config.config_file_name is not None:
 # Set the target metadata for 'autogenerate' support
 target_metadata = Base.metadata
 
+
 # Other values from the config
 def get_url():
     """Get database URL from environment or config."""
     url = config.get_main_option("sqlalchemy.url")
     if url:
         return url
-    
+
     # Fallback to a default SQLite URL for offline mode
     return "sqlite:///promptlab.db"
 

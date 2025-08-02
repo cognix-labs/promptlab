@@ -39,22 +39,22 @@ class DatabaseManager:
         if is_initialized():
             logger.info("Database already initialized, skipping initialization")
             return
-            
+
         # Ensure the directory exists
         db_path = Path(db_file)
         db_path.parent.mkdir(parents=True, exist_ok=True)
-        
+
         self._db_url = f"sqlite:///{db_file}"
-        
+
         logger.info(f"Initializing database at: {db_file}")
         
         try:
             # Initialize the engine and create tables
             init_engine(self._db_url)
-            
+
             # Run migrations if Alembic is available
             self._run_migrations()
-            
+
             logger.info("Database initialized successfully")
             
         except Exception as e:
@@ -84,30 +84,30 @@ class DatabaseManager:
             # Configure Alembic
             alembic_cfg = Config(str(alembic_cfg_path))
             alembic_cfg.set_main_option("sqlalchemy.url", self._db_url)
-            
+
             # Check if we need to run migrations
             script = ScriptDirectory.from_config(alembic_cfg)
-            
+
             # Create a connection to check current revision
             engine = create_engine(self._db_url)
             
             with engine.connect():
                 context = EnvironmentContext(alembic_cfg, script)
-                
+
                 def get_current_revision():
                     return context.get_current_revision()
-                
+
                 try:
                     with context.begin_transaction():
                         current_rev = context.get_current_revision()
                         head_rev = script.get_current_head()
-                        
+
                         if current_rev != head_rev:
                             logger.info(f"Running migrations from {current_rev} to {head_rev}")
                             command.upgrade(alembic_cfg, "head")
                         else:
                             logger.info("Database is up to date, no migrations needed")
-                            
+
                 except Exception:
                     logger.info("No migration table found, creating initial migration state")
                     # Stamp the database with the current head revision
