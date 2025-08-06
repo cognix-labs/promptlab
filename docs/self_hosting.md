@@ -107,6 +107,12 @@ This is the simplest method for getting started with cloud hosting.
 
 #### Step 3: Deploy Container Instance
 
+Choose **one** of the following deployment options:
+
+##### Option A: Basic Deployment (No Persistent Storage)
+
+Use this for testing or if you don't need data persistence across container restarts:
+
 ```bash
 az container create \
   --resource-group promptlab-rg \
@@ -123,6 +129,62 @@ az container create \
   --restart-policy Always \
   --environment-variables PROMPTLAB_SECRET_KEY="your-secure-32-character-secret-key-here"
 ```
+
+##### Option B: Production Deployment with Persistent Storage
+
+By default, PromptLab's SQLite database is stored within the container. If the container is restarted or deleted, all data will be lost. To persist your data, mount an Azure file share to store the database externally.
+
+**Create Storage Resources:**
+
+1. **Create a storage account:**
+   ```bash
+   az storage account create \
+     --resource-group promptlab-rg \
+     --name yourstorageaccountname \
+     --location eastus \
+     --sku Standard_LRS
+   ```
+
+2. **Create the file share:**
+   ```bash
+   az storage share create \
+     --name promptlab-data \
+     --account-name yourstorageaccountname
+   ```
+
+3. **Get the storage access key:**
+   ```bash
+   az storage account keys list \
+     --resource-group promptlab-rg \
+     --account-name yourstorageaccountname \
+     --query "[0].value" \
+     --output tsv
+   ```
+
+**Deploy Container with Mounted Storage:**
+
+```bash
+az container create \
+  --resource-group promptlab-rg \
+  --name promptlab-aci \
+  --image yourregistryname.azurecr.io/promptlab:latest \
+  --registry-login-server yourregistryname.azurecr.io \
+  --registry-username $(az acr credential show --name yourregistryname --query username --output tsv) \
+  --registry-password $(az acr credential show --name yourregistryname --query passwords[0].value --output tsv) \
+  --dns-name-label promptlab-unique-dns \
+  --ports 8000 8001 \
+  --cpu 2 \
+  --memory 4 \
+  --os-type Linux \
+  --restart-policy Always \
+  --environment-variables PROMPTLAB_SECRET_KEY="your-secure-32-character-secret-key-here" \
+  --azure-file-volume-account-name yourstorageaccountname \
+  --azure-file-volume-account-key "your-generated-key-from-step-3" \
+  --azure-file-volume-share-name promptlab-data \
+  --azure-file-volume-mount-path /app/data
+```
+
+**Important:** Replace `yourstorageaccountname` with your actual storage account name and `your-generated-key-from-step-3` with the key obtained in step 3.
 
 #### Step 4: Access Your Application
 
