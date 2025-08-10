@@ -34,7 +34,7 @@ class Utils:
 
         dataset = []
         try:
-            with open(dataset_path, "r") as file:
+            with open(dataset_path, "r", encoding="utf-8") as file:
                 for line in file:
                     dataset.append(json.loads(line.strip()))
             logger.debug(f"Loaded {len(dataset)} records from dataset.")
