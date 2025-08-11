@@ -1005,7 +1005,7 @@
                     // Create metrics map
                     const metricResults = {};
                     evaluationData.forEach(e => {
-                        metricResults[e.metric] = e.result ? e.result.toString() : '-';
+                        metricResults[e.metric] = (e.result !== null && e.result !== undefined) ? e.result.toString() : '-';
                     });
                     
                     // Map of all possible values
