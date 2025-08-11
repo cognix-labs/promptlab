@@ -557,6 +557,7 @@
                             <th>Prompt Template Version</th>
                             <th>Dataset</th>
                             <th>Dataset Version</th>
+                            <th>Created At</th>
                             <th>System Prompt</th>
                             <th>User Prompt</th>
                             <th>User ID</th>
@@ -764,6 +765,7 @@
                 const tableBody = document.getElementById('tableBody');
                 uniqueExperiments.forEach(exp => {
                     const row = document.createElement('tr');
+                    const createdAt = exp.created_at ? new Date(exp.created_at).toLocaleString() : '-';
                     row.innerHTML = `
                         <td><input type="checkbox" class="experiment-checkbox" data-id="${exp.experiment_id}"></td>
                         <td>${exp.experiment_id}</td>
@@ -773,6 +775,7 @@
                         <td>${exp.prompt_template_version}</td>
                         <td>${exp.dataset_name}</td>
                         <td>${exp.dataset_version}</td>
+                        <td>${createdAt}</td>
                         <td>${exp.system_prompt_template.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
                         <td>${exp.user_prompt_template.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
                         <td>${exp.user_id ?? '-'}</td>
