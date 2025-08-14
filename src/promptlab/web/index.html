@@ -557,6 +557,7 @@
                             <th>Prompt Template Version</th>
                             <th>Dataset</th>
                             <th>Dataset Version</th>
+                            <th>Created At</th>
                             <th>System Prompt</th>
                             <th>User Prompt</th>
                             <th>User ID</th>
@@ -764,6 +765,7 @@
                 const tableBody = document.getElementById('tableBody');
                 uniqueExperiments.forEach(exp => {
                     const row = document.createElement('tr');
+                    const createdAt = exp.created_at ? new Date(exp.created_at).toLocaleString() : '-';
                     row.innerHTML = `
                         <td><input type="checkbox" class="experiment-checkbox" data-id="${exp.experiment_id}"></td>
                         <td>${exp.experiment_id}</td>
@@ -773,6 +775,7 @@
                         <td>${exp.prompt_template_version}</td>
                         <td>${exp.dataset_name}</td>
                         <td>${exp.dataset_version}</td>
+                        <td>${createdAt}</td>
                         <td>${exp.system_prompt_template.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
                         <td>${exp.user_prompt_template.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
                         <td>${exp.user_id ?? '-'}</td>
@@ -1005,7 +1008,7 @@
                     // Create metrics map
                     const metricResults = {};
                     evaluationData.forEach(e => {
-                        metricResults[e.metric] = e.result ? e.result.toString() : '-';
+                        metricResults[e.metric] = (e.result !== null && e.result !== undefined) ? e.result.toString() : '-';
                     });
                     
                     // Map of all possible values
@@ -1116,6 +1119,40 @@
             });
         });
 
+        // Helper function to truncate text and add 'see more...' for prompt templates
+        function getTruncatedPromptContent(text) {
+            if (!text) return '-';
+            const safeText = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            if (safeText.length <= 170) return safeText;
+            const preview = safeText.slice(0, 170);
+            return `<span class="truncated-text">${preview}</span> <a href="#" class="see-more-prompt-link">see more...</a>`;
+        }
+
+        // Function to show overlay for prompt templates (reusing the same popup infrastructure)
+        function showPromptOverlay(fullText, title) {
+            // Remove any existing popup first
+            let existingOverlay = document.getElementById('popupOverlay');
+            if (existingOverlay) {
+                existingOverlay.remove();
+            }
+            
+            // Create new popup with same ID to inherit CSS
+            const overlay = document.createElement('div');
+            overlay.id = 'popupOverlay';
+            overlay.innerHTML = `
+                <div class="popup-content">
+                    <button class="close-popup">&times;</button>
+                    <h3 style="margin-top: 0; margin-bottom: 16px; color: #2c3e50;">${title}</h3>
+                    <pre class="popup-text">${fullText}</pre>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            overlay.querySelector('.close-popup').onclick = () => overlay.style.display = 'none';
+            overlay.onclick = (e) => { if (e.target === overlay) overlay.style.display = 'none'; };
+            overlay.style.display = 'flex';
+        }
+
         async function loadPromptTemplates() {
             try {
                 const currentPort = window.location.port || '8000'; // default to 8000 if no port
@@ -1129,7 +1166,7 @@
                 const tableBody = document.getElementById('promptTemplateTableBody');
                 tableBody.innerHTML = '';
                 
-                data.prompt_templates.forEach(template => {
+                data.prompt_templates.forEach((template, index) => {
                     const row = document.createElement('tr');
                     const createdAt = new Date(template.created_at).toLocaleString();
                     const deploymentTime = template.deployment_time ? new Date(template.deployment_time).toLocaleString() : '-';
@@ -1137,19 +1174,55 @@
                     if (template.is_deployed) {
                         row.classList.add('deployed-row');
                     }
+                    
+                    const systemPromptCell = document.createElement('td');
+                    systemPromptCell.className = 'evaluation-cell';
+                    systemPromptCell.innerHTML = getTruncatedPromptContent(template.system_prompt_template);
+                    
+                    const userPromptCell = document.createElement('td');
+                    userPromptCell.className = 'evaluation-cell';
+                    userPromptCell.innerHTML = getTruncatedPromptContent(template.user_prompt_template);
+                    
                     row.innerHTML = `
                         <td>${template.asset_name}</td>
                         <td>${template.asset_description}</td>
                         <td>${template.asset_version}</td>
                         <td>${createdAt}</td>
-                        <td class="evaluation-cell">${template.system_prompt_template.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
-                        <td class="evaluation-cell">${template.user_prompt_template.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
+                    `;
+                    
+                    row.appendChild(systemPromptCell);
+                    row.appendChild(userPromptCell);
+                    
+                    row.innerHTML += `
                         <td>${deploymentTime}</td>
                         <td>${template.is_deployed ? '✓' : '✗'}</td>
                         <td>${template.user_id ?? '-'}</td>
                     `;
+                    
+                    // Store template data for see more functionality
+                    row.dataset.systemPrompt = template.system_prompt_template;
+                    row.dataset.userPrompt = template.user_prompt_template;
+                    
                     tableBody.appendChild(row);
                 });
+
+                // Add event listeners for see more links
+                tableBody.querySelectorAll('.see-more-prompt-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const tr = this.closest('tr');
+                        const cell = this.closest('td');
+                        
+                        // Determine if this is system or user prompt based on cell position
+                        const cellIndex = Array.from(tr.children).indexOf(cell);
+                        if (cellIndex === 4) { // System prompt column
+                            showPromptOverlay(tr.dataset.systemPrompt, 'System Prompt');
+                        } else if (cellIndex === 5) { // User prompt column
+                            showPromptOverlay(tr.dataset.userPrompt, 'User Prompt');
+                        }
+                    });
+                });
+                
             } catch (error) {
                 console.error('Error fetching prompt templates:', error);
             }

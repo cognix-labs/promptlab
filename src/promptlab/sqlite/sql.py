@@ -125,7 +125,8 @@ class SQLQuery:
                                     er.latency_ms as latency_ms,
                                     er.evaluation as evaluation,
                                     a.asset_binary,
-                                    u.username
+                                    u.username,
+                                    e.created_at
                                 FROM experiments e
                                 JOIN experiment_result er on
                                     e.experiment_id = er.experiment_id
