@@ -59,7 +59,7 @@ class Fluency(Evaluator):
 
 
                     # Evaluation Material
-                    RESPONSE: {{feedback}}
+                    RESPONSE: {{content}}
 
 
                     # Assessment Task
@@ -68,7 +68,7 @@ class Fluency(Evaluator):
 
         completion = data["response"]
 
-        user_prompt = user_prompt.replace("{{feedback}}", completion)
+        user_prompt = user_prompt.replace("{{content}}", completion)
 
         model_response = self.completion(system_prompt, user_prompt)
 
