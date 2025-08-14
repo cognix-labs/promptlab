@@ -557,10 +557,10 @@
                             <th>Prompt Template Version</th>
                             <th>Dataset</th>
                             <th>Dataset Version</th>
-                            <th>Created At</th>
                             <th>System Prompt</th>
                             <th>User Prompt</th>
                             <th>User ID</th>
+                            <th>Created At</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
@@ -591,12 +591,12 @@
                             <th>Name</th>
                             <th>Description</th>
                             <th>Version</th>
-                            <th>Created At</th>
                             <th>System Prompt</th>
                             <th>User Prompt</th>
                             <th>Deployment Time</th>
                             <th>Is Deployed</th>
                             <th>User ID</th>
+                            <th>Created At</th>
                         </tr>
                     </thead>
                     <tbody id="promptTemplateTableBody"></tbody>
@@ -616,9 +616,9 @@
                             <th>Name</th>
                             <th>Description</th>
                             <th>Version</th>
-                            <th>Created At</th>
                             <th>File Path</th>
                             <th>User ID</th>
+                            <th>Created At</th>
                         </tr>
                     </thead>
                     <tbody id="datasetTableBody"></tbody>
@@ -763,25 +763,75 @@
                 );
 
                 const tableBody = document.getElementById('tableBody');
-                uniqueExperiments.forEach(exp => {
-                    const row = document.createElement('tr');
-                    const createdAt = exp.created_at ? new Date(exp.created_at).toLocaleString() : '-';
-                    row.innerHTML = `
-                        <td><input type="checkbox" class="experiment-checkbox" data-id="${exp.experiment_id}"></td>
-                        <td>${exp.experiment_id}</td>
-                        <td>${exp.completion_model}</td>
-                        <td>${exp.embedding_model}</td>
-                        <td>${exp.prompt_template_name}</td>
-                        <td>${exp.prompt_template_version}</td>
-                        <td>${exp.dataset_name}</td>
-                        <td>${exp.dataset_version}</td>
-                        <td>${createdAt}</td>
-                        <td>${exp.system_prompt_template.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
-                        <td>${exp.user_prompt_template.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
-                        <td>${exp.user_id ?? '-'}</td>
-                    `;
-                    tableBody.appendChild(row);
-                });
+                    // Helper function to truncate text and add 'see more...'
+                    function getTruncatedPromptContent(text) {
+                        if (!text) return '-';
+                        const safeText = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                        if (safeText.length <= 170) return safeText;
+                        const preview = safeText.slice(0, 170);
+                        return `<span class="truncated-text">${preview}</span> <a href="#" class="see-more-exp-link">see more...</a>`;
+                    }
+
+                    uniqueExperiments.forEach(exp => {
+                        const row = document.createElement('tr');
+                        const createdAt = exp.created_at ? new Date(exp.created_at).toLocaleString() : '-';
+                        row.innerHTML = `
+                            <td><input type="checkbox" class="experiment-checkbox" data-id="${exp.experiment_id}"></td>
+                            <td>${exp.experiment_id}</td>
+                            <td>${exp.completion_model}</td>
+                            <td>${exp.embedding_model}</td>
+                            <td>${exp.prompt_template_name}</td>
+                            <td>${exp.prompt_template_version}</td>
+                            <td>${exp.dataset_name}</td>
+                            <td>${exp.dataset_version}</td>
+                            <td class="evaluation-cell">${getTruncatedPromptContent(exp.system_prompt_template)}</td>
+                            <td class="evaluation-cell">${getTruncatedPromptContent(exp.user_prompt_template)}</td>
+                            <td>${exp.user_id ?? '-'}</td>
+                            <td>${createdAt}</td>
+                        `;
+                        // Store full prompt for popup
+                        row.dataset.systemPrompt = exp.system_prompt_template;
+                        row.dataset.userPrompt = exp.user_prompt_template;
+                        tableBody.appendChild(row);
+                    });
+
+                    // Add event listeners for see more links in experimentTable
+                    tableBody.querySelectorAll('.see-more-exp-link').forEach(link => {
+                        link.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            const tr = this.closest('tr');
+                            const cell = this.closest('td');
+                            const cellIndex = Array.from(tr.children).indexOf(cell);
+                            let title = '';
+                            let fullText = '';
+                            if (cellIndex === 8) { // System Prompt column
+                                title = 'System Prompt';
+                                fullText = tr.dataset.systemPrompt;
+                            } else if (cellIndex === 9) { // User Prompt column
+                                title = 'User Prompt';
+                                fullText = tr.dataset.userPrompt;
+                            }
+                            // Remove any existing popup first
+                            let existingOverlay = document.getElementById('popupOverlay');
+                            if (existingOverlay) {
+                                existingOverlay.remove();
+                            }
+                            // Create new popup
+                            const overlay = document.createElement('div');
+                            overlay.id = 'popupOverlay';
+                            overlay.innerHTML = `
+                                <div class="popup-content">
+                                    <button class="close-popup">&times;</button>
+                                    <h3 style="margin-top: 0; margin-bottom: 16px; color: #2c3e50;">${title}</h3>
+                                    <pre class="popup-text">${fullText.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+                                </div>
+                            `;
+                            document.body.appendChild(overlay);
+                            overlay.querySelector('.close-popup').onclick = () => overlay.style.display = 'none';
+                            overlay.onclick = (ev) => { if (ev.target === overlay) overlay.style.display = 'none'; };
+                            overlay.style.display = 'flex';
+                        });
+                    });
 
                 // Handle checkbox events
                 const compareBtn = document.getElementById('compareBtn');
@@ -1187,7 +1237,6 @@
                         <td>${template.asset_name}</td>
                         <td>${template.asset_description}</td>
                         <td>${template.asset_version}</td>
-                        <td>${createdAt}</td>
                     `;
                     
                     row.appendChild(systemPromptCell);
@@ -1197,6 +1246,7 @@
                         <td>${deploymentTime}</td>
                         <td>${template.is_deployed ? '✓' : '✗'}</td>
                         <td>${template.user_id ?? '-'}</td>
+                        <td>${createdAt}</td>
                     `;
                     
                     // Store template data for see more functionality
@@ -1215,9 +1265,9 @@
                         
                         // Determine if this is system or user prompt based on cell position
                         const cellIndex = Array.from(tr.children).indexOf(cell);
-                        if (cellIndex === 4) { // System prompt column
+                        if (cellIndex === 3) { // System prompt column
                             showPromptOverlay(tr.dataset.systemPrompt, 'System Prompt');
-                        } else if (cellIndex === 5) { // User prompt column
+                        } else if (cellIndex === 4) { // User prompt column
                             showPromptOverlay(tr.dataset.userPrompt, 'User Prompt');
                         }
                     });
@@ -1248,9 +1298,9 @@
                         <td>${dataset.asset_name}</td>
                         <td>${dataset.asset_description}</td>
                         <td>${dataset.asset_version}</td>
-                        <td>${createdAt}</td>
                         <td class="evaluation-cell">${dataset.file_path}</td>
                         <td>${dataset.user_id ?? '-'}</td>
+                        <td>${createdAt}</td>
                     `;
                     tableBody.appendChild(row);
                 });
