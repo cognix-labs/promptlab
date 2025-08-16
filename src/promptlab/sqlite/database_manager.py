@@ -73,9 +73,9 @@ class DatabaseManager:
             from alembic.runtime.environment import EnvironmentContext
             from sqlalchemy import create_engine
 
-            # Get the project root directory
-            project_root = Path(__file__).parent.parent.parent.parent
-            alembic_cfg_path = project_root / "alembic.ini"
+            # Get the alembic.ini from within the package
+            package_root = Path(__file__).parent.parent
+            alembic_cfg_path = package_root / "alembic.ini"
 
             if not alembic_cfg_path.exists():
                 logger.warning("Alembic configuration not found, skipping migrations")

@@ -70,9 +70,9 @@ def revision(db, message):
         from alembic import command
         from pathlib import Path
 
-        # Get the project root directory
-        project_root = Path(__file__).parent.parent.parent.parent
-        alembic_cfg_path = project_root / "alembic.ini"
+        # Get the alembic.ini from within the package
+        package_root = Path(__file__).parent
+        alembic_cfg_path = package_root / "alembic.ini"
 
         if not alembic_cfg_path.exists():
             click.echo("Error: Alembic configuration not found", err=True)

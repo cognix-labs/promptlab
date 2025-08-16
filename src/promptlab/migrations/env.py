@@ -9,7 +9,7 @@ from sqlalchemy import pool
 from alembic import context
 
 # Add the src directory to the path so we can import our models
-project_root = Path(__file__).parent.parent
+project_root = Path(__file__).parent.parent.parent.parent
 src_path = project_root / "src"
 sys.path.insert(0, str(src_path))
 
