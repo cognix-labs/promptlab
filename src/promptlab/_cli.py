@@ -31,6 +31,5 @@ def start(db, port):
 
     click.echo(f"Running on port: {port}")
 
-
 if __name__ == "__main__":
     promptlab()

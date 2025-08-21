@@ -6,7 +6,8 @@ from sqlalchemy import text
 from sqlalchemy.orm import joinedload
 
 from promptlab.types import ExperimentConfig, TracerConfig, Dataset, PromptTemplate
-from promptlab.sqlite.session import get_session, init_engine
+# from promptlab.sqlite.session import get_session
+from promptlab.sqlite.db_manager import db_manager
 from promptlab.enums import AssetType
 from promptlab.sqlite.sql import SQLQuery
 from promptlab.tracer.tracer import Tracer
@@ -20,11 +21,10 @@ from promptlab.sqlite.models import Asset as ORMAsset
 
 class LocalTracer(Tracer):
     def __init__(self, tracer_config: TracerConfig):
-        db_url = f"sqlite:///{tracer_config.db_file}"
-        init_engine(db_url)
+        db_manager.initialize_database(tracer_config.db_file)
 
     def _create_asset(self, asset: ORMAsset):
-        session = get_session()
+        session = db_manager.get_session()
         try:
             session.add(asset)
             session.commit()
@@ -95,7 +95,7 @@ class LocalTracer(Tracer):
     def trace_experiment(
         self, experiment_config: ExperimentConfig, experiment_summary: List[Dict]
     ) -> None:
-        session = get_session()
+        session = db_manager.get_session()
         try:
             experiment_id = experiment_summary[0]["experiment_id"]
 
@@ -144,7 +144,7 @@ class LocalTracer(Tracer):
             session.close()
 
     def get_asset(self, asset_name: str, asset_version: int) -> ORMAsset:
-        session = get_session()
+        session = db_manager.get_session()
         try:
             asset = (
                 session.query(ORMAsset)
@@ -163,7 +163,7 @@ class LocalTracer(Tracer):
             session.close()
 
     def get_assets_by_type(self, asset_type: str) -> List[Any]:
-        session = get_session()
+        session = db_manager.get_session()
         try:
             if asset_type not in AssetType._value2member_map_:
                 raise ValueError(f"Invalid asset type: {asset_type}")
@@ -181,7 +181,7 @@ class LocalTracer(Tracer):
             session.close()
 
     def get_latest_asset(self, asset_name: str) -> ORMAsset:
-        session = get_session()
+        session = db_manager.get_session()
         try:
             asset = (
                 session.query(ORMAsset)
@@ -197,7 +197,7 @@ class LocalTracer(Tracer):
             session.close()
 
     def get_user_by_username(self, username: str) -> User:
-        session = get_session()
+        session = db_manager.get_session()
         try:
             user = session.query(User).filter_by(username=username).first()
             if not user:
@@ -210,7 +210,7 @@ class LocalTracer(Tracer):
             session.close()
 
     def get_experiments(self):
-        session = get_session()
+        session = db_manager.get_session()
         try:
             return (
                 session.execute(text(SQLQuery.SELECT_EXPERIMENTS_QUERY))
@@ -224,7 +224,7 @@ class LocalTracer(Tracer):
             session.close()
 
     def get_users(self):
-        session = get_session()
+        session = db_manager.get_session()
         try:
             return session.query(User).filter(User.status == 1).all()
         except Exception:
@@ -234,7 +234,7 @@ class LocalTracer(Tracer):
             session.close()
 
     def create_user(self, user: User):
-        session = get_session()
+        session = db_manager.get_session()
         try:
             session.add(user)
             session.commit()
@@ -245,7 +245,7 @@ class LocalTracer(Tracer):
             session.close()
 
     def deactivate_user_by_username(self, username: str):
-        session = get_session()
+        session = db_manager.get_session()
         try:
             user = session.query(User).filter_by(username=username).first()
             if not user:
@@ -262,7 +262,7 @@ class LocalTracer(Tracer):
         _current_username = (
             "admin"  # This should be replaced with the actual current user logic
         )
-        session = get_session()
+        session = db_manager.get_session()
         try:
             user = (
                 session.query(User).filter_by(username=_current_username).first()
