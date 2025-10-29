@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "promptlab"
-version = "0.1.10"
+version = "0.1.11"
 description = "PromptLab is a free, lightweight, open-source experimentation tool for Gen AI applications."
 readme = "README.md"
 authors = [{name = "ra1han", email = "hello@pl.com"}]
@@ -36,7 +36,7 @@ dependencies = [
     "passlib",
     "python-jose",
     "python-multipart",
-    "bcrypt",
+    "bcrypt==4.1.2",
     "uvloop>=0.17.0; sys_platform != 'win32'",
     "httptools>=0.5.0; sys_platform != 'win32'",
 ]
