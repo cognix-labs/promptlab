@@ -30,7 +30,7 @@ class Studio:
         """
 
         tprint("PromptLab")
-        print(f"\n🚀 PromptLab Studio running on: http://localhost:{port} 🚀")
+        print(f"\n🚀 PromptLab Studio läuft unter: http://localhost:{port} 🚀")
 
     def create_web_app(self):
         """Create a production-ready FastAPI app that serves both API and static files"""
@@ -61,7 +61,7 @@ class Studio:
 
         def signal_handler(signum, frame):
             self.logger.info(
-                f"Received signal {signum}, initiating graceful shutdown..."
+                f"Signal {signum} empfangen, starte geordnetes Herunterfahren..."
             )
             self.shutdown_event.set()
 
@@ -97,16 +97,16 @@ class Studio:
             server = uvicorn.Server(config)
             server_task = asyncio.create_task(server.serve())
 
-            self.logger.info(f"PromptLab Studio started at http://localhost:{port}")
+            self.logger.info(f"PromptLab Studio gestartet unter http://localhost:{port}")
 
             # Wait for shutdown signal
             await self.shutdown_event.wait()
 
             # Graceful shutdown
-            self.logger.info("Initiating graceful shutdown...")
+            self.logger.info("Starte geordnetes Herunterfahren...")
             server.should_exit = True
             await server_task
 
         except Exception as e:
-            self.logger.error(f"Error starting PromptLab Studio: {e}")
+            self.logger.error(f"Fehler beim Starten von PromptLab Studio: {e}")
             raise e

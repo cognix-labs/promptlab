@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -485,20 +485,20 @@
         <h2>PromptLab</h2>
         <form id="loginForm">
             <div>
-                <label for="username">Username</label>
+                <label for="username">Benutzername</label>
                 <input type="text" id="username" name="username" required>
             </div>
             <div>
-                <label for="password">Password</label>
+                <label for="password">Passwort</label>
                 <input type="password" id="password" name="password" required>
             </div>
-            <button type="submit">Login</button>
+            <button type="submit">Anmelden</button>
             <div id="loginError"></div>
         </form>
     </div>
     <div class="container" id="mainApp">
         <nav class="left-menu">
-            <button class="nav-toggle" title="Toggle menu">☰</button>
+            <button class="nav-toggle" title="Menü umschalten">☰</button>
             <ul>
                 <li class="active" data-content="experimentContent">
                     <div class="menu-item">
@@ -509,29 +509,29 @@
                 <li data-content="promptTemplateContent">
                     <div class="menu-item">
                         <i class="menu-icon">📝</i>
-                        <span>Prompt Template</span>
+                        <span>Prompt-Vorlage</span>
                     </div>
                 </li>
                 <li data-content="datasetContent">
                     <div class="menu-item">
                         <i class="menu-icon">📂</i>
-                        <span>Dataset</span>
+                        <span>Datensatz</span>
                     </div>
                 </li>
             </ul>
         </nav>
         
         <div id="profileMenu">
-            <div id="profileIcon" title="Profile">
+            <div id="profileIcon" title="Profil">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="white"/>
                     <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="white"/>
                 </svg>
             </div>
             <div id="profileDropdown">
-                <div class="profile-username" id="profileUsername">User</div>
-                <div class="profile-option" id="showTokenOption">Auth Token</div>
-                <div class="profile-option" id="logoutOption">Logout</div>
+                <div class="profile-username" id="profileUsername">Benutzer</div>
+                <div class="profile-option" id="showTokenOption">Auth-Token</div>
+                <div class="profile-option" id="logoutOption">Abmelden</div>
             </div>
         </div>
         
@@ -540,13 +540,13 @@
                 <h1>PromptLab</h1>
                 <div class="action-bar">
                     <div>
-                        <button id="compareBtn" disabled>Compare</button>
-                        <button id="backBtn">Back</button>
+                        <button id="compareBtn" disabled>Vergleichen</button>
+                        <button id="backBtn">Zurück</button>
                     </div>
                     <div id="filterContainer" class="filter-container">
                         <div class="column-filter">
                             <div class="column-filter-header">
-                                <span>Select columns to display</span>
+                                <span>Spalten zum Anzeigen auswählen</span>
                                 <span>▼</span>
                             </div>
                             <div class="column-filter-dropdown"></div>
@@ -557,17 +557,17 @@
                     <thead>
                         <tr>
                             <th><input type="checkbox" id="selectAll"></th>
-                            <th>Experiment ID</th>
-                            <th>Completion Model</th>
-                            <th>Embedding Model</th>
-                            <th>Prompt Template</th>
-                            <th>Prompt Template Version</th>
-                            <th>Dataset</th>
-                            <th>Dataset Version</th>
-                            <th>System Prompt</th>
-                            <th>User Prompt</th>
-                            <th>User ID</th>
-                            <th>Created At</th>
+                            <th>Experiment-ID</th>
+                            <th>Completion-Modell</th>
+                            <th>Embedding-Modell</th>
+                            <th>Prompt-Vorlage</th>
+                            <th>Prompt-Vorlagen-Version</th>
+                            <th>Datensatz</th>
+                            <th>Datensatz-Version</th>
+                            <th>System-Prompt</th>
+                            <th>Benutzer-Prompt</th>
+                            <th>Benutzer-ID</th>
+                            <th>Erstellt am</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
@@ -576,12 +576,12 @@
                 <table id="comparisonTable">
                     <thead>
                         <tr>
-                            <th>Experiment ID</th>
-                            <th>Dataset Record ID</th>
+                            <th>Experiment-ID</th>
+                            <th>Datensatz-Datensatz-ID</th>
                             <th>Completion</th>
-                            <th>Completion Tokens</th>
-                            <th>Prompt Tokens</th>
-                            <th>Latency (ms)</th>
+                            <th>Completion-Tokens</th>
+                            <th>Prompt-Tokens</th>
+                            <th>Latenz (ms)</th>
                             <th>ragas-SemanticSimilarity</th>
                             <th>ragas-RougeScore</th>
                         </tr>
@@ -591,19 +591,19 @@
             </div>
 
             <div id="promptTemplateContent">
-                <h1>Prompt Templates</h1>
+                <h1>Prompt-Vorlagen</h1>
                 <table id="promptTemplateTable">
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Description</th>
+                            <th>Beschreibung</th>
                             <th>Version</th>
-                            <th>System Prompt</th>
-                            <th>User Prompt</th>
-                            <th>Deployment Time</th>
-                            <th>Is Deployed</th>
-                            <th>User ID</th>
-                            <th>Created At</th>
+                            <th>System-Prompt</th>
+                            <th>Benutzer-Prompt</th>
+                            <th>Bereitstellungszeit</th>
+                            <th>Bereitgestellt</th>
+                            <th>Benutzer-ID</th>
+                            <th>Erstellt am</th>
                         </tr>
                     </thead>
                     <tbody id="promptTemplateTableBody"></tbody>
@@ -612,20 +612,20 @@
 
             <div id="assetContent">
                 <h1>Assets</h1>
-                <p>Asset management content will go here.</p>
+                <p>Asset-Verwaltungsinhalte werden hier angezeigt.</p>
             </div>
             
             <div id="datasetContent">
-                <h1>Datasets</h1>
+                <h1>Datensätze</h1>
                 <table id="datasetTable">
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Description</th>
+                            <th>Beschreibung</th>
                             <th>Version</th>
-                            <th>File Path</th>
-                            <th>User ID</th>
-                            <th>Created At</th>
+                            <th>Dateipfad</th>
+                            <th>Benutzer-ID</th>
+                            <th>Erstellt am</th>
                         </tr>
                     </thead>
                     <tbody id="datasetTableBody"></tbody>
@@ -638,7 +638,7 @@
     <div id="tokenModal" style="display:none;position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(44,62,80,0.7);z-index:3000;">
         <div class="modal-content" style="background:#fff;border-radius:8px;max-width:600px;width:90vw;margin:80px auto;padding:32px 24px;position:relative;box-shadow:0 4px 32px rgba(44,62,80,0.2);">
             <button id="closeTokenModal" class="close-modal" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:2rem;color:#34495e;cursor:pointer;">&times;</button>
-            <h2 style="margin-top:0;">Your Auth Token</h2>
+            <h2 style="margin-top:0;">Ihr Auth-Token</h2>
             <pre id="jwtTokenText" style="white-space:pre-wrap;word-break:break-all;background:#f5f7fa;padding:16px;border-radius:6px;font-size:0.95em;max-height:300px;overflow:auto;"></pre>
         </div>
     </div>
@@ -666,7 +666,7 @@
         function getUsername() {
             const token = localStorage.getItem('access_token');
             const payload = parseJwt(token);
-            return payload && payload.sub ? payload.sub : 'User';
+            return payload && payload.sub ? payload.sub : 'Benutzer';
         }
         function showLogin() {
             document.getElementById('loginContainer').style.display = 'block';
@@ -692,7 +692,7 @@
                     const li = document.createElement('li');
                     li.id = 'adminTab';
                     li.dataset.content = 'adminContent';
-                    li.innerHTML = `<div class="menu-item"><i class="menu-icon">🔒</i><span>Admin</span></div>`;
+                    li.innerHTML = `<div class="menu-item"><i class="menu-icon">🔒</i><span>Verwaltung</span></div>`;
                     document.querySelector('.left-menu ul').appendChild(li);
                     li.addEventListener('click', () => {
                         showTab('adminContent');
@@ -732,11 +732,11 @@
                     showApp();
                     location.reload();
                 } else {
-                    errorDiv.textContent = data.message || 'Login failed';
+                    errorDiv.textContent = data.message || 'Anmeldung fehlgeschlagen';
                     errorDiv.style.display = 'block';
                 }
             } catch (err) {
-                errorDiv.textContent = 'Login error';
+                errorDiv.textContent = 'Anmeldefehler';
                 errorDiv.style.display = 'block';
             }
         });
@@ -747,6 +747,7 @@
             showLogin();
         }
 
+        document.querySelector('.nav-toggle').setAttribute('title', 'Menü umschalten');
         document.querySelector('.nav-toggle').addEventListener('click', () => {
             document.querySelector('.container').classList.toggle('nav-collapsed');
         });
@@ -776,7 +777,7 @@
                         const safeText = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
                         if (safeText.length <= 170) return safeText;
                         const preview = safeText.slice(0, 170);
-                        return `<span class="truncated-text">${preview}</span> <a href="#" class="see-more-exp-link">see more...</a>`;
+                        return `<span class="truncated-text">${preview}</span> <a href="#" class="see-more-exp-link">mehr anzeigen...</a>`;
                     }
 
                     uniqueExperiments.forEach(exp => {
@@ -908,13 +909,13 @@
             
             // Define fixed columns
             const fixedColumns = [
-                'Experiment ID',
-                'User ID',
-                'Dataset Record ID',
+                'Experiment-ID',
+                'Benutzer-ID',
+                'Datensatz-Datensatz-ID',
                 'Completion',
-                'Completion Tokens',
-                'Prompt Tokens',
-                'Latency (ms)'
+                'Completion-Tokens',
+                'Prompt-Tokens',
+                'Latenz (ms)'
             ];
             
             // Get all unique metric names
@@ -931,7 +932,7 @@
             selectAllDiv.className = 'column-filter-option';
             selectAllDiv.innerHTML = `
                 <input type="checkbox" id="selectAllColumns" checked>
-                <label for="selectAllColumns">Select All</label>
+                <label for="selectAllColumns">Alle auswählen</label>
             `;
             columnFilterDropdown.appendChild(selectAllDiv);
             
@@ -1028,7 +1029,7 @@
                     const safeText = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
                     if (safeText.length <= 170) return safeText;
                     const preview = safeText.slice(0, 170);
-                    return `<span class="truncated-text">${preview}</span> <a href="#" class="see-more-link">see more...</a>`;
+                    return `<span class="truncated-text">${preview}</span> <a href="#" class="see-more-link">mehr anzeigen...</a>`;
                 }
 
                 // Pop-up overlay logic
@@ -1070,13 +1071,13 @@
                     
                     // Map of all possible values
                     const allValues = {
-                        'Experiment ID': exp.experiment_id,
-                        'User ID': exp.user_id ?? '-',
-                        'Dataset Record ID': exp.dataset_record_id,
+                        'Experiment-ID': exp.experiment_id,
+                        'Benutzer-ID': exp.user_id ?? '-',
+                        'Datensatz-Datensatz-ID': exp.dataset_record_id,
                         'Completion': exp.completion,
-                        'Completion Tokens': exp.completion_tokens,
-                        'Prompt Tokens': exp.prompt_tokens,
-                        'Latency (ms)': exp.latency_ms?.toFixed(2) ?? '-',
+                        'Completion-Tokens': exp.completion_tokens,
+                        'Prompt-Tokens': exp.prompt_tokens,
+                        'Latenz (ms)': exp.latency_ms?.toFixed(2) ?? '-',
                         ...metricResults
                     };
 
@@ -1182,7 +1183,7 @@
             const safeText = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
             if (safeText.length <= 170) return safeText;
             const preview = safeText.slice(0, 170);
-            return `<span class="truncated-text">${preview}</span> <a href="#" class="see-more-prompt-link">see more...</a>`;
+            return `<span class="truncated-text">${preview}</span> <a href="#" class="see-more-prompt-link">mehr anzeigen...</a>`;
         }
 
         // Function to show overlay for prompt templates (reusing the same popup infrastructure)
@@ -1273,9 +1274,9 @@
                         // Determine if this is system or user prompt based on cell position
                         const cellIndex = Array.from(tr.children).indexOf(cell);
                         if (cellIndex === 3) { // System prompt column
-                            showPromptOverlay(tr.dataset.systemPrompt, 'System Prompt');
+                            showPromptOverlay(tr.dataset.systemPrompt, 'System-Prompt');
                         } else if (cellIndex === 4) { // User prompt column
-                            showPromptOverlay(tr.dataset.userPrompt, 'User Prompt');
+                            showPromptOverlay(tr.dataset.userPrompt, 'Benutzer-Prompt');
                         }
                     });
                 });
@@ -1323,19 +1324,19 @@
             adminDiv.id = 'adminContent';
             adminDiv.style.display = 'none';
             adminDiv.innerHTML = `
-                <h1>User Management</h1>
+                <h1>Benutzerverwaltung</h1>
                 <form id="addUserForm" style="margin-bottom:20px;display:flex;gap:10px;align-items:center;">
-                    <input type="text" id="newUsername" placeholder="Username" required style="padding:6px;">
-                    <input type="password" id="newPassword" placeholder="Password" required style="padding:6px;">
+                    <input type="text" id="newUsername" placeholder="Benutzername" required style="padding:6px;">
+                    <input type="password" id="newPassword" placeholder="Passwort" required style="padding:6px;">
                     <select id="newRole" required style="padding:6px;">
-                        <option value="engineer">Engineer</option>
-                        <option value="admin">Admin</option>
+                        <option value="engineer">Ingenieur</option>
+                        <option value="admin">Administrator</option>
                     </select>
-                    <button type="submit">Add User</button>
+                    <button type="submit">Benutzer hinzufügen</button>
                     <span id="addUserError" style="color:#e74c3c;margin-left:10px;"></span>
                 </form>
                 <table id="userTable" style="width:100%;background:#fff;">
-                    <thead><tr><th>Username</th><th>Role</th><th>Created At</th><th>Action</th></tr></thead>
+                    <thead><tr><th>Benutzername</th><th>Rolle</th><th>Erstellt am</th><th>Aktion</th></tr></thead>
                     <tbody></tbody>
                 </table>
             `;
@@ -1351,20 +1352,20 @@
             tbody.innerHTML = '';
             data.users.forEach(user => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${user.username}</td><td>${user.role}</td><td>${new Date(user.created_at).toLocaleString()}</td><td><button class="removeUserBtn" data-username="${user.username}">Remove</button></td>`;
+                tr.innerHTML = `<td>${user.username}</td><td>${user.role}</td><td>${new Date(user.created_at).toLocaleString()}</td><td><button class="removeUserBtn" data-username="${user.username}">Entfernen</button></td>`;
                 tbody.appendChild(tr);
             });
             // Remove user event
             document.querySelectorAll('.removeUserBtn').forEach(btn => {
                 btn.onclick = async function() {
-                    if (!confirm('Remove user ' + this.dataset.username + '?')) return;
+                    if (!confirm('Benutzer ' + this.dataset.username + ' entfernen?')) return;
                     const currentPort = window.location.port || '8000';
                     const apiUrl = `http://${window.location.hostname}:${currentPort}/api/users/${this.dataset.username}`;
                     const token = localStorage.getItem('access_token');
                     const resp = await fetch(apiUrl, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
                     const result = await resp.json();
                     if (result.success) loadUsers();
-                    else alert(result.message || 'Failed to remove user');
+                    else alert(result.message || 'Benutzer konnte nicht entfernt werden');
                 };
             });
         }
@@ -1390,7 +1391,7 @@
                     document.getElementById('addUserForm').reset();
                     loadUsers();
                 } else {
-                    errorSpan.textContent = result.message || 'Failed to add user';
+                    errorSpan.textContent = result.message || 'Benutzer konnte nicht hinzugefügt werden';
                 }
             }
         });
@@ -1433,9 +1434,9 @@
                     </svg>
                 </div>
                 <div id="profileDropdown" style="display:none;position:absolute;right:0;top:44px;background:#fff;border-radius:8px;box-shadow:0 2px 12px rgba(44,62,80,0.12);min-width:180px;">
-                    <div class="profile-username" id="profileUsername" style="padding:12px 18px;border-bottom:1px solid #eee;font-weight:600;color:#2c3e50;background-color:#f8fafc;">User</div>
-                    <div class="profile-option" id="showTokenOption" style="padding:12px 18px;cursor:pointer;border-bottom:1px solid #eee;">Auth Token</div>
-                    <div class="profile-option" id="logoutOption" style="padding:12px 18px;cursor:pointer;">Logout</div>
+                    <div class="profile-username" id="profileUsername" style="padding:12px 18px;border-bottom:1px solid #eee;font-weight:600;color:#2c3e50;background-color:#f8fafc;">Benutzer</div>
+                    <div class="profile-option" id="showTokenOption" style="padding:12px 18px;cursor:pointer;border-bottom:1px solid #eee;">Auth-Token</div>
+                    <div class="profile-option" id="logoutOption" style="padding:12px 18px;cursor:pointer;">Abmelden</div>
                 </div>
             `;
             document.body.appendChild(profileMenu);

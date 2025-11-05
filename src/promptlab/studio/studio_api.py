@@ -28,11 +28,11 @@ class StudioApi:
         if not self.SECRET_KEY:
             self.SECRET_KEY = secrets.token_urlsafe(32)
             print(
-                "WARNING: Using auto-generated SECRET_KEY. Set PROMPTLAB_SECRET_KEY environment variable for production."
+                "WARNUNG: Verwende automatisch generiertes SECRET_KEY. Setzen Sie die Umgebungsvariable PROMPTLAB_SECRET_KEY für die Produktionsumgebung."
             )
         elif len(self.SECRET_KEY) < 32:
             print(
-                "WARNING: SECRET_KEY should be at least 32 characters long for security."
+                "WARNUNG: SECRET_KEY sollte aus Sicherheitsgründen mindestens 32 Zeichen lang sein."
             )
         self.ALGORITHM = "HS256"
         self.ACCESS_TOKEN_EXPIRE_MINUTES = 30 * 24 * 60  # 30 days in minutes
@@ -60,17 +60,17 @@ class StudioApi:
 
     def _auth_dependency(self, authorization: str = Header(None)):
         if not authorization or not authorization.startswith("Bearer "):
-            raise HTTPException(status_code=401, detail="Not authenticated")
+            raise HTTPException(status_code=401, detail="Nicht authentifiziert")
         token = authorization.split(" ", 1)[1]
         try:
             payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
             username = payload.get("sub")
             role = payload.get("role")
             if username is None or role is None:
-                raise HTTPException(status_code=401, detail="Invalid token")
+                raise HTTPException(status_code=401, detail="Ungültiger Token")
             return {"username": username, "role": role}
         except JWTError:
-            raise HTTPException(status_code=401, detail="Invalid token")
+            raise HTTPException(status_code=401, detail="Ungültiger Token")
 
     def _setup_routes(self):
         @self.api_router.get("/experiments")
@@ -162,7 +162,7 @@ class StudioApi:
                 if not asset:
                     raise HTTPException(
                         status_code=404,
-                        detail=f"Asset {asset_name} with version {asset_version} not found",
+                        detail=f"Asset {asset_name} mit Version {asset_version} nicht gefunden",
                     )
 
                 asset_data = {
@@ -212,7 +212,7 @@ class StudioApi:
                     )
                 else:
                     return JSONResponse(
-                        {"success": False, "message": "Invalid credentials"},
+                        {"success": False, "message": "Ungültige Anmeldedaten"},
                         status_code=401,
                     )
             except Exception as e:
@@ -221,7 +221,7 @@ class StudioApi:
         @self.api_router.get("/users")
         async def get_users(auth=Depends(self._auth_dependency)):
             if auth["role"] != "admin":
-                raise HTTPException(status_code=403, detail="Admin access required")
+                raise HTTPException(status_code=403, detail="Administratorzugriff erforderlich")
             try:
                 users = await asyncio.to_thread(self.tracer.get_users)
                 return {
@@ -241,7 +241,7 @@ class StudioApi:
         @self.api_router.post("/users")
         async def add_user(request: Request, auth=Depends(self._auth_dependency)):
             if auth["role"] != "admin":
-                raise HTTPException(status_code=403, detail="Admin access required")
+                raise HTTPException(status_code=403, detail="Administratorzugriff erforderlich")
 
             try:
                 data = await request.json()
@@ -250,7 +250,7 @@ class StudioApi:
                 role = data.get("role")
                 if not username or not password or role not in ("admin", "engineer"):
                     return JSONResponse(
-                        {"success": False, "message": "Invalid input"}, status_code=400
+                        {"success": False, "message": "Ungültige Eingabe"}, status_code=400
                     )
                 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
                 password_hash = pwd_context.hash(password)
@@ -265,12 +265,12 @@ class StudioApi:
         @self.api_router.delete("/users/{username}")
         async def delete_user(username: str, auth=Depends(self._auth_dependency)):
             if auth["role"] != "admin":
-                raise HTTPException(status_code=403, detail="Admin access required")
+                raise HTTPException(status_code=403, detail="Administratorzugriff erforderlich")
             try:
                 # Don't allow deleting self
                 if username == auth["username"]:
                     return JSONResponse(
-                        {"success": False, "message": "Cannot delete yourself"},
+                        {"success": False, "message": "Sie können sich nicht selbst löschen"},
                         status_code=400,
                     )
                 await asyncio.to_thread(
@@ -293,7 +293,7 @@ class StudioApi:
                     return JSONResponse(
                         {
                             "success": False,
-                            "message": "Missing experiment_config or experiment_summary data",
+                            "message": "Fehlende experiment_config oder experiment_summary Daten",
                         },
                         status_code=400,
                     )
@@ -324,7 +324,7 @@ class StudioApi:
                 return JSONResponse(
                     {
                         "success": True,
-                        "message": "Dataset created successfully",
+                        "message": "Datensatz erfolgreich erstellt",
                         "dataset": {
                             "name": created_dataset.name,
                             "version": created_dataset.version,
@@ -352,7 +352,7 @@ class StudioApi:
                 return JSONResponse(
                     {
                         "success": True,
-                        "message": "Prompt template created successfully",
+                        "message": "Prompt-Vorlage erfolgreich erstellt",
                         "template": {
                             "name": created_template.name,
                             "version": created_template.version,

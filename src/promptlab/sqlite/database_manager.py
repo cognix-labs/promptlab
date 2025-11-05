@@ -37,7 +37,7 @@ class DatabaseManager:
             db_file (str): Path to the SQLite database file
         """
         if is_initialized():
-            logger.info("Database already initialized, skipping initialization")
+            logger.info("Datenbank bereits initialisiert, überspringe Initialisierung")
             return
 
         # Ensure the directory exists
@@ -46,7 +46,7 @@ class DatabaseManager:
 
         self._db_url = f"sqlite:///{db_file}"
 
-        logger.info(f"Initializing database at: {db_file}")
+        logger.info(f"Initialisiere Datenbank unter: {db_file}")
 
         try:
             # Initialize the engine and create tables
@@ -55,10 +55,10 @@ class DatabaseManager:
             # Run migrations if Alembic is available
             self._run_migrations()
 
-            logger.info("Database initialized successfully")
+            logger.info("Datenbank erfolgreich initialisiert")
 
         except Exception as e:
-            logger.error(f"Failed to initialize database: {e}")
+            logger.error(f"Fehler beim Initialisieren der Datenbank: {e}")
             raise
 
     def _run_migrations(self) -> None:
@@ -78,7 +78,7 @@ class DatabaseManager:
             alembic_cfg_path = package_root / "alembic.ini"
 
             if not alembic_cfg_path.exists():
-                logger.warning("Alembic configuration not found, skipping migrations")
+                logger.warning("Alembic-Konfiguration nicht gefunden, überspringe Migrationen")
                 return
 
             # Configure Alembic
@@ -104,23 +104,23 @@ class DatabaseManager:
 
                         if current_rev != head_rev:
                             logger.info(
-                                f"Running migrations from {current_rev} to {head_rev}"
+                                f"Führe Migrationen von {current_rev} zu {head_rev} aus"
                             )
                             command.upgrade(alembic_cfg, "head")
                         else:
-                            logger.info("Database is up to date, no migrations needed")
+                            logger.info("Datenbank ist aktuell, keine Migrationen erforderlich")
 
                 except Exception:
                     logger.info(
-                        "No migration table found, creating initial migration state"
+                        "Keine Migrationstabelle gefunden, erstelle initialen Migrationsstatus"
                     )
                     # Stamp the database with the current head revision
                     command.stamp(alembic_cfg, "head")
 
         except ImportError:
-            logger.warning("Alembic not installed, skipping migrations")
+            logger.warning("Alembic nicht installiert, überspringe Migrationen")
         except Exception as e:
-            logger.error(f"Error running migrations: {e}")
+            logger.error(f"Fehler beim Ausführen der Migrationen: {e}")
             # Don't fail initialization if migrations fail
 
     @property

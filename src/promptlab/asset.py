@@ -43,7 +43,7 @@ class Asset:
         if not Asset.is_valid_name(asset.name):
             logger.warning(f"Invalid asset name: {asset.name}")
             raise ValueError(
-                "Name must begin with a letter and use only alphanumeric, underscore, or hyphen."
+                "Name muss mit einem Buchstaben beginnen und darf nur alphanumerische Zeichen, Unterstriche oder Bindestriche enthalten."
             )
 
         if isinstance(asset, Dataset):
@@ -53,7 +53,7 @@ class Asset:
             return self._create_prompt_template(asset)
 
         else:
-            raise TypeError(f"Unsupported asset type: {type(asset)}")
+            raise TypeError(f"Nicht unterstützter Asset-Typ: {type(asset)}")
 
     def update(self, asset: T) -> T:
         logger.info(f"Updating asset: {getattr(asset, 'name', str(asset))}")
@@ -65,7 +65,7 @@ class Asset:
             return self._update_prompt_template(asset)
 
         else:
-            raise TypeError(f"Unsupported asset type: {type(asset)}")
+            raise TypeError(f"Nicht unterstützter Asset-Typ: {type(asset)}")
 
     def _create_dataset(self, dataset: Dataset) -> Dataset:
         logger.debug(f"Creating dataset asset: {dataset.name}")
