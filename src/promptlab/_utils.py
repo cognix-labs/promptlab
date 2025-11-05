@@ -18,10 +18,10 @@ class Utils:
 
         if any(char in value for char in '<>"|?*'):
             logger.warning(f"Invalid characters in file path: {value}")
-            raise ValueError("Invalid characters in file path")
+            raise ValueError("Ungültige Zeichen im Dateipfad")
         if not value:
             logger.error("File path cannot be empty")
-            raise ValueError("File path cannot be empty")
+            raise ValueError("Dateipfad darf nicht leer sein")
         value = os.path.normpath(value.replace("\t", "\\t"))
 
         return value
@@ -39,7 +39,7 @@ class Utils:
                     dataset.append(json.loads(line.strip()))
             logger.debug(f"Loaded {len(dataset)} records from dataset.")
         except Exception as e:
-            logger.error(f"Failed to load dataset: {e}", exc_info=True)
+            logger.error(f"Fehler beim Laden des Datensatzes: {e}", exc_info=True)
             raise
 
         return dataset
@@ -57,7 +57,7 @@ class Utils:
 
         if not matches:
             logger.error("No valid prompt format found in template.")
-            raise ValueError("No valid prompt format found in template.")
+            raise ValueError("Kein gültiges Prompt-Format in der Vorlage gefunden.")
 
         system_prompt = matches[0][0].strip()
         user_prompt = matches[0][1].strip()
@@ -71,7 +71,7 @@ class Utils:
 
     @staticmethod
     def download_required_nltk_resources():
-        logger.info("Ensuring required NLTK resources are available.")
+        logger.info("Stelle sicher, dass erforderliche NLTK-Ressourcen verfügbar sind.")
         """
         Ensure all required NLTK language processing resources are available locally.
 
