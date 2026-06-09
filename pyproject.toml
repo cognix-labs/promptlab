@@ -29,7 +29,6 @@ dependencies = [
     "rouge-score>=0.1.2",
     "art>=6.5",
     "setuptools",
-    "fastapi",
     "uvicorn[standard]>=0.18.0",
     "sqlalchemy",
     "alembic>=1.8.0",
