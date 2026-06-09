@@ -13,9 +13,8 @@ def mock_model_config():
     from promptlab.types import ModelConfig
 
     return ModelConfig(
+        name="mock/model",
         type="mock",
-        completion_model_deployment="mock-model",
-        embedding_model_deployment="mock-model",
     )
 
 

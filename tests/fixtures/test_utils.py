@@ -12,7 +12,8 @@ class MockModel(Model):
         # Provide a default mock config if none is passed
         if model_config is None:
             model_config = ModelConfig(
-                type="mock", completion_model_deployment="mock-sync-async"
+                name="mock/model",
+                type="mock",
             )
         super().__init__(model_config)
         self.delay_seconds = delay_seconds
@@ -22,7 +23,7 @@ class MockModel(Model):
         """Async invocation that simulates a delay"""
         await asyncio.sleep(self.delay_seconds)  # Simulate network delay
         return ModelResponse(
-            completion=f"Async response to: {user_prompt}",
+            response=f"Async response to: {user_prompt}",
             prompt_tokens=10,
             completion_tokens=20,
             latency_ms=self.latency_ms,
@@ -32,7 +33,7 @@ class MockModel(Model):
         """Synchronous invocation"""
         time.sleep(self.delay_seconds)  # Simulate network delay
         return ModelResponse(
-            completion=f"Sync response to: {user_prompt}",
+            response=f"Sync response to: {user_prompt}",
             prompt_tokens=10,
             completion_tokens=20,
             latency_ms=self.latency_ms,

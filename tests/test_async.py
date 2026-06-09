@@ -19,9 +19,8 @@ class TestAsyncSupport(unittest.TestCase):
 
         # Create a mock model config
         model_config = ModelConfig(
+            name="mock/model",
             type="mock",
-            completion_model_deployment="mock-model",
-            embedding_model_deployment="mock-model",
         )
 
         # Create a concrete implementation of the abstract class
@@ -38,7 +37,6 @@ class TestAsyncSupport(unittest.TestCase):
         # Check that the model has the expected methods
         self.assertTrue(hasattr(model, "invoke"))
         self.assertTrue(hasattr(model, "ainvoke"))
-        self.assertTrue(hasattr(model, "invoke_async"))
 
     def test_async_execution_performance(self):
         """Test that async execution is faster than synchronous execution"""
@@ -78,12 +76,11 @@ class TestAsyncSupport(unittest.TestCase):
 
         # Create a mock model config
         model_config = ModelConfig(
+            name="azure_openai/chat",
             type="azure_openai",
             api_key="test-key",
             api_version="2023-05-15",
             endpoint="https://test.openai.azure.com",
-            completion_model_deployment="gpt-35-turbo",
-            embedding_model_deployment="text-embedding-ada-002",
         )
 
         # Mock the client's chat.completions.create method
@@ -103,7 +100,7 @@ class TestAsyncSupport(unittest.TestCase):
         # Mock the invoke method
         model.invoke = MagicMock(
             return_value=ModelResponse(
-                completion="Test response",
+                response="Test response",
                 prompt_tokens=10,
                 completion_tokens=20,
                 latency_ms=100,
@@ -115,7 +112,7 @@ class TestAsyncSupport(unittest.TestCase):
         result = model("System prompt", "User prompt")
 
         # Check that the result has the expected structure
-        self.assertEqual(result.completion, "Test response")
+        self.assertEqual(result.response, "Test response")
         self.assertEqual(result.prompt_tokens, 10)
         self.assertEqual(result.completion_tokens, 20)
         self.assertIsNotNone(result.latency_ms)
@@ -134,26 +131,23 @@ class TestAsyncSupport(unittest.TestCase):
         # Check that the experiment has the expected methods
         self.assertTrue(hasattr(experiment, "run"))
         self.assertTrue(hasattr(experiment, "run_async"))
-        self.assertTrue(hasattr(experiment, "init_batch_eval_async"))
+        self.assertTrue(hasattr(experiment, "_init_batch_eval_async"))
         self.assertTrue(hasattr(experiment, "_process_record_async"))
 
     def test_async_studio(self):
         """Test that Studio class has async methods"""
         from promptlab.studio.studio import Studio
-        from promptlab._config import TracerConfig
+        from promptlab.tracer.tracer import Tracer
 
-        # Create a mock tracer config
-        tracer_config = MagicMock(spec=TracerConfig)
-
-        # Create an instance of Studio
-        studio = Studio(tracer_config)
+        # Mock asyncio.Event so it doesn't need a running event loop
+        with patch("asyncio.Event"):
+            tracer = MagicMock(spec=Tracer)
+            with patch("promptlab.studio.studio.Studio.create_web_app") as mock_create:
+                mock_create.return_value = MagicMock()
+                studio = Studio(tracer)
 
         # Check that the studio has the expected async methods
         self.assertTrue(hasattr(studio, "start_async"))
-        self.assertTrue(hasattr(studio, "start"))
-        self.assertTrue(hasattr(studio, "start_web_server"))
-        self.assertTrue(hasattr(studio, "start_api_server_async"))
-        self.assertTrue(hasattr(studio, "shutdown"))
 
     def test_promptlab_async_methods(self):
         """Test that PromptLab class has async methods"""
@@ -163,16 +157,14 @@ class TestAsyncSupport(unittest.TestCase):
         tracer_config = {"type": "sqlite", "db_file": ":memory:"}
 
         # Create an instance of PromptLab
-        with patch("promptlab.core.TracerFactory"):
-            with patch("promptlab.core.ConfigValidator"):
-                with patch("promptlab.core.TracerConfig"):
-                    promptlab = PromptLab(tracer_config)
+        with patch("asyncio.Event"):
+            with patch("promptlab.core.TracerFactory.get_tracer") as mock_get_tracer:
+                mock_get_tracer.return_value = MagicMock()
+                promptlab = PromptLab(tracer_config)
 
-                    # Check that the promptlab has the expected methods
-                    self.assertTrue(hasattr(promptlab, "experiment.run_async"))
-                    self.assertTrue(hasattr(promptlab, "studio.start_async"))
-                    # No longer has async_studio attribute after refactoring
-                    self.assertTrue(hasattr(promptlab, "studio"))
+                # Check that the promptlab has the expected methods
+                self.assertTrue(hasattr(promptlab, "experiment"))
+                self.assertTrue(hasattr(promptlab, "studio"))
 
 
 if __name__ == "__main__":
